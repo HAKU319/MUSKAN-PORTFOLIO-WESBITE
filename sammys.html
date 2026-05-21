@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sammy's Senior Sanctuary — Non-Profit Website Redesign | Muskan KC</title>
+<meta name="description" content="Freelance website redesign for Sammy's Senior Sanctuary, a non-profit dedicated to senior dogs. Improved UX, modernised look, mission-focused storytelling.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+
+<style>
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box }
+html { scroll-behavior:smooth }
+body {
+  background-color: #3D5C2A;
+  color: #f0ede6;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 16px; line-height:1.7;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+a { color:inherit; text-decoration:none }
+em { font-style:italic; color:rgba(240,237,230,.65); font-weight:300 }
+
+.nav-back {
+  position:fixed; top:24px; left:32px; z-index:100;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:10px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.55);
+  border-bottom:1px solid rgba(240,237,230,.25);
+  padding-bottom:3px;
+  transition:color .2s, border-color .2s;
+}
+.nav-back:hover { color:rgba(240,237,230,.95); border-color:rgba(240,237,230,.7) }
+
+.nav-visit {
+  position:fixed; top:24px; right:32px; z-index:100;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:10px; font-weight:700;
+  letter-spacing:2.5px; text-transform:uppercase;
+  color:rgba(240,237,230,.85);
+  border:1.5px solid rgba(240,237,230,.3);
+  padding:10px 22px;
+  transition:all .2s;
+}
+.nav-visit:hover { border-color:rgba(240,237,230,.7); background:rgba(240,237,230,.06) }
+
+.hero {
+  min-height:90vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:120px 40px 80px; text-align:center;
+}
+.hero-eyebrow {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:6px; text-transform:uppercase;
+  color:rgba(240,237,230,.42); margin-bottom:26px;
+}
+.hero-title {
+  font-family:'Fraunces',serif;
+  font-size:clamp(48px,7.5vw,108px);
+  font-weight:800; font-style:italic;
+  color:rgba(240,237,230,.96); line-height:.97;
+  letter-spacing:-3px;
+  font-variation-settings:'opsz' 108,'WONK' 1;
+  margin:0; max-width:900px;
+}
+.hero-sub {
+  font-family:'Fraunces',serif;
+  font-size:clamp(18px,2.2vw,28px);
+  font-weight:300; font-style:italic;
+  color:rgba(240,237,230,.55);
+  margin-top:20px; max-width:680px;
+  font-variation-settings:'opsz' 28;
+}
+.hero-meta {
+  margin-top:48px;
+  display:flex; gap:48px; flex-wrap:wrap; justify-content:center;
+}
+.hero-meta > div { display:flex; flex-direction:column; gap:6px }
+.hero-meta-l {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:8px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.4);
+}
+.hero-meta-v {
+  font-family:'Fraunces',serif;
+  font-size:15px; font-weight:500;
+  color:rgba(240,237,230,.88);
+  font-variation-settings:'opsz' 15;
+}
+
+section.cs { padding:60px 40px; max-width:860px; margin:0 auto }
+.cs-eyebrow {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:5px; text-transform:uppercase;
+  color:rgba(240,237,230,.4); margin-bottom:14px;
+}
+.cs-h {
+  font-family:'Fraunces',serif;
+  font-size:clamp(28px,4vw,48px);
+  font-weight:800; font-style:italic;
+  color:rgba(240,237,230,.92);
+  line-height:1.05; letter-spacing:-1.5px;
+  margin:0 0 24px;
+  font-variation-settings:'opsz' 48,'WONK' 1;
+}
+.cs-p {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:16px; line-height:1.78;
+  color:rgba(240,237,230,.65);
+  margin:0 0 16px; max-width:680px;
+}
+.cs-pull {
+  font-family:'Fraunces',serif;
+  font-size:clamp(20px,2.4vw,28px);
+  font-weight:300; font-style:italic;
+  color:rgba(240,237,230,.78);
+  line-height:1.4; letter-spacing:-.5px;
+  margin:32px 0;
+  padding-left:24px;
+  border-left:2px solid rgba(240,237,230,.3);
+  font-variation-settings:'opsz' 28;
+}
+.cs-list {
+  list-style:none; padding-left:0;
+  margin:18px 0; max-width:680px;
+}
+.cs-list li {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:15px; line-height:1.78;
+  color:rgba(240,237,230,.6);
+  padding-left:28px; position:relative;
+  margin-bottom:10px;
+}
+.cs-list li::before {
+  content:'—'; position:absolute; left:0;
+  color:rgba(240,237,230,.35); font-weight:700;
+}
+
+.steps { display:flex; flex-direction:column; gap:32px; margin-top:32px }
+.step {
+  display:grid; grid-template-columns:60px 1fr; gap:24px;
+  padding-bottom:28px;
+  border-bottom:1px solid rgba(240,237,230,.08);
+}
+.step:last-child { border-bottom:none; padding-bottom:0 }
+.step-n {
+  font-family:'Fraunces',serif;
+  font-size:32px; font-weight:900;
+  color:rgba(240,237,230,.16);
+  line-height:1;
+  font-variation-settings:'opsz' 32;
+}
+.step-t {
+  font-family:'Fraunces',serif;
+  font-size:20px; font-weight:700; font-style:italic;
+  color:rgba(240,237,230,.9);
+  margin:0 0 10px;
+  font-variation-settings:'opsz' 20;
+}
+.step-d {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:14px; line-height:1.72;
+  color:rgba(240,237,230,.6);
+}
+
+.tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:24px }
+.tag {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase;
+  border:1px solid rgba(240,237,230,.18);
+  padding:6px 14px; color:rgba(240,237,230,.6);
+}
+
+.cta-section {
+  padding:100px 40px;
+  text-align:center;
+  border-top:1px solid rgba(240,237,230,.08);
+  margin-top:60px;
+}
+.cta-h {
+  font-family:'Fraunces',serif;
+  font-size:clamp(32px,4.5vw,56px);
+  font-weight:800; font-style:italic;
+  color:rgba(240,237,230,.94);
+  line-height:1.05; letter-spacing:-1.5px;
+  margin:0 0 30px;
+  font-variation-settings:'opsz' 56,'WONK' 1;
+}
+.cta-btn {
+  display:inline-flex; align-items:center; gap:12px;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:11px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.95);
+  border:1.5px solid rgba(240,237,230,.4);
+  padding:16px 34px;
+  transition:all .25s;
+}
+.cta-btn:hover { border-color:rgba(240,237,230,.85); background:rgba(240,237,230,.08) }
+
+footer.cs-footer {
+  padding:30px 40px; text-align:center;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.3);
+  border-top:1px solid rgba(240,237,230,.06);
+}
+
+@media (max-width:760px) {
+  .nav-back { top:18px; left:18px }
+  .nav-visit { top:18px; right:18px; padding:8px 16px; font-size:9px }
+  .hero { padding:100px 24px 60px }
+  section.cs { padding:50px 24px }
+  .hero-meta { gap:28px }
+  .step { grid-template-columns:50px 1fr; gap:16px }
+}
+
+.project-nav {
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:32px;
+  padding:48px 40px 80px;
+  max-width:1100px;
+  margin:0 auto;
+  border-top:1px solid rgba(240,237,230,.08);
+}
+.pn-link {
+  display:flex; align-items:center; gap:18px;
+  text-decoration:none;
+  transition:opacity .2s;
+}
+.pn-prev { justify-content:flex-start }
+.pn-next { justify-content:flex-end }
+.pn-link:hover { opacity:.7 }
+.pn-link:hover .pn-arrow { transform:translateX(0) }
+.pn-prev:hover .pn-arrow { transform:translateX(-6px) }
+.pn-next:hover .pn-arrow { transform:translateX(6px) }
+.pn-arrow {
+  font-family:'Fraunces',serif;
+  font-size:32px; font-weight:200;
+  color:rgba(240,237,230,.45);
+  transition:transform .25s cubic-bezier(.22,.61,.36,1);
+  font-variation-settings:'opsz' 32;
+}
+.pn-link > span:not(.pn-arrow) {
+  display:flex; flex-direction:column; gap:4px;
+}
+.pn-prev > span:not(.pn-arrow) { text-align:left }
+.pn-next > span:not(.pn-arrow) { text-align:right }
+.pn-l {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:8px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.38);
+}
+.pn-n {
+  font-family:'Fraunces',serif;
+  font-size:16px; font-weight:500;
+  font-style:italic;
+  color:rgba(240,237,230,.88);
+  font-variation-settings:'opsz' 16;
+}
+.pn-home {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.5);
+  text-decoration:none;
+  border:1px solid rgba(240,237,230,.2);
+  padding:10px 22px;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.pn-home:hover {
+  color:rgba(240,237,230,.95);
+  border-color:rgba(240,237,230,.55);
+  background:rgba(240,237,230,.04);
+}
+.pn-empty { width:1px; height:1px }
+@media (max-width:760px) {
+  .project-nav {
+    grid-template-columns:1fr;
+    gap:18px; padding:40px 24px 60px;
+    text-align:center;
+  }
+  .pn-link { justify-content:center }
+  .pn-home { order:3 }
+}
+
+</style>
+</head>
+<body>
+
+<a href="/" class="nav-back">&larr; Back to portfolio</a>
+<a href="https://medium.com/@mkc_51000/redesigning-sammys-senior-sanctuary-a-ux-ui-journey-99c0dc8f1c82" target="_blank" class="nav-visit">Full case study on Medium &#8594;</a>
+
+<section class="hero">
+  <div class="hero-eyebrow">Client &middot; Non-Profit &middot; UX/UI &middot; Web Redesign</div>
+  <h1 class="hero-title">Sammy&rsquo;s Senior<br><em>Sanctuary</em></h1>
+  <div class="hero-sub">Website redesign for a non-profit dedicated to senior dogs</div>
+  <div class="hero-meta">
+    <div><div class="hero-meta-l">Type</div><div class="hero-meta-v">Freelance Redesign</div></div>
+    <div><div class="hero-meta-l">Role</div><div class="hero-meta-v">UX/UI Designer</div></div>
+    <div><div class="hero-meta-l">Platform</div><div class="hero-meta-v">Squarespace</div></div>
+    <div><div class="hero-meta-l">Live at</div><div class="hero-meta-v">sammysseniorsanctuary.org</div></div>
+  </div>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">Background</div>
+  <h2 class="cs-h">A heartfelt cause that needed a digital home worthy of it.</h2>
+  <p class="cs-p">Sammy&rsquo;s Senior Sanctuary is a non-profit organisation dedicated to senior dogs. The redesign focused on improving user experience, modernising the look and feel, and emphasising the sanctuary&rsquo;s mission.</p>
+  <p class="cs-p">This project was a rewarding journey to create an impactful digital presence for a heartfelt cause.</p>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">Before the Redesign</div>
+  <h2 class="cs-h">Functional, but missing the heart.</h2>
+  <p class="cs-p">The original website, while functional, lacked a user-friendly interface and failed to communicate the sanctuary&rsquo;s mission effectively. The story of the dogs &mdash; the whole reason people would want to donate, volunteer, or sponsor &mdash; wasn&rsquo;t coming through.</p>
+  <div class="cs-pull">A non-profit website should make you feel something before it asks for anything.</div>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">The Redesign</div>
+  <h2 class="cs-h">Mission-first, dog-first, donor-friendly.</h2>
+  <p class="cs-p">The full case study lives on Medium &mdash; covering specific design decisions, before-and-after comparisons, and the UX/UI journey from audit to launch.</p>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">Outcome</div>
+  <h2 class="cs-h">A site that tells the story.</h2>
+  <p class="cs-p">The redesigned website is live at <a href="https://www.sammysseniorsanctuary.org/" target="_blank" style="color:rgba(240,237,230,.85);border-bottom:1px solid rgba(240,237,230,.4)">sammysseniorsanctuary.org</a> &mdash; modernised UX, a clearer donation flow, and a tone of voice that matches the warmth of the sanctuary itself.</p>
+</section>
+
+
+<!-- Project navigation -->
+<section class="project-nav">
+  <a href="freelance.html" class="pn-link pn-prev"><span class="pn-arrow">&larr;</span><span><span class="pn-l">Previous Project</span><span class="pn-n">Freelance Graphics</span></span></a>
+  <a href="/" class="pn-home">All Work</a>
+  <a href="spotify.html" class="pn-link pn-next"><span><span class="pn-l">Next Project</span><span class="pn-n">Spotify</span></span><span class="pn-arrow">&rarr;</span></a>
+</section>
+
+<section class="cta-section">
+  <h2 class="cta-h">Want to see more <em>work</em>?</h2>
+  <a href="/" class="cta-btn">Back to portfolio &#8594;</a>
+</section>
+
+<footer class="cs-footer">
+  &copy; 2026 Muskan KC &middot; Designed &amp; built in New York
+</footer>
+
+</body>
+</html>

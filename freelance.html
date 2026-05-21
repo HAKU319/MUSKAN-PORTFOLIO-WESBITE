@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Freelance Event Graphics — Muskan KC</title>
+<meta name="description" content="Freelance graphic design work — event posters, wedding stationery, restaurant branding, social media graphics, and promotional materials for small businesses.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+
+<style>
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box }
+html { scroll-behavior:smooth }
+body {
+  background-color: #7A2E1A;
+  color: #f0ede6;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 16px; line-height:1.7;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+a { color:inherit; text-decoration:none }
+em { font-style:italic; color:rgba(240,237,230,.65); font-weight:300 }
+
+.nav-back {
+  position:fixed; top:24px; left:32px; z-index:100;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:10px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.55);
+  border-bottom:1px solid rgba(240,237,230,.25);
+  padding-bottom:3px;
+  transition:color .2s, border-color .2s;
+}
+.nav-back:hover { color:rgba(240,237,230,.95); border-color:rgba(240,237,230,.7) }
+
+.nav-visit {
+  position:fixed; top:24px; right:32px; z-index:100;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:10px; font-weight:700;
+  letter-spacing:2.5px; text-transform:uppercase;
+  color:rgba(240,237,230,.85);
+  border:1.5px solid rgba(240,237,230,.3);
+  padding:10px 22px;
+  transition:all .2s;
+}
+.nav-visit:hover { border-color:rgba(240,237,230,.7); background:rgba(240,237,230,.06) }
+
+.hero {
+  min-height:90vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:120px 40px 80px; text-align:center;
+}
+.hero-eyebrow {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:6px; text-transform:uppercase;
+  color:rgba(240,237,230,.42); margin-bottom:26px;
+}
+.hero-title {
+  font-family:'Fraunces',serif;
+  font-size:clamp(48px,7.5vw,108px);
+  font-weight:800; font-style:italic;
+  color:rgba(240,237,230,.96); line-height:.97;
+  letter-spacing:-3px;
+  font-variation-settings:'opsz' 108,'WONK' 1;
+  margin:0; max-width:900px;
+}
+.hero-sub {
+  font-family:'Fraunces',serif;
+  font-size:clamp(18px,2.2vw,28px);
+  font-weight:300; font-style:italic;
+  color:rgba(240,237,230,.55);
+  margin-top:20px; max-width:680px;
+  font-variation-settings:'opsz' 28;
+}
+.hero-meta {
+  margin-top:48px;
+  display:flex; gap:48px; flex-wrap:wrap; justify-content:center;
+}
+.hero-meta > div { display:flex; flex-direction:column; gap:6px }
+.hero-meta-l {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:8px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.4);
+}
+.hero-meta-v {
+  font-family:'Fraunces',serif;
+  font-size:15px; font-weight:500;
+  color:rgba(240,237,230,.88);
+  font-variation-settings:'opsz' 15;
+}
+
+section.cs { padding:60px 40px; max-width:860px; margin:0 auto }
+.cs-eyebrow {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:5px; text-transform:uppercase;
+  color:rgba(240,237,230,.4); margin-bottom:14px;
+}
+.cs-h {
+  font-family:'Fraunces',serif;
+  font-size:clamp(28px,4vw,48px);
+  font-weight:800; font-style:italic;
+  color:rgba(240,237,230,.92);
+  line-height:1.05; letter-spacing:-1.5px;
+  margin:0 0 24px;
+  font-variation-settings:'opsz' 48,'WONK' 1;
+}
+.cs-p {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:16px; line-height:1.78;
+  color:rgba(240,237,230,.65);
+  margin:0 0 16px; max-width:680px;
+}
+.cs-pull {
+  font-family:'Fraunces',serif;
+  font-size:clamp(20px,2.4vw,28px);
+  font-weight:300; font-style:italic;
+  color:rgba(240,237,230,.78);
+  line-height:1.4; letter-spacing:-.5px;
+  margin:32px 0;
+  padding-left:24px;
+  border-left:2px solid rgba(240,237,230,.3);
+  font-variation-settings:'opsz' 28;
+}
+.cs-list {
+  list-style:none; padding-left:0;
+  margin:18px 0; max-width:680px;
+}
+.cs-list li {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:15px; line-height:1.78;
+  color:rgba(240,237,230,.6);
+  padding-left:28px; position:relative;
+  margin-bottom:10px;
+}
+.cs-list li::before {
+  content:'—'; position:absolute; left:0;
+  color:rgba(240,237,230,.35); font-weight:700;
+}
+
+.steps { display:flex; flex-direction:column; gap:32px; margin-top:32px }
+.step {
+  display:grid; grid-template-columns:60px 1fr; gap:24px;
+  padding-bottom:28px;
+  border-bottom:1px solid rgba(240,237,230,.08);
+}
+.step:last-child { border-bottom:none; padding-bottom:0 }
+.step-n {
+  font-family:'Fraunces',serif;
+  font-size:32px; font-weight:900;
+  color:rgba(240,237,230,.16);
+  line-height:1;
+  font-variation-settings:'opsz' 32;
+}
+.step-t {
+  font-family:'Fraunces',serif;
+  font-size:20px; font-weight:700; font-style:italic;
+  color:rgba(240,237,230,.9);
+  margin:0 0 10px;
+  font-variation-settings:'opsz' 20;
+}
+.step-d {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:14px; line-height:1.72;
+  color:rgba(240,237,230,.6);
+}
+
+.tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:24px }
+.tag {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase;
+  border:1px solid rgba(240,237,230,.18);
+  padding:6px 14px; color:rgba(240,237,230,.6);
+}
+
+.cta-section {
+  padding:100px 40px;
+  text-align:center;
+  border-top:1px solid rgba(240,237,230,.08);
+  margin-top:60px;
+}
+.cta-h {
+  font-family:'Fraunces',serif;
+  font-size:clamp(32px,4.5vw,56px);
+  font-weight:800; font-style:italic;
+  color:rgba(240,237,230,.94);
+  line-height:1.05; letter-spacing:-1.5px;
+  margin:0 0 30px;
+  font-variation-settings:'opsz' 56,'WONK' 1;
+}
+.cta-btn {
+  display:inline-flex; align-items:center; gap:12px;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:11px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.95);
+  border:1.5px solid rgba(240,237,230,.4);
+  padding:16px 34px;
+  transition:all .25s;
+}
+.cta-btn:hover { border-color:rgba(240,237,230,.85); background:rgba(240,237,230,.08) }
+
+footer.cs-footer {
+  padding:30px 40px; text-align:center;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.3);
+  border-top:1px solid rgba(240,237,230,.06);
+}
+
+@media (max-width:760px) {
+  .nav-back { top:18px; left:18px }
+  .nav-visit { top:18px; right:18px; padding:8px 16px; font-size:9px }
+  .hero { padding:100px 24px 60px }
+  section.cs { padding:50px 24px }
+  .hero-meta { gap:28px }
+  .step { grid-template-columns:50px 1fr; gap:16px }
+}
+
+.project-nav {
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:32px;
+  padding:48px 40px 80px;
+  max-width:1100px;
+  margin:0 auto;
+  border-top:1px solid rgba(240,237,230,.08);
+}
+.pn-link {
+  display:flex; align-items:center; gap:18px;
+  text-decoration:none;
+  transition:opacity .2s;
+}
+.pn-prev { justify-content:flex-start }
+.pn-next { justify-content:flex-end }
+.pn-link:hover { opacity:.7 }
+.pn-link:hover .pn-arrow { transform:translateX(0) }
+.pn-prev:hover .pn-arrow { transform:translateX(-6px) }
+.pn-next:hover .pn-arrow { transform:translateX(6px) }
+.pn-arrow {
+  font-family:'Fraunces',serif;
+  font-size:32px; font-weight:200;
+  color:rgba(240,237,230,.45);
+  transition:transform .25s cubic-bezier(.22,.61,.36,1);
+  font-variation-settings:'opsz' 32;
+}
+.pn-link > span:not(.pn-arrow) {
+  display:flex; flex-direction:column; gap:4px;
+}
+.pn-prev > span:not(.pn-arrow) { text-align:left }
+.pn-next > span:not(.pn-arrow) { text-align:right }
+.pn-l {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:8px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.38);
+}
+.pn-n {
+  font-family:'Fraunces',serif;
+  font-size:16px; font-weight:500;
+  font-style:italic;
+  color:rgba(240,237,230,.88);
+  font-variation-settings:'opsz' 16;
+}
+.pn-home {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.5);
+  text-decoration:none;
+  border:1px solid rgba(240,237,230,.2);
+  padding:10px 22px;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.pn-home:hover {
+  color:rgba(240,237,230,.95);
+  border-color:rgba(240,237,230,.55);
+  background:rgba(240,237,230,.04);
+}
+.pn-empty { width:1px; height:1px }
+@media (max-width:760px) {
+  .project-nav {
+    grid-template-columns:1fr;
+    gap:18px; padding:40px 24px 60px;
+    text-align:center;
+  }
+  .pn-link { justify-content:center }
+  .pn-home { order:3 }
+}
+
+</style>
+</head>
+<body>
+
+<a href="/" class="nav-back">&larr; Back to portfolio</a>
+
+
+<section class="hero">
+  <div class="hero-eyebrow">Freelance &middot; Graphic Design &middot; 2024</div>
+  <h1 class="hero-title">Freelance Event<br><em>Graphics</em></h1>
+  <div class="hero-sub">Posters, stationery, branding and social creatives for small businesses and live events</div>
+  <div class="hero-meta">
+    <div><div class="hero-meta-l">Type</div><div class="hero-meta-v">Ongoing Freelance</div></div>
+    <div><div class="hero-meta-l">Role</div><div class="hero-meta-v">Graphic Designer</div></div>
+    <div><div class="hero-meta-l">Tools</div><div class="hero-meta-v">Figma &middot; Canva &middot; Illustrator</div></div>
+    <div><div class="hero-meta-l">Year</div><div class="hero-meta-v">2023&ndash;2024</div></div>
+  </div>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">Overview</div>
+  <h2 class="cs-h">Visual work across many clients.</h2>
+  <p class="cs-p">As a freelance designer, I create engaging visual assets for small businesses, local events, and special occasions. The work spans posters, invitations, save-the-date cards, branding, and promotional graphics across print and digital.</p>
+  <p class="cs-p">Every brief is different. Some come from event organisers needing a poster in 48 hours. Others come from couples wanting wedding stationery that feels like them. Each one is a chance to read the room quickly and translate someone&rsquo;s energy into a piece of design.</p>
+  <div class="cs-pull">Freelance graphic design means reading the room quickly &mdash; understanding a client&rsquo;s audience, energy, and purpose without a long discovery process.</div>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">Project Types</div>
+  <h2 class="cs-h">What I&rsquo;ve made.</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-n">01</div>
+      <div>
+        <h3 class="step-t">Wedding stationery</h3>
+        <p class="step-d">Save-the-dates, invitations, RSVP cards, table settings. Couples come in with a feeling more than a brief &mdash; my job is to translate that feeling into a coherent visual language across every piece.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">02</div>
+      <div>
+        <h3 class="step-t">Live music &amp; event posters</h3>
+        <p class="step-d">Posters and flyers for live music nights, parties, and community events. Bold typography, strong colour, and a clear hierarchy so the date, venue, and lineup all land at a glance.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">03</div>
+      <div>
+        <h3 class="step-t">Restaurant promos</h3>
+        <p class="step-d">Menu inserts, social media graphics, seasonal promotions and grand-opening collateral for local restaurants. The work has to feel appetising &mdash; never cheap.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">04</div>
+      <div>
+        <h3 class="step-t">Caf&eacute; branding</h3>
+        <p class="step-d">Logo, menus, signage, packaging stickers. Small-scale brand identity work for independent caf&eacute;s and coffee shops.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">05</div>
+      <div>
+        <h3 class="step-t">Social media graphics</h3>
+        <p class="step-d">Templates, story sets, post series for small businesses. Designed to feel coherent across an Instagram grid without looking like every other small business out there.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">Approach</div>
+  <h2 class="cs-h">Every client is different.</h2>
+  <p class="cs-p">Freelance work has taught me to ask the right questions fast. Who&rsquo;s this for? What do you want them to feel? What absolutely cannot be missed? My illustration background helps here &mdash; I&rsquo;m always thinking about composition and feeling before I open the file.</p>
+  <p class="cs-p">Each piece gets delivered print-ready and optimised for digital &mdash; the right resolution, the right colour space, the right format for where it&rsquo;s actually going to live. Nothing kills a good design like an exported file that doesn&rsquo;t print well.</p>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">Takeaway</div>
+  <h2 class="cs-h">What freelance has taught me.</h2>
+  <p class="cs-p">The breadth of freelance work has made me faster, more flexible, and more confident reading briefs. A wedding invitation, a club poster, and a restaurant menu all teach you something different about how design lives in the world &mdash; on a fridge, on a streetlamp, on a table at dinner.</p>
+  <div class="cs-pull">Good design starts with respect for where it&rsquo;s going to live.</div>
+</section>
+
+
+<!-- Project navigation -->
+<section class="project-nav">
+  <a href="nyeeminc.html" class="pn-link pn-prev"><span class="pn-arrow">&larr;</span><span><span class="pn-l">Previous Project</span><span class="pn-n">NyeemInc</span></span></a>
+  <a href="/" class="pn-home">All Work</a>
+  <a href="sammys.html" class="pn-link pn-next"><span><span class="pn-l">Next Project</span><span class="pn-n">Sammy’s</span></span><span class="pn-arrow">&rarr;</span></a>
+</section>
+
+<section class="cta-section">
+  <h2 class="cta-h">Want to see more <em>work</em>?</h2>
+  <a href="/" class="cta-btn">Back to portfolio &#8594;</a>
+</section>
+
+<footer class="cs-footer">
+  &copy; 2026 Muskan KC &middot; Designed &amp; built in New York
+</footer>
+
+</body>
+</html>
