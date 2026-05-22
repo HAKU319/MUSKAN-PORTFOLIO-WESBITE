@@ -296,74 +296,7 @@ setTimeout(function(){ setBodyWada(0); }, 2500);
 
 
 
-/* =========================================================
-   Hero figure — purposeful animation:
-   1. Figure draws itself slowly (line art)
-   2. A guide line draws downward from it (leads eye into page)
-   3. A small accent dot lands at the line's end
-   Then it stays as a faint background mark; fades before sketchbook.
-========================================================= */
-(function(){
-  var fig  = document.getElementById('bgf-path');
-  var line = document.getElementById('bgf-line');
-  var dot  = document.getElementById('bgf-dot');
-  var layer= document.getElementById('bg-figure');
-  var flip = document.getElementById('flip-track');
-  if(!fig || !layer) return;
 
-  // set up draw lengths
-  var figLen = fig.getTotalLength();
-  fig.style.strokeDasharray = figLen;
-  fig.style.strokeDashoffset = figLen;
-  var lineLen = line ? line.getTotalLength() : 0;
-  if(line){
-    line.style.strokeDasharray = lineLen;
-    line.style.strokeDashoffset = lineLen;
-  }
-
-  // 1) figure draws slowly on load
-  setTimeout(function(){
-    fig.style.transition = 'stroke-dashoffset 3.4s cubic-bezier(.45,0,.25,1)';
-    fig.style.strokeDashoffset = '0';
-  }, 600);
-
-  // 2) guide line draws down after the figure
-  setTimeout(function(){
-    if(line){
-      line.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(.45,0,.25,1)';
-      line.style.strokeDashoffset = '0';
-    }
-  }, 3600);
-
-  // 3) accent dot appears at the end of the line
-  setTimeout(function(){
-    if(dot){
-      dot.style.transition = 'opacity .6s ease-out';
-      dot.style.opacity = '1';
-    }
-  }, 4900);
-
-  // fade the layer out as the sketchbook approaches (keeps busy sections clean)
-  var ticking = false;
-  function update(){
-    ticking = false;
-    if(!flip) return;
-    var fr = flip.getBoundingClientRect();
-    if(fr.top < window.innerHeight && fr.top > -window.innerHeight){
-      var fadeP = Math.min(Math.max(1 - (fr.top / window.innerHeight), 0), 1);
-      layer.style.opacity = String(Math.max(1 - fadeP, 0));
-    } else if(fr.top <= -window.innerHeight){
-      layer.style.opacity = '0';
-    } else {
-      layer.style.opacity = '1';
-    }
-  }
-  window.addEventListener('scroll', function(){
-    if(!ticking){ window.requestAnimationFrame(update); ticking = true; }
-  }, {passive:true});
-  window.addEventListener('resize', update);
-  update();
-})();
 
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -665,7 +598,7 @@ body.wada-1 body.wada-2 body.wada-3 body.wada-4 .h-panel::after {
 
 .h-text {
   position:relative; z-index:3;
-  padding:0 0 72px 52px; max-width:52%;
+  padding:0 0 72px 52px; max-width:48%;
 }
 .h-eyebrow {
   font-family:'Cabinet Grotesk',sans-serif; font-size:10px;
@@ -1670,13 +1603,12 @@ background:#2C4A6E;z-index:2;}
 /* ═══ Persistent background figure — draws on scroll, fades before busy sections ═══ */
 #bg-figure {
   position: fixed;
-  top: 50%;
-  /* UX: sits in the right third, optical balance against left-aligned hero text */
-  right: 11vw;
+  top: 54%;                            /* nudged down so it's not too high */
+  right: 7vw;                          /* uses the right whitespace */
   transform: translateY(-50%);
-  width: clamp(240px, 30vw, 400px);   /* a bit bigger, commands presence */
+  width: clamp(300px, 34vw, 480px);    /* bigger + wider */
   height: auto;
-  z-index: 0;
+  z-index: 0;                          /* behind text — never covers info */
   pointer-events: none;
   opacity: 1;
   transition: opacity .9s ease;
@@ -2331,6 +2263,101 @@ function doForm(e){
 
 
 
+
+/* =========================================================
+   Hero figure — outline draws on first screen, then fades
+   progressively across the next two screens. Scrolling back
+   up redraws/reveals it. Tied to scroll position so it's
+   reversible and smooth.
+========================================================= */
+(function(){
+  var fig  = document.getElementById('bgf-path');
+  var line = document.getElementById('bgf-line');
+  var dot  = document.getElementById('bgf-dot');
+  var layer= document.getElementById('bg-figure');
+  if(!fig || !layer) return;
+
+  var figLen = fig.getTotalLength();
+  fig.style.strokeDasharray = figLen;
+  fig.style.strokeDashoffset = figLen;
+  var lineLen = line ? line.getTotalLength() : 0;
+  if(line){
+    line.style.strokeDasharray = lineLen;
+    line.style.strokeDashoffset = lineLen;
+  }
+  // we drive everything by scroll, so disable CSS transitions on the path
+  fig.style.transition = 'none';
+  if(line) line.style.transition = 'none';
+  if(dot)  dot.style.transition = 'opacity .3s linear';
+
+  var vh = function(){ return window.innerHeight; };
+  var ticking = false;
+
+  function clamp(v,a,b){ return Math.min(Math.max(v,a),b); }
+  function ease(p){ return p<0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2; }
+
+  function update(){
+    ticking = false;
+    var y = window.scrollY || window.pageYOffset;
+    var H = vh();
+
+    // PHASE 1 (screen 1, y: 0 → H): outline draws in as you arrive/scroll
+    //   we also let it auto-start a bit (handled below on load)
+    // PHASE 2 (screen 2, y: H → 2H): figure begins to fade
+    // PHASE 3 (screen 3, y: 2H → 3H): figure fully fades to 0
+    // Scrolling back up reverses all of it.
+
+    // draw progress: 0 at top → 1 by end of screen 1
+    var drawP = clamp(y / (H * 0.9), 0, 1);
+    var drawE = ease(drawP);
+    fig.style.strokeDashoffset = String(figLen * (1 - drawE));
+    if(line){
+      // line draws in the last 30% of screen 1
+      var lp = clamp((drawP - 0.7) / 0.3, 0, 1);
+      line.style.strokeDashoffset = String(lineLen * (1 - lp));
+    }
+    if(dot) dot.style.opacity = String(drawP >= 0.98 ? 1 : 0);
+
+    // fade: stays full until end of screen 1, fades across screens 2–3
+    // y < H        => opacity 1
+    // H ≤ y < 3H   => opacity from 1 → 0 (slow, over two screens)
+    var fade;
+    if(y <= H){
+      fade = 1;
+    } else if(y >= H * 3){
+      fade = 0;
+    } else {
+      fade = 1 - ((y - H) / (H * 2));   // linear fade over 2 screens
+    }
+    layer.style.opacity = String(clamp(fade, 0, 1));
+  }
+
+  window.addEventListener('scroll', function(){
+    if(!ticking){ requestAnimationFrame(update); ticking = true; }
+  }, {passive:true});
+  window.addEventListener('resize', update);
+
+  // gentle auto draw-in on first load (so it animates before any scroll)
+  var t0 = null;
+  function autoIntro(ts){
+    if(t0 === null) t0 = ts;
+    var p = clamp((ts - t0) / 3200, 0, 1);   // 3.2s draw
+    // only auto-draw while user is still at the very top
+    if((window.scrollY || 0) < 8){
+      var e = ease(p);
+      fig.style.strokeDashoffset = String(figLen * (1 - e));
+      if(line){
+        var lp = clamp((p - 0.7)/0.3, 0, 1);
+        line.style.strokeDashoffset = String(lineLen * (1 - lp));
+      }
+      if(dot) dot.style.opacity = String(p >= 0.98 ? 1 : 0);
+      if(p < 1) requestAnimationFrame(autoIntro);
+    }
+  }
+  setTimeout(function(){ requestAnimationFrame(autoIntro); }, 500);
+
+  update();
+})();
 </script>
 </body>
 </html>
