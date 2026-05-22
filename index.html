@@ -292,6 +292,42 @@ setTimeout(function(){ setBodyWada(0); }, 2500);
   });
 })();
 
+
+/* =========================================================
+   HERO figure — draws itself once when hero is in view,
+   fills with the background blue, leaves a faint outline
+========================================================= */
+(function(){
+  var path = document.getElementById('hf-path');
+  if(!path) return;
+  var played = false;
+
+  function draw(){
+    if(played) return;
+    played = true;
+    var len = path.getTotalLength();
+    path.style.strokeDasharray = len;
+    path.style.strokeDashoffset = len;
+    path.getBoundingClientRect();
+    path.style.transition = 'stroke-dashoffset 3.4s cubic-bezier(.45,0,.25,1)';
+    setTimeout(function(){ path.style.strokeDashoffset = '0'; }, 200);
+    // gently fill with the bg blue — melts into the background
+    path.style.transition += ', fill-opacity 2.6s ease-in-out';
+    setTimeout(function(){ path.style.fillOpacity = '0.55'; }, 3400);
+  }
+
+  // Play once the hero is on screen (it's at top, so basically on load)
+  var hero = document.getElementById('hero');
+  if('IntersectionObserver' in window && hero){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting) draw(); });
+    }, {threshold: 0.25});
+    io.observe(hero);
+  } else {
+    setTimeout(draw, 400);
+  }
+})();
+
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
@@ -463,7 +499,7 @@ body.cd #cur-dot { background:var(--mist) }
 #intro.gone {
   pointer-events: none;
   opacity: 0;
-  transition: opacity 1.6s ease-in-out;
+  transition: opacity 1.8s ease-in-out;
 }
 
 /* Stage — figure + word stacked, perfectly centered */
@@ -474,76 +510,42 @@ body.cd #cur-dot { background:var(--mist) }
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* The SVG figure — BIG, centered, dimmed */
-#nm-figure {
-  width: clamp(240px, 36vw, 420px);
-  height: auto;
-  position: relative;
-  z-index: 1;
-  margin: 0 auto;
-}
-#nm-figure.out {
-  opacity: 0;
-  transform: scale(.97);
-  transition: opacity 1.6s ease-in-out, transform 1.6s ease-in-out;
-}
-#nm-svg {
-  width: 100%;
-  height: auto;
-  display: block;
-  overflow: visible;
+  padding: 0 16px;
+  box-sizing: border-box;
 }
 
 /* The path — dimmed/transparent rust outline that draws itself */
-#nm-path {
-  fill: #eebb92;
-  fill-opacity: 0;
-  stroke: rgba(238, 187, 146, .8);
-  stroke-width: 5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: fill-opacity 3s ease-in-out;
-}
-
 /* नमस्ते word — overlaps the figure, centered, dimmed/transparent, BIG */
 #nm-word {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(.98);
+  /* centered with flexbox parent — no absolute translate so letters never clip */
   font-family: 'Baloo 2', 'Tiro Devanagari Hindi', sans-serif;
-  font-size: clamp(80px, 13vw, 190px);   /* bigger */
+  font-size: clamp(72px, 17vw, 260px);   /* bigger, scales smoothly desktop↔mobile */
   font-weight: 600;
   font-style: normal;
-  /* outline style — transparent fill, light orange stroke */
-  color: transparent;
-  -webkit-text-stroke: 2px rgba(238, 187, 146, .45);
+  /* filled light orange that will blend away */
+  color: #eebb92;
   letter-spacing: 0;
-  line-height: 1;
+  line-height: 1.15;                      /* room for Devanagari marks ( े ्) */
+  text-align: center;
+  max-width: 94vw;
+  padding: 0 16px;
   z-index: 3;
   opacity: 0;
-  clip-path: inset(0 100% 0 0);
-  transition: clip-path 2.4s cubic-bezier(.45,0,.25,1),
-              opacity .8s ease-out,
-              transform 2.4s cubic-bezier(.45,0,.25,1);
+  transform: scale(.96);
+  transition: opacity 1.6s ease-in-out, transform 2s cubic-bezier(.45,0,.25,1);
   pointer-events: none;
+  -webkit-font-smoothing: antialiased;
 }
 #nm-word.in {
   opacity: 1;
-  clip-path: inset(0 0% 0 0);
-  transform: translate(-50%, -50%) scale(1);
+  transform: scale(1);
 }
+/* blends into the background then disappears */
 #nm-word.out {
   opacity: 0;
-  transform: translate(-50%, -50%) scale(1.03);
-  transition: opacity 1.4s ease-in-out, transform 1.4s ease-in-out;
-}
-
-/* Figure stays visible — only fades when whole intro dismisses */
-#nm-figure.dim {
-  transition: opacity 1.2s ease;
+  transform: scale(1.06);
+  filter: blur(4px);
+  transition: opacity 1.8s ease-in-out, transform 1.8s ease-in-out, filter 1.8s ease-in-out;
 }
 
 /* Legacy hidden class — clean up old letter spans */
@@ -1616,6 +1618,41 @@ background:#2C4A6E;z-index:2;}
   .fpage-face { padding: 36px 28px; }
 }
 
+
+/* ═══ HERO decorative namaste figure (right side, draws once, fades into bg) ═══ */
+#hero-figure {
+  position: absolute;
+  top: 50%;
+  right: 5vw;
+  transform: translateY(-50%);
+  width: clamp(260px, 30vw, 460px);
+  height: auto;
+  z-index: 1;            /* behind text (text is z-index 3) but it's on the empty right side */
+  pointer-events: none;
+}
+#hf-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+#hf-path {
+  /* fills with the hero blue so it melts into the background, leaving a faint ghost */
+  fill: #2C4A6E;
+  fill-opacity: 0;
+  stroke: rgba(224, 168, 120, .32);   /* faint warm outline */
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* hide on small screens so it never crowds the headline */
+@media (max-width: 860px) {
+  #hero-figure { display: none; }
+}
+
+
+
+
 </style>
 </head>
 <body>
@@ -1624,15 +1661,13 @@ background:#2C4A6E;z-index:2;}
 <!-- ═══ INTRO ═══ -->
 <div id="intro">
   <div id="nm-stage">
-    <div id="nm-figure">
-    <svg id="nm-svg" viewBox="0 0 233.208795 405.880884" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-      <g transform="translate(-132.626958,441.880884) scale(0.100000,-0.100000)">
-        <path id="nm-path" d="M2335 4408 c-167 -39 -212 -54 -304 -98 -209 -101 -362 -259 -461 -474 -138 -300 -212 -732 -239 -1401 -12 -279 -3 -366 56 -580 28 -101 87 -227 141 -297 52 -69 151 -145 234 -181 68 -30 80 -32 191 -32 64 1 117 -2 117 -5 0 -3 -31 -39 -68 -80 l-69 -74 -56 13 c-31 7 -72 9 -94 5 -59 -11 -126 -49 -152 -88 -21 -32 -23 -43 -17 -100 7 -59 6 -65 -16 -82 -45 -36 -168 -148 -168 -154 0 -4 14 -16 31 -29 35 -26 37 -26 134 58 33 28 63 51 66 51 4 0 38 -30 75 -68 41 -40 92 -79 126 -95 31 -15 59 -31 62 -35 3 -5 -31 -48 -74 -96 -44 -47 -80 -88 -80 -90 0 -3 16 -15 36 -27 l37 -22 30 34 c131 153 159 180 173 168 29 -24 12 -91 -36 -146 -17 -19 -30 -44 -30 -56 0 -36 35 -67 75 -67 58 0 81 58 51 131 -21 53 -29 149 -13 149 32 0 71 -80 83 -169 5 -42 9 -49 20 -40 21 18 17 74 -12 145 l-26 65 26 24 c50 46 61 126 26 183 -22 36 -20 44 21 82 25 22 159 186 208 253 23 32 46 55 51 52 5 -3 30 -38 57 -78 55 -83 69 -101 139 -177 51 -55 67 -89 78 -167 3 -23 17 -58 30 -78 l24 -35 -44 -67 c-70 -106 -91 -183 -51 -183 7 0 31 36 52 81 54 109 65 117 65 45 0 -37 -7 -69 -20 -93 -11 -21 -20 -45 -20 -54 0 -27 40 -69 65 -69 51 0 74 93 35 143 -14 18 -19 39 -19 76 1 28 3 51 5 51 1 0 18 -9 36 -19 18 -10 47 -22 64 -25 19 -4 54 -31 94 -71 36 -36 70 -65 77 -65 7 0 24 5 38 12 l25 11 -45 45 c-25 24 -45 50 -45 58 0 8 21 27 48 42 62 35 161 138 190 196 13 25 29 46 35 46 7 0 49 -39 94 -87 108 -115 118 -105 78 77 -58 264 -234 504 -450 612 -72 36 -144 58 -217 66 l-63 7 2 50 c1 28 10 92 19 144 16 92 17 95 68 145 28 28 75 77 104 109 l52 59 53 -56 c29 -31 60 -56 70 -56 12 0 17 -8 17 -30 0 -28 -1 -29 -25 -18 -19 8 -31 8 -50 0 -41 -19 -31 -52 20 -69 26 -8 30 -14 27 -40 -4 -34 1 -40 40 -47 40 -7 71 20 63 55 -6 26 -4 29 18 29 24 0 57 27 57 48 0 18 -39 34 -69 27 -20 -4 -30 -2 -34 8 -7 19 2 29 47 52 104 53 104 228 0 408 -38 65 -41 88 -18 167 9 33 18 115 21 205 l5 150 34 32 c38 36 42 57 17 108 -19 39 -32 43 -68 19 -30 -20 -38 -15 -66 41 -47 95 -154 187 -259 224 -19 6 -80 16 -135 22 -163 16 -263 75 -326 191 l-34 63 0 280 0 280 32 3 c117 11 385 -123 586 -293 43 -37 81 -64 84 -61 18 18 -141 192 -251 275 -106 80 -156 105 -251 131 -44 12 -111 39 -148 62 l-69 40 -121 -48 c-259 -101 -297 -120 -402 -204 -117 -94 -208 -203 -279 -333 -45 -83 -106 -222 -106 -243 0 -15 -38 -25 -46 -13 -8 13 16 126 43 197 32 86 106 232 150 295 57 81 200 224 282 279 274 187 626 217 881 75 52 -29 171 -114 215 -154 125 -113 271 -352 346 -569 55 -158 66 -211 110 -539 6 -44 9 -118 6 -165 -4 -47 -11 -269 -16 -495 -6 -225 -17 -454 -24 -508 -8 -54 -10 -100 -5 -103 4 -3 40 -8 79 -11 67 -6 71 -5 66 13 -43 146 -49 266 -42 774 9 592 -5 792 -75 1063 -44 172 -139 368 -233 479 -173 206 -501 340 -821 337 -61 -1 -129 -6 -151 -11z m113 -560 l-3 -293 -29 -59 c-61 -124 -131 -175 -298 -217 -82 -21 -122 -37 -157 -63 -52 -38 -101 -101 -101 -130 0 -15 7 -12 37 15 55 48 149 86 252 103 53 8 106 23 125 36 56 34 142 134 167 194 12 31 26 56 31 56 4 0 15 -15 24 -32 31 -61 85 -117 145 -153 67 -39 106 -50 234 -64 180 -21 313 -121 374 -282 63 -164 19 -480 -98 -714 -57 -116 -86 -158 -171 -249 -55 -58 -90 -81 -90 -58 -2 63 -36 213 -61 267 -5 11 -15 38 -23 60 -15 43 -175 393 -254 555 l-27 55 -50 0 -50 0 -33 -70 c-95 -204 -106 -216 -204 -223 -78 -6 -110 10 -202 97 -53 52 -67 61 -61 41 26 -91 107 -182 179 -201 40 -11 117 -5 149 12 32 18 30 11 -82 -261 -28 -69 -64 -155 -78 -192 -15 -38 -32 -68 -37 -68 -32 0 -152 178 -196 291 -33 82 -89 319 -90 377 0 17 -5 32 -11 32 -13 0 -7 -122 12 -246 l11 -71 -45 -42 c-113 -105 -128 -305 -27 -380 62 -46 64 -68 6 -63 -70 6 -93 -48 -30 -74 27 -12 34 -19 29 -34 -7 -23 26 -60 56 -60 39 0 59 19 59 55 0 30 3 35 23 35 29 0 47 18 47 47 0 30 -31 46 -65 33 -21 -8 -27 -7 -32 7 -4 9 -2 18 5 21 34 11 77 51 87 81 6 19 16 36 22 38 5 2 35 -26 66 -62 59 -69 59 -70 72 -215 3 -36 17 -127 32 -203 17 -85 23 -141 17 -146 -5 -5 -55 -14 -112 -20 -124 -12 -188 1 -270 55 -107 72 -208 240 -259 434 l-28 105 0 425 c0 453 4 506 51 620 26 64 30 57 38 -60 9 -158 58 -353 118 -472 22 -44 30 -47 52 -14 15 23 14 28 -13 88 -71 159 -96 293 -96 513 0 228 30 356 126 545 50 97 143 219 214 282 142 123 328 201 498 207 l28 1 -3 -292z m128 -1175 c70 -145 189 -441 181 -449 -7 -7 -35 42 -126 220 -92 180 -96 186 -122 186 -17 0 -19 8 -19 78 0 124 12 119 86 -35z m-116 48 c0 -82 -6 -101 -30 -101 -13 0 -26 -19 -46 -72 -15 -40 -37 -99 -50 -132 -32 -80 -68 -231 -60 -251 15 -40 44 25 62 140 6 39 40 142 71 218 18 42 40 48 48 15 3 -13 5 -293 3 -623 l-3 -600 -26 -50 c-15 -27 -41 -67 -58 -89 -17 -21 -31 -42 -31 -46 0 -5 -58 -67 -128 -139 -90 -92 -135 -131 -151 -131 -35 0 -126 49 -164 89 -63 66 -66 60 117 247 91 93 166 176 166 185 0 9 -18 112 -40 229 -43 230 -48 301 -25 397 13 57 87 244 105 268 4 6 13 26 18 45 10 34 65 166 102 245 26 57 70 162 70 168 0 21 22 57 35 57 12 0 15 -14 15 -69z m78 -173 c5 -7 29 -50 53 -95 88 -167 99 -186 131 -241 81 -141 101 -209 100 -327 -1 -49 -7 -115 -13 -145 -7 -30 -12 -120 -13 -200 -1 -132 1 -149 21 -187 21 -39 78 -93 99 -93 5 0 38 -21 74 -46 36 -25 88 -60 116 -79 61 -40 66 -51 52 -102 -16 -61 -70 -118 -149 -157 -71 -35 -72 -36 -103 -18 -60 34 -273 260 -321 342 -94 161 -90 126 -92 708 -2 350 1 512 8 512 14 0 57 -100 75 -176 20 -89 32 -116 45 -108 14 8 6 128 -10 148 -16 18 -101 237 -101 259 0 20 13 22 28 5z m-694 -323 c20 -50 36 -106 36 -125 0 -47 -47 -100 -87 -100 -115 2 -134 229 -26 308 15 11 31 18 34 14 3 -4 23 -48 43 -97z m1464 35 c14 -38 26 -99 29 -146 l6 -80 -32 -27 c-18 -15 -39 -27 -47 -27 -24 0 -67 26 -98 59 l-30 31 46 92 c26 51 52 110 59 131 19 54 40 44 67 -33z m-1580 -389 c-2 -9 -11 -17 -21 -19 -21 -4 -35 27 -17 38 19 12 42 0 38 -19z m140 2 c2 -7 -4 -16 -12 -19 -19 -7 -49 14 -40 28 8 13 46 6 52 -9z m1479 -9 c8 -21 -13 -42 -28 -27 -13 13 -5 43 11 43 6 0 13 -7 17 -16z m-139 -11 c-4 -21 -36 -29 -51 -14 -9 9 -8 14 3 21 25 16 52 12 48 -7z m-1410 -56 c4 -20 -25 -34 -40 -19 -15 15 -1 44 19 40 10 -2 19 -11 21 -21z m1472 -28 c0 -12 -7 -19 -19 -19 -27 0 -34 15 -15 34 19 19 34 12 34 -15z m-298 -300 c136 -28 293 -149 394 -303 26 -39 56 -83 66 -98 10 -15 24 -44 32 -65 51 -136 63 -174 56 -178 -17 -11 -130 133 -130 166 0 9 -17 43 -39 76 -46 71 -92 98 -151 88 -38 -6 -44 -3 -142 72 -57 43 -123 91 -146 107 -40 27 -72 70 -72 96 0 17 39 50 60 50 10 0 43 -5 72 -11z m-1180 -346 c-8 -102 80 -233 199 -294 38 -19 53 -21 121 -16 76 6 78 6 78 -16 0 -29 -33 -83 -61 -97 -13 -7 -49 -11 -88 -8 -172 9 -358 180 -369 339 -5 69 12 103 61 125 51 22 63 15 59 -33z m1466 -67 c5 -54 -24 -141 -60 -181 -41 -47 -29 -56 19 -15 49 42 68 72 83 126 14 48 24 54 40 25 16 -31 12 -96 -10 -158 -43 -123 -164 -212 -290 -213 -47 0 -74 5 -97 20 -35 21 -96 98 -88 110 3 4 25 11 50 14 136 21 278 144 316 274 15 51 33 50 37 -2z"/>
-      </g>
-    </svg>
+    <div id="nm-word">
+      <svg id="nmt-svg" viewBox="0 0 935.000000 364.926733" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <path id="nmt-path" d="M8400 4244 c-89 -16 -228 -55 -248 -69 -4 -4 129 -398 138 -408 4 -5 43 1 86 11 110 28 179 33 254 21 128 -20 205 -85 284 -238 38 -73 146 -364 146 -392 0 -5 -1851 -9 -4230 -9 l-4230 0 0 -220 0 -220 808 -2 807 -3 3 -272 2 -273 -634 0 c-663 0 -707 -2 -768 -44 -67 -45 -108 -172 -88 -276 35 -187 263 -430 469 -501 60 -21 164 -25 224 -8 48 13 102 60 130 113 17 33 22 63 25 158 l4 118 319 0 319 0 0 -530 0 -530 265 0 265 0 0 1025 0 1025 385 0 385 0 -2 -362 -3 -363 -85 -6 c-143 -10 -206 -61 -230 -187 -34 -183 158 -460 406 -584 101 -50 180 -59 269 -33 118 34 175 127 175 287 l0 78 375 0 375 0 0 -440 0 -440 265 0 265 0 2 1023 3 1022 566 3 567 2 6 -23 c16 -65 24 -203 16 -280 -10 -97 -24 -154 -52 -213 l-20 -43 -61 40 c-82 53 -153 73 -257 73 -152 0 -230 -45 -286 -168 -46 -102 -32 -239 38 -366 73 -133 266 -357 562 -654 213 -212 491 -476 504 -476 4 0 83 76 175 168 l168 169 -167 143 c-176 151 -450 413 -535 511 l-50 58 40 20 39 20 137 -45 c215 -70 327 -87 603 -88 228 -1 232 -1 232 -22 0 -50 44 -187 90 -279 75 -152 183 -286 392 -490 l183 -178 172 178 c95 97 173 180 173 184 -1 3 -31 29 -68 56 -96 72 -288 261 -331 325 -62 93 -76 135 -76 230 0 72 4 92 25 130 76 134 225 169 723 170 l197 0 0 -600 0 -600 270 0 270 0 0 1025 0 1025 185 0 185 0 0 220 0 220 -204 0 -204 0 -52 163 c-159 496 -322 750 -551 857 -111 51 -169 62 -349 65 -91 2 -176 1 -190 -1z m-3602 -1886 l-3 -363 -370 0 -370 0 -3 350 c-1 192 0 356 3 362 3 10 87 13 375 13 l370 0 -2 -362z m4242 158 l0 -203 -372 -6 c-205 -3 -413 -11 -463 -17 -196 -26 -353 -92 -462 -193 -59 -56 -66 -59 -142 -72 -167 -30 -460 -29 -628 1 l-31 6 24 51 c68 151 83 381 38 605 l-6 32 1021 0 1021 0 0 -204z"/>
+      </svg>
     </div>
-    <div id="nm-word">नमस्ते</div>
   </div>
+</div>
 </div>
 
 <!-- Cursor -->
@@ -1677,6 +1712,14 @@ background:#2C4A6E;z-index:2;}
     </div>
     <div class="h-sub">Muskan KC &nbsp;·&nbsp; Available for freelance</div>
     <a href="#flip-track" class="h-cta">View work →</a>
+  </div>
+
+  <div id="hero-figure">
+    <svg id="hf-svg" viewBox="0 0 233.208795 405.880884" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+      <g transform="translate(-132.626958,441.880884) scale(0.100000,-0.100000)">
+        <path id="hf-path" d="M2335 4408 c-167 -39 -212 -54 -304 -98 -209 -101 -362 -259 -461 -474 -138 -300 -212 -732 -239 -1401 -12 -279 -3 -366 56 -580 28 -101 87 -227 141 -297 52 -69 151 -145 234 -181 68 -30 80 -32 191 -32 64 1 117 -2 117 -5 0 -3 -31 -39 -68 -80 l-69 -74 -56 13 c-31 7 -72 9 -94 5 -59 -11 -126 -49 -152 -88 -21 -32 -23 -43 -17 -100 7 -59 6 -65 -16 -82 -45 -36 -168 -148 -168 -154 0 -4 14 -16 31 -29 35 -26 37 -26 134 58 33 28 63 51 66 51 4 0 38 -30 75 -68 41 -40 92 -79 126 -95 31 -15 59 -31 62 -35 3 -5 -31 -48 -74 -96 -44 -47 -80 -88 -80 -90 0 -3 16 -15 36 -27 l37 -22 30 34 c131 153 159 180 173 168 29 -24 12 -91 -36 -146 -17 -19 -30 -44 -30 -56 0 -36 35 -67 75 -67 58 0 81 58 51 131 -21 53 -29 149 -13 149 32 0 71 -80 83 -169 5 -42 9 -49 20 -40 21 18 17 74 -12 145 l-26 65 26 24 c50 46 61 126 26 183 -22 36 -20 44 21 82 25 22 159 186 208 253 23 32 46 55 51 52 5 -3 30 -38 57 -78 55 -83 69 -101 139 -177 51 -55 67 -89 78 -167 3 -23 17 -58 30 -78 l24 -35 -44 -67 c-70 -106 -91 -183 -51 -183 7 0 31 36 52 81 54 109 65 117 65 45 0 -37 -7 -69 -20 -93 -11 -21 -20 -45 -20 -54 0 -27 40 -69 65 -69 51 0 74 93 35 143 -14 18 -19 39 -19 76 1 28 3 51 5 51 1 0 18 -9 36 -19 18 -10 47 -22 64 -25 19 -4 54 -31 94 -71 36 -36 70 -65 77 -65 7 0 24 5 38 12 l25 11 -45 45 c-25 24 -45 50 -45 58 0 8 21 27 48 42 62 35 161 138 190 196 13 25 29 46 35 46 7 0 49 -39 94 -87 108 -115 118 -105 78 77 -58 264 -234 504 -450 612 -72 36 -144 58 -217 66 l-63 7 2 50 c1 28 10 92 19 144 16 92 17 95 68 145 28 28 75 77 104 109 l52 59 53 -56 c29 -31 60 -56 70 -56 12 0 17 -8 17 -30 0 -28 -1 -29 -25 -18 -19 8 -31 8 -50 0 -41 -19 -31 -52 20 -69 26 -8 30 -14 27 -40 -4 -34 1 -40 40 -47 40 -7 71 20 63 55 -6 26 -4 29 18 29 24 0 57 27 57 48 0 18 -39 34 -69 27 -20 -4 -30 -2 -34 8 -7 19 2 29 47 52 104 53 104 228 0 408 -38 65 -41 88 -18 167 9 33 18 115 21 205 l5 150 34 32 c38 36 42 57 17 108 -19 39 -32 43 -68 19 -30 -20 -38 -15 -66 41 -47 95 -154 187 -259 224 -19 6 -80 16 -135 22 -163 16 -263 75 -326 191 l-34 63 0 280 0 280 32 3 c117 11 385 -123 586 -293 43 -37 81 -64 84 -61 18 18 -141 192 -251 275 -106 80 -156 105 -251 131 -44 12 -111 39 -148 62 l-69 40 -121 -48 c-259 -101 -297 -120 -402 -204 -117 -94 -208 -203 -279 -333 -45 -83 -106 -222 -106 -243 0 -15 -38 -25 -46 -13 -8 13 16 126 43 197 32 86 106 232 150 295 57 81 200 224 282 279 274 187 626 217 881 75 52 -29 171 -114 215 -154 125 -113 271 -352 346 -569 55 -158 66 -211 110 -539 6 -44 9 -118 6 -165 -4 -47 -11 -269 -16 -495 -6 -225 -17 -454 -24 -508 -8 -54 -10 -100 -5 -103 4 -3 40 -8 79 -11 67 -6 71 -5 66 13 -43 146 -49 266 -42 774 9 592 -5 792 -75 1063 -44 172 -139 368 -233 479 -173 206 -501 340 -821 337 -61 -1 -129 -6 -151 -11z m113 -560 l-3 -293 -29 -59 c-61 -124 -131 -175 -298 -217 -82 -21 -122 -37 -157 -63 -52 -38 -101 -101 -101 -130 0 -15 7 -12 37 15 55 48 149 86 252 103 53 8 106 23 125 36 56 34 142 134 167 194 12 31 26 56 31 56 4 0 15 -15 24 -32 31 -61 85 -117 145 -153 67 -39 106 -50 234 -64 180 -21 313 -121 374 -282 63 -164 19 -480 -98 -714 -57 -116 -86 -158 -171 -249 -55 -58 -90 -81 -90 -58 -2 63 -36 213 -61 267 -5 11 -15 38 -23 60 -15 43 -175 393 -254 555 l-27 55 -50 0 -50 0 -33 -70 c-95 -204 -106 -216 -204 -223 -78 -6 -110 10 -202 97 -53 52 -67 61 -61 41 26 -91 107 -182 179 -201 40 -11 117 -5 149 12 32 18 30 11 -82 -261 -28 -69 -64 -155 -78 -192 -15 -38 -32 -68 -37 -68 -32 0 -152 178 -196 291 -33 82 -89 319 -90 377 0 17 -5 32 -11 32 -13 0 -7 -122 12 -246 l11 -71 -45 -42 c-113 -105 -128 -305 -27 -380 62 -46 64 -68 6 -63 -70 6 -93 -48 -30 -74 27 -12 34 -19 29 -34 -7 -23 26 -60 56 -60 39 0 59 19 59 55 0 30 3 35 23 35 29 0 47 18 47 47 0 30 -31 46 -65 33 -21 -8 -27 -7 -32 7 -4 9 -2 18 5 21 34 11 77 51 87 81 6 19 16 36 22 38 5 2 35 -26 66 -62 59 -69 59 -70 72 -215 3 -36 17 -127 32 -203 17 -85 23 -141 17 -146 -5 -5 -55 -14 -112 -20 -124 -12 -188 1 -270 55 -107 72 -208 240 -259 434 l-28 105 0 425 c0 453 4 506 51 620 26 64 30 57 38 -60 9 -158 58 -353 118 -472 22 -44 30 -47 52 -14 15 23 14 28 -13 88 -71 159 -96 293 -96 513 0 228 30 356 126 545 50 97 143 219 214 282 142 123 328 201 498 207 l28 1 -3 -292z m128 -1175 c70 -145 189 -441 181 -449 -7 -7 -35 42 -126 220 -92 180 -96 186 -122 186 -17 0 -19 8 -19 78 0 124 12 119 86 -35z m-116 48 c0 -82 -6 -101 -30 -101 -13 0 -26 -19 -46 -72 -15 -40 -37 -99 -50 -132 -32 -80 -68 -231 -60 -251 15 -40 44 25 62 140 6 39 40 142 71 218 18 42 40 48 48 15 3 -13 5 -293 3 -623 l-3 -600 -26 -50 c-15 -27 -41 -67 -58 -89 -17 -21 -31 -42 -31 -46 0 -5 -58 -67 -128 -139 -90 -92 -135 -131 -151 -131 -35 0 -126 49 -164 89 -63 66 -66 60 117 247 91 93 166 176 166 185 0 9 -18 112 -40 229 -43 230 -48 301 -25 397 13 57 87 244 105 268 4 6 13 26 18 45 10 34 65 166 102 245 26 57 70 162 70 168 0 21 22 57 35 57 12 0 15 -14 15 -69z m78 -173 c5 -7 29 -50 53 -95 88 -167 99 -186 131 -241 81 -141 101 -209 100 -327 -1 -49 -7 -115 -13 -145 -7 -30 -12 -120 -13 -200 -1 -132 1 -149 21 -187 21 -39 78 -93 99 -93 5 0 38 -21 74 -46 36 -25 88 -60 116 -79 61 -40 66 -51 52 -102 -16 -61 -70 -118 -149 -157 -71 -35 -72 -36 -103 -18 -60 34 -273 260 -321 342 -94 161 -90 126 -92 708 -2 350 1 512 8 512 14 0 57 -100 75 -176 20 -89 32 -116 45 -108 14 8 6 128 -10 148 -16 18 -101 237 -101 259 0 20 13 22 28 5z m-694 -323 c20 -50 36 -106 36 -125 0 -47 -47 -100 -87 -100 -115 2 -134 229 -26 308 15 11 31 18 34 14 3 -4 23 -48 43 -97z m1464 35 c14 -38 26 -99 29 -146 l6 -80 -32 -27 c-18 -15 -39 -27 -47 -27 -24 0 -67 26 -98 59 l-30 31 46 92 c26 51 52 110 59 131 19 54 40 44 67 -33z m-1580 -389 c-2 -9 -11 -17 -21 -19 -21 -4 -35 27 -17 38 19 12 42 0 38 -19z m140 2 c2 -7 -4 -16 -12 -19 -19 -7 -49 14 -40 28 8 13 46 6 52 -9z m1479 -9 c8 -21 -13 -42 -28 -27 -13 13 -5 43 11 43 6 0 13 -7 17 -16z m-139 -11 c-4 -21 -36 -29 -51 -14 -9 9 -8 14 3 21 25 16 52 12 48 -7z m-1410 -56 c4 -20 -25 -34 -40 -19 -15 15 -1 44 19 40 10 -2 19 -11 21 -21z m1472 -28 c0 -12 -7 -19 -19 -19 -27 0 -34 15 -15 34 19 19 34 12 34 -15z m-298 -300 c136 -28 293 -149 394 -303 26 -39 56 -83 66 -98 10 -15 24 -44 32 -65 51 -136 63 -174 56 -178 -17 -11 -130 133 -130 166 0 9 -17 43 -39 76 -46 71 -92 98 -151 88 -38 -6 -44 -3 -142 72 -57 43 -123 91 -146 107 -40 27 -72 70 -72 96 0 17 39 50 60 50 10 0 43 -5 72 -11z m-1180 -346 c-8 -102 80 -233 199 -294 38 -19 53 -21 121 -16 76 6 78 6 78 -16 0 -29 -33 -83 -61 -97 -13 -7 -49 -11 -88 -8 -172 9 -358 180 -369 339 -5 69 12 103 61 125 51 22 63 15 59 -33z m1466 -67 c5 -54 -24 -141 -60 -181 -41 -47 -29 -56 19 -15 49 42 68 72 83 126 14 48 24 54 40 25 16 -31 12 -96 -10 -158 -43 -123 -164 -212 -290 -213 -47 0 -74 5 -97 20 -35 21 -96 98 -88 110 3 4 25 11 50 14 136 21 278 144 316 274 15 51 33 50 37 -2z"/>
+      </g>
+    </svg>
   </div>
   <div class="h-scroll"><div class="hs-l"></div><div class="hs-t">Scroll</div></div>
 </section>
@@ -2039,61 +2082,49 @@ background:#2C4A6E;z-index:2;}
 
 <script>
 /* =========================================================
-   INTRO — slow, gentle:
-   1. Figure outline draws slowly
-   2. Outline fills with light orange (slow)
-   3. Figure fades out gently
-   4. नमस्ते outline draws in slowly (light orange)
-   5. नमस्ते fades, intro fades naturally into the site
+   INTRO — नमस्ते draws as outline, fills with bg blue, fades
+   (smooth high-end sequence)
 ========================================================= */
 (function(){
-  var intro  = document.getElementById('intro');
-  var path   = document.getElementById('nm-path');
-  var figure = document.getElementById('nm-figure');
-  var word   = document.getElementById('nm-word');
+  var intro = document.getElementById('intro');
+  var word  = document.getElementById('nm-word');
+  var path  = document.getElementById('nmt-path');
   var introDone = false;
 
-  // 1) Draw the outline slowly
+  // 1) Draw the outline stroke-by-stroke
   if(path){
     var len = path.getTotalLength();
     path.style.strokeDasharray = len;
     path.style.strokeDashoffset = len;
     path.getBoundingClientRect();
-    path.style.transition = 'stroke-dashoffset 3.6s cubic-bezier(.45,0,.25,1)';
+    path.style.transition = 'stroke-dashoffset 3.4s cubic-bezier(.45,0,.25,1)';
     setTimeout(function(){ path.style.strokeDashoffset = '0'; }, 400);
-    // 2) gentle slow fill after the outline is drawn
-    setTimeout(function(){ path.style.fillOpacity = '0.85'; }, 4200);
+    // 2) fill with the background blue — letters melt into the bg
+    setTimeout(function(){ path.style.fillOpacity = '1'; }, 3600);
   }
 
-  // 3) figure fades out gently
-  setTimeout(function(){ if(figure) figure.classList.add('out'); }, 7600);
-
-  // 4) नमस्ते outline draws in slowly
-  setTimeout(function(){ if(word) word.classList.add('in'); }, 8400);
-
-  // 5) dismiss — natural fade into the site
+  // 3) slowly fade the whole thing away → reveal site
   function dismissIntro(){
     if(introDone) return;
     introDone = true;
-    if(word){ word.classList.remove('in'); word.classList.add('out'); }
-    if(figure){ figure.classList.add('out'); }
-    setTimeout(function(){ if(intro) intro.classList.add('gone'); }, 600);
+    if(word){ word.classList.add('out'); }
+    setTimeout(function(){ if(intro) intro.classList.add('gone'); }, 900);
     setTimeout(function(){
       if(intro) intro.style.display = 'none';
       document.body.style.overflow = 'auto';
-    }, 1900);
+    }, 2600);
   }
 
   document.body.style.overflow = 'hidden';
-  // full slow sequence ~10s, then gentle dismiss
-  setTimeout(dismissIntro, 11600);
+  // outline (3.4s) + fill (2.4s) + hold, then fade — ~7s total
+  setTimeout(dismissIntro, 6800);
 
-  // allow skip only after the figure has begun (so it never feels rushed)
+  // allow skip after outline starts
   setTimeout(function(){
     ['click','keydown','wheel','touchstart'].forEach(function(ev){
       window.addEventListener(ev, function(){ setTimeout(dismissIntro, 50); }, {once:true});
     });
-  }, 2000);
+  }, 1500);
 })();
 
 /* =========================================================
