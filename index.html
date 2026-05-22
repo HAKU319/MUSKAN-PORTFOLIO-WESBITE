@@ -463,7 +463,7 @@ body.cd #cur-dot { background:var(--mist) }
 #intro.gone {
   pointer-events: none;
   opacity: 0;
-  transition: opacity 1.2s ease-in-out;   /* natural slow fade to site */
+  transition: opacity 1.6s ease-in-out;
 }
 
 /* Stage — figure + word stacked, perfectly centered */
@@ -478,7 +478,7 @@ body.cd #cur-dot { background:var(--mist) }
 
 /* The SVG figure — BIG, centered, dimmed */
 #nm-figure {
-  width: clamp(340px, 50vw, 600px);   /* bigger */
+  width: clamp(240px, 36vw, 420px);
   height: auto;
   position: relative;
   z-index: 1;
@@ -486,8 +486,8 @@ body.cd #cur-dot { background:var(--mist) }
 }
 #nm-figure.out {
   opacity: 0;
-  transform: scale(.96);
-  transition: opacity 1.1s ease-in-out, transform 1.1s ease-in-out;
+  transform: scale(.97);
+  transition: opacity 1.6s ease-in-out, transform 1.6s ease-in-out;
 }
 #nm-svg {
   width: 100%;
@@ -498,13 +498,13 @@ body.cd #cur-dot { background:var(--mist) }
 
 /* The path — dimmed/transparent rust outline that draws itself */
 #nm-path {
-  fill: #e0a878;                    /* lighter, soft orange */
+  fill: #eebb92;
   fill-opacity: 0;
-  stroke: rgba(224, 168, 120, .85); /* lighter orange outline */
+  stroke: rgba(238, 187, 146, .8);
   stroke-width: 5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: fill-opacity 2.4s ease-in-out;   /* slow gentle fill */
+  transition: fill-opacity 3s ease-in-out;
 }
 
 /* नमस्ते word — overlaps the figure, centered, dimmed/transparent, BIG */
@@ -514,12 +514,12 @@ body.cd #cur-dot { background:var(--mist) }
   left: 50%;
   transform: translate(-50%, -50%) scale(.98);
   font-family: 'Baloo 2', 'Tiro Devanagari Hindi', sans-serif;
-  font-size: clamp(110px, 19vw, 280px);   /* bigger */
+  font-size: clamp(80px, 13vw, 190px);   /* bigger */
   font-weight: 600;
   font-style: normal;
   /* outline style — transparent fill, light orange stroke */
   color: transparent;
-  -webkit-text-stroke: 2.5px rgba(224, 168, 120, .9);
+  -webkit-text-stroke: 2px rgba(238, 187, 146, .45);
   letter-spacing: 0;
   line-height: 1;
   z-index: 3;
@@ -537,8 +537,8 @@ body.cd #cur-dot { background:var(--mist) }
 }
 #nm-word.out {
   opacity: 0;
-  transform: translate(-50%, -50%) scale(1.04);
-  transition: opacity 1.1s ease-in-out, transform 1.1s ease-in-out;
+  transform: translate(-50%, -50%) scale(1.03);
+  transition: opacity 1.4s ease-in-out, transform 1.4s ease-in-out;
 }
 
 /* Figure stays visible — only fades when whole intro dismisses */
@@ -2062,14 +2062,14 @@ background:#2C4A6E;z-index:2;}
     path.style.transition = 'stroke-dashoffset 3.6s cubic-bezier(.45,0,.25,1)';
     setTimeout(function(){ path.style.strokeDashoffset = '0'; }, 400);
     // 2) gentle slow fill after the outline is drawn
-    setTimeout(function(){ path.style.fillOpacity = '0.5'; }, 4200);
+    setTimeout(function(){ path.style.fillOpacity = '0.85'; }, 4200);
   }
 
   // 3) figure fades out gently
-  setTimeout(function(){ if(figure) figure.classList.add('out'); }, 6200);
+  setTimeout(function(){ if(figure) figure.classList.add('out'); }, 7600);
 
   // 4) नमस्ते outline draws in slowly
-  setTimeout(function(){ if(word) word.classList.add('in'); }, 7000);
+  setTimeout(function(){ if(word) word.classList.add('in'); }, 8400);
 
   // 5) dismiss — natural fade into the site
   function dismissIntro(){
@@ -2086,7 +2086,7 @@ background:#2C4A6E;z-index:2;}
 
   document.body.style.overflow = 'hidden';
   // full slow sequence ~10s, then gentle dismiss
-  setTimeout(dismissIntro, 10000);
+  setTimeout(dismissIntro, 11600);
 
   // allow skip only after the figure has begun (so it never feels rushed)
   setTimeout(function(){
