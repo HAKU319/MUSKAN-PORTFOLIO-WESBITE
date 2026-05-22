@@ -211,71 +211,7 @@ setTimeout(function(){ setBodyWada(0); }, 2500);
 
 
 
-/* =========================================================
-   ACADEMIC — swipe/scroll cycles slides, bg colour shifts
-========================================================= */
-(function(){
-  var slides  = document.querySelectorAll('#academic .ac-slide');
-  var dots    = document.querySelectorAll('#academic .ac-dot');
-  var counter = document.getElementById('acCur');
-  var section = document.getElementById('academic');
-  var btnPrev = document.getElementById('acPrev');
-  var btnNext = document.getElementById('acNext');
-  if(!section || !slides.length) return;
 
-  var slideColors = ['#2C4A6E', '#1E4A3A', '#4A3070'];
-
-  var TOTAL = slides.length;
-  var cur = 0;
-  var busy = false;
-
-  function go(n){
-    if(busy) return;
-    busy = true;
-    slides[cur].classList.remove('is-active');
-    if(dots[cur]) dots[cur].classList.remove('is-on');
-    cur = ((n % TOTAL) + TOTAL) % TOTAL;
-    slides[cur].classList.add('is-active');
-    if(dots[cur]) dots[cur].classList.add('is-on');
-    if(counter) counter.textContent = String(cur+1).padStart(2,'0');
-
-    section.style.backgroundColor = slideColors[cur];
-
-    if(typeof setBodyWada === 'function') setBodyWada(cur);
-
-    setTimeout(function(){ busy = false; }, 900);
-  }
-
-  section.style.backgroundColor = slideColors[0];
-  section.style.transition = 'background-color 1.1s cubic-bezier(.4,0,.2,1)';
-
-  if(btnPrev) btnPrev.addEventListener('click', function(e){ e.stopPropagation(); go(cur-1); });
-  if(btnNext) btnNext.addEventListener('click', function(e){ e.stopPropagation(); go(cur+1); });
-  dots.forEach(function(d){
-    d.addEventListener('click', function(e){
-      e.stopPropagation();
-      go(parseInt(d.dataset.idx,10));
-    });
-  });
-
-  var tx=0, ty=0;
-  section.addEventListener('touchstart', function(e){
-    tx=e.touches[0].clientX; ty=e.touches[0].clientY;
-  }, {passive:true});
-  section.addEventListener('touchend', function(e){
-    var dx = tx - e.changedTouches[0].clientX;
-    var dy = ty - e.changedTouches[0].clientY;
-    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 44) go(cur + (dx>0?1:-1));
-    else if(Math.abs(dy) > 44) go(cur + (dy>0?1:-1));
-  }, {passive:true});
-
-  window.addEventListener('keydown', function(e){
-    var r = section.getBoundingClientRect();
-    if(r.top > window.innerHeight*.6 || r.bottom < window.innerHeight*.4) return;
-    if(e.key === 'ArrowRight' || e.key === 'ArrowDown'){ e.preventDefault(); go(cur+1); }
-    if(e.key === 'ArrowLeft'  || e.key === 'ArrowUp'){   e.preventDefault(); go(cur-1); }
-  });
-})();
 
 /* ═══════════════════════════════════════════════════════════
    CLIENT PANELS — Sons & Daughters scroll reveal + click navigation
@@ -307,6 +243,51 @@ setTimeout(function(){ setBodyWada(0); }, 2500);
         if(p.dataset.target === '_blank') window.open(href, '_blank');
         else window.location.href = href;
       }, 520);
+    });
+  });
+})();
+
+
+/* =========================================================
+   SKETCHBOOK — scroll-driven page-curl flip
+========================================================= */
+(function(){
+  var track = document.getElementById('flip-track');
+  var pages = Array.prototype.slice.call(document.querySelectorAll('.fpage'));
+  var cnt   = document.getElementById('flipCnt');
+  if(!track || !pages.length) return;
+  var TOTAL = pages.length;
+
+  function onScroll(){
+    var rect = track.getBoundingClientRect();
+    var trackH = track.offsetHeight - window.innerHeight;
+    var scrolled = Math.min(Math.max(-rect.top, 0), trackH);
+    var progress = trackH > 0 ? scrolled / trackH : 0;
+
+    pages.forEach(function(p, i){
+      var startP = i / TOTAL;
+      var endP = (i + 1) / TOTAL;
+      var local = (progress - startP) / (endP - startP);
+      local = Math.min(Math.max(local, 0), 1);
+      var angle = local * -175;
+      p.style.transform = 'rotateY(' + angle + 'deg)';
+    });
+
+    var current = Math.min(TOTAL, Math.floor(progress * TOTAL) + 1);
+    if(cnt) cnt.textContent = String(current).padStart(2, '0');
+  }
+
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', onScroll);
+  onScroll();
+
+  // Click an open page's CTA navigates (links handle themselves);
+  // clicking the page body when it's the front page also navigates
+  pages.forEach(function(p){
+    p.addEventListener('click', function(e){
+      if(e.target.closest('a')) return; // let real links work
+      var href = p.dataset.href;
+      if(href) window.location.href = href;
     });
   });
 })();
@@ -1178,130 +1159,10 @@ footer { padding:20px 52px;background:rgba(0,0,0,.4);display:flex;align-items:ce
 /* ═══════════════════════════════════════════════════════════
    ACADEMIC PROJECTS — Compact slide deck
 ═══════════════════════════════════════════════════════════ */
-#academic {
-  position:relative;
-  min-height:100vh;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  padding:80px 60px;
-}
-.ac-label {
-  position:absolute; top:48px; left:0; right:0;
-  text-align:center; z-index:5;
-  pointer-events:none;
-}
-.ac-eyebrow {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:9px; font-weight:700;
-  letter-spacing:5px; text-transform:uppercase;
-  color:rgba(240,237,230,.3);
-}
-.ac-h {
-  font-family:'Fraunces',serif;
-  font-size:clamp(20px,2.2vw,28px);
-  font-weight:300; font-style:italic;
-  color:rgba(240,237,230,.55);
-  margin-top:5px;
-  font-variation-settings:'opsz' 28;
-}
 .ac-h em { font-style:italic; color:rgba(240,237,230,.7) }
 
-.ac-slide {
-  position:absolute;
-  top:0; left:0; right:0; bottom:0;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  padding:130px 80px 110px;
-  text-align:center;
-  opacity:0; visibility:hidden;
-  pointer-events:none;
-  transition:opacity .85s cubic-bezier(.4,0,.2,1),
-             visibility 0s linear .85s;
-}
-.ac-slide.is-active {
-  opacity:1; visibility:visible; pointer-events:auto;
-  transition:opacity .85s cubic-bezier(.4,0,.2,1),
-             visibility 0s linear 0s;
-}
-.ac-cat {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:9px; font-weight:700;
-  letter-spacing:4px; text-transform:uppercase;
-  color:rgba(240,237,230,.32); margin-bottom:20px;
-}
-.ac-accent { width:28px; height:1px; margin:0 auto 22px; opacity:.6 }
-.ac-title {
-  font-family:'Fraunces',serif;
-  font-size:clamp(36px,5.5vw,68px);
-  font-weight:800; font-style:italic;
-  color:rgba(240,237,230,.9); line-height:.98;
-  letter-spacing:-1.5px;
-  font-variation-settings:'opsz' 68,'WONK' 1;
-  margin:0;
-}
-.ac-sub {
-  display:block;
-  font-style:normal; font-weight:200;
-  font-size:.52em; color:rgba(240,237,230,.42);
-  margin-top:8px;
-}
-.ac-desc {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:13px; font-weight:500;
-  line-height:1.7; color:rgba(240,237,230,.4);
-  max-width:420px; margin:22px auto 0;
-}
-.ac-cta {
-  display:inline-block; margin-top:30px;
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:10px; font-weight:700;
-  letter-spacing:2.5px; text-transform:uppercase;
-  color:rgba(240,237,230,.5); text-decoration:none;
-  border-bottom:1px solid rgba(240,237,230,.22);
-  padding-bottom:4px;
-  transition:color .2s, border-color .2s;
-}
-.ac-cta:hover { color:rgba(240,237,230,.9); border-color:rgba(240,237,230,.55) }
 
-.ac-arrow {
-  position:absolute; top:50%;
-  transform:translateY(-50%);
-  z-index:20;
-  background:none; border:none;
-  cursor:pointer;
-  width:44px; height:44px;
-  font-size:20px; font-weight:200;
-  color:rgba(240,237,230,.4);
-  transition:color .2s;
-  pointer-events:all;
-}
-.ac-arrow:hover { color:rgba(240,237,230,.85) }
-.ac-arrow-prev { left:28px }
-.ac-arrow-next { right:28px }
 
-.ac-counter {
-  position:absolute; bottom:50px; left:0; right:0;
-  text-align:center; z-index:5;
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:8px; font-weight:700;
-  letter-spacing:3px; text-transform:uppercase;
-  color:rgba(240,237,230,.25);
-}
-.ac-dots {
-  position:absolute; bottom:74px; left:0; right:0;
-  display:flex; justify-content:center; gap:9px; z-index:5;
-}
-.ac-dot {
-  width:4px; height:4px;
-  background:rgba(240,237,230,.22);
-  border:none; padding:0; cursor:pointer;
-  border-radius:50%;
-  transition:background .3s, height .3s, border-radius .3s;
-}
-.ac-dot.is-on {
-  background:rgba(240,237,230,.7);
-  height:16px; border-radius:2px;
-}
 
 /* ═══════════════════════════════════════════════════════════
    ABOUT — Simple, quiet, single-screen
@@ -1412,10 +1273,7 @@ background:#2C4A6E;z-index:2;}
   .cs-title { font-size:clamp(40px,12vw,72px); letter-spacing:-2px }
   .cs-meta { flex-direction:column; gap:8px; align-items:flex-start }
   .cs-deco::before { font-size:50vw }
-  #academic { padding:60px 20px }
-  .ac-slide { padding:100px 24px 90px }
-  .ac-title { font-size:clamp(32px,9vw,52px) }
-  #about { padding:80px 24px }
+        #about { padding:80px 24px }
   .ab-meta { gap:20px }
   #socials-strip { padding:40px 24px 60px }
 }
@@ -1624,15 +1482,131 @@ background:#2C4A6E;z-index:2;}
   #socials-strip { padding:30px 24px 80px }
 }
 
-.ac-hint {
-  position:absolute;
-  bottom:24px; left:0; right:0;
-  text-align:center;
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:8px; font-weight:700;
-  letter-spacing:3px; text-transform:uppercase;
-  color:rgba(240,237,230,.3);
-  pointer-events:none;
+
+
+/* ═══ SKETCHBOOK page-curl flip (Paper-app style) ═══ */
+#flip-track {
+  height: 420vh;          /* tall scroll track gives room to flip pages */
+  position: relative;
+  z-index: 2;
+}
+#flip-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.flip-label {
+  position: absolute; top: 48px; left: 0; right: 0;
+  text-align: center; z-index: 5; pointer-events: none;
+}
+.flip-eyebrow {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 5px; text-transform: uppercase;
+  color: rgba(240,237,230,.4); margin-bottom: 8px;
+}
+.flip-h {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(20px, 2.4vw, 30px);
+  font-weight: 300; font-style: italic;
+  color: rgba(240,237,230,.6);
+}
+.flip-h em { font-style: italic; color: rgba(240,237,230,.78); }
+
+#book {
+  position: relative;
+  width: min(440px, 82vw);
+  height: min(580px, 66vh);
+  perspective: 2600px;
+}
+.fpage {
+  position: absolute; inset: 0;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transition: transform .12s linear;
+  will-change: transform;
+}
+.fpage:nth-child(1){ z-index:5 }
+.fpage:nth-child(2){ z-index:4 }
+.fpage:nth-child(3){ z-index:3 }
+.fpage:nth-child(4){ z-index:2 }
+.fpage-face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  border-radius: 4px 10px 10px 4px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f4ead5 0%, #ece0c6 100%);
+  box-shadow: 0 18px 50px rgba(0,0,0,.4), inset 0 0 40px rgba(180,150,100,.08);
+  display: flex; flex-direction: column;
+  padding: 46px 40px;
+}
+.fpage-face::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 55px;
+  background: linear-gradient(90deg, rgba(120,90,50,.22), transparent);
+}
+.fp-cat {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 8px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(58,37,21,.5); margin-bottom: 18px;
+}
+.fp-accent { width: 30px; height: 2px; margin-bottom: 18px; }
+.fp-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 800; font-style: italic;
+  color: #2a1a0e; line-height: 1.0; letter-spacing: -1px;
+}
+.fp-sub {
+  display: block; font-style: normal; font-weight: 300;
+  font-size: .5em; color: rgba(58,37,21,.55); margin-top: 8px;
+}
+.fp-desc {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 13px; line-height: 1.7;
+  color: rgba(58,37,21,.62); margin-top: 24px; max-width: 300px;
+}
+.fp-cta {
+  display: inline-block; margin-top: auto;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: rgba(58,37,21,.7); text-decoration: none;
+  border-bottom: 1px solid rgba(58,37,21,.35);
+  padding-bottom: 4px; align-self: flex-start;
+  transition: color .2s, border-color .2s;
+}
+.fp-cta:hover { color: #2a1a0e; border-color: rgba(58,37,21,.7); }
+.fp-num {
+  position: absolute; bottom: 30px; right: 34px;
+  font-family: 'Fraunces', serif;
+  font-size: 13px; font-style: italic;
+  color: rgba(58,37,21,.4);
+}
+.flip-count {
+  position: absolute; bottom: 64px; left: 0; right: 0;
+  text-align: center; z-index: 5;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 11px; letter-spacing: 2px;
+  color: rgba(240,237,230,.5); font-weight: 700;
+  pointer-events: none;
+}
+.flip-hint {
+  position: absolute; bottom: 40px; left: 0; right: 0;
+  text-align: center; z-index: 5;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(240,237,230,.35);
+  pointer-events: none;
+}
+@media (max-width: 600px) {
+  #book { width: 86vw; height: 64vh; }
+  .fpage-face { padding: 36px 28px; }
 }
 
 </style>
@@ -1668,7 +1642,7 @@ background:#2C4A6E;z-index:2;}
 <nav id="nav">
   <a href="#hero" class="n-logo">मुस्कान <span class="n-dot"></span></a>
   <ul class="n-links">
-    <li><a href="#academic">Projects</a></li>
+    <li><a href="#flip-track">Projects</a></li>
     <li><a href="#about">Clients</a></li>
     <li><a href="#about">About</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -1677,7 +1651,7 @@ background:#2C4A6E;z-index:2;}
 </nav>
 <div class="mob" id="mob">
   <button class="mob-x" id="mobX">✕</button>
-  <a href="#academic" onclick="cMob()">Projects</a>
+  <a href="#flip-track" onclick="cMob()">Projects</a>
   <a href="#about" onclick="cMob()">Clients</a>
   <a href="#about" onclick="cMob()">About</a>
   <a href="#contact" onclick="cMob()">Contact</a>
@@ -1699,7 +1673,7 @@ background:#2C4A6E;z-index:2;}
       <span class="w teal">still learning</span>
     </div>
     <div class="h-sub">Muskan KC &nbsp;·&nbsp; Available for freelance</div>
-    <a href="#academic" class="h-cta">View work →</a>
+    <a href="#flip-track" class="h-cta">View work →</a>
   </div>
   <div class="h-scroll"><div class="hs-l"></div><div class="hs-t">Scroll</div></div>
 </section>
@@ -1784,50 +1758,60 @@ background:#2C4A6E;z-index:2;}
 </section>
 
 <!-- ═══ ACADEMIC PROJECTS — Compact slide deck ═══ -->
-<section id="academic">
+<!-- ═══ ACADEMIC — Sketchbook page-curl flip ═══ -->
+<div id="flip-track">
+  <div id="flip-stage">
+    <div class="flip-label">
+      <div class="flip-eyebrow">Sketchbook</div>
+      <div class="flip-h">Research &amp; <em>experiments</em></div>
+    </div>
 
-  <div class="ac-label">
-    <div class="ac-eyebrow">Academic Work</div>
-    <div class="ac-h">Research &amp; <em>experiments</em></div>
+    <div id="book">
+      <div class="fpage" data-href="spotify.html">
+        <div class="fpage-face">
+          <div class="fp-cat">UX Research &nbsp;&middot;&nbsp; Thesis &nbsp;&middot;&nbsp; 2024</div>
+          <div class="fp-accent" style="background:#2C4A6E"></div>
+          <div class="fp-title">Spotify Research<span class="fp-sub">Feature Design</span></div>
+          <div class="fp-desc">End-to-end UX — research, flows, wireframes and interactive prototype. A feature born from listening to real users.</div>
+          <a href="spotify.html" class="fp-cta">View Case Study &#8594;</a>
+          <div class="fp-num">01</div>
+        </div>
+      </div>
+
+      <div class="fpage" data-href="piano-vr.html">
+        <div class="fpage-face">
+          <div class="fp-cat">VR / XR Design &nbsp;&middot;&nbsp; 2025</div>
+          <div class="fp-accent" style="background:#3D5C2A"></div>
+          <div class="fp-title">Piano VR App<span class="fp-sub">Menu Redesign</span></div>
+          <div class="fp-desc">Spatial UX redesign — navigation architecture, information hierarchy and immersive user flows.</div>
+          <a href="piano-vr.html" class="fp-cta">View Case Study &#8594;</a>
+          <div class="fp-num">02</div>
+        </div>
+      </div>
+
+      <div class="fpage" data-href="vr-accessibility.html">
+        <div class="fpage-face">
+          <div class="fp-cat">VR &nbsp;&middot;&nbsp; AI &nbsp;&middot;&nbsp; Accessibility &nbsp;&middot;&nbsp; 2024</div>
+          <div class="fp-accent" style="background:#4A3070"></div>
+          <div class="fp-title">VR Accessibility<span class="fp-sub">AI Object Descriptions</span></div>
+          <div class="fp-desc">AI-powered real-time 3D object descriptions inside VR. Making immersive spaces inclusive for everyone.</div>
+          <a href="vr-accessibility.html" class="fp-cta">View Case Study &#8594;</a>
+          <div class="fp-num">03</div>
+        </div>
+      </div>
+
+      <div class="fpage fpage-end">
+        <div class="fpage-face" style="align-items:center;justify-content:center;text-align:center">
+          <div class="fp-title" style="font-size:clamp(26px,3.4vw,38px)">End of the<br>sketchbook</div>
+          <div class="fp-desc" style="margin-top:18px;text-align:center;max-width:none">Keep scrolling to explore the rest.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-count"><span id="flipCnt">01</span> / 04</div>
+    <div class="flip-hint">Scroll to turn the page</div>
   </div>
-
-  <button class="ac-arrow ac-arrow-prev" id="acPrev" type="button">&#8592;</button>
-  <button class="ac-arrow ac-arrow-next" id="acNext" type="button">&#8594;</button>
-
-  <div class="ac-slide is-active" data-idx="0" data-href="spotify.html">
-    <div class="ac-cat">UX Research &nbsp;&middot;&nbsp; Thesis &nbsp;&middot;&nbsp; 2024</div>
-    <div class="ac-accent" style="background:#2C4A6E"></div>
-    <h2 class="ac-title">Spotify Research<span class="ac-sub">Feature Design</span></h2>
-    <p class="ac-desc">End-to-end UX — research, flows, wireframes and interactive prototype. A feature born from listening to real users.</p>
-    <a href="spotify.html" class="ac-cta" onclick="event.stopPropagation()">View Case Study &#8594;</a>
-  </div>
-
-  <div class="ac-slide" data-idx="1" data-href="piano-vr.html">
-    <div class="ac-cat">VR / XR Design &nbsp;&middot;&nbsp; 2025</div>
-    <div class="ac-accent" style="background:#3D5C2A"></div>
-    <h2 class="ac-title">Piano VR App<span class="ac-sub">Menu Redesign</span></h2>
-    <p class="ac-desc">Spatial UX redesign — navigation architecture, information hierarchy and immersive user flows.</p>
-    <a href="piano-vr.html" class="ac-cta" onclick="event.stopPropagation()">View Case Study &#8594;</a>
-  </div>
-
-  <div class="ac-slide" data-idx="2" data-href="vr-accessibility.html">
-    <div class="ac-cat">VR &nbsp;&middot;&nbsp; AI &nbsp;&middot;&nbsp; Accessibility &nbsp;&middot;&nbsp; 2024</div>
-    <div class="ac-accent" style="background:#4A3070"></div>
-    <h2 class="ac-title">VR Accessibility<span class="ac-sub">AI Object Descriptions</span></h2>
-    <p class="ac-desc">AI-powered real-time 3D object descriptions in VR. Making immersive spaces inclusive for everyone.</p>
-    <a href="vr-accessibility.html" class="ac-cta" onclick="event.stopPropagation()">View Project &#8594;</a>
-  </div>
-
-  <div class="ac-counter"><span id="acCur">01</span> / 03</div>
-  <div class="ac-dots" id="acDots">
-    <button class="ac-dot is-on" data-idx="0" type="button"></button>
-    <button class="ac-dot" data-idx="1" type="button"></button>
-    <button class="ac-dot" data-idx="2" type="button"></button>
-  </div>
-
-
-  <div class="ac-hint">Swipe &middot; Arrows &middot; Tap dots</div>
-</section>
+</div>
 
 <svg class="brush" viewBox="0 0 1440 16" preserveAspectRatio="none" style="height:16px" xmlns="http://www.w3.org/2000/svg">
   <path d="M0 9C120 5 240 13 360 8C480 3 600 12 720 7C840 2 960 11 1080 7C1200 3 1320 10 1440 8" stroke="rgba(240,237,230,.18)" stroke-width="2" fill="none" stroke-linecap="round"/>
