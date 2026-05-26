@@ -439,23 +439,30 @@ body.cd #cur-dot { background:var(--mist) }
 /* ── NAV — Oscar Tao: barely there ───────────────── */
 nav {
   position: fixed;
-  top: 0; left: 0; bottom: 0;
-  width: 240px;
+  top: 50%;
+  left: 44px;
+  transform: translateY(-50%) translateX(-16px);
   z-index: 500;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
-  gap: 48px;
-  padding: 48px 40px;
-  background: rgba(26, 46, 74, .55);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-right: 1px solid rgba(240,237,230,.12);
-  transform: translateX(-100%);
-  transition: transform .7s cubic-bezier(.22,1,.36,1);
+  gap: 30px;
+  /* NO box — sits directly on the page background */
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  width: auto;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .7s ease, transform .7s cubic-bezier(.22,1,.36,1);
 }
-nav.show { transform: translateX(0); }
+nav.show {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+  pointer-events: auto;
+}
 nav.show {
   transform: translateX(0);
   opacity: 1;
@@ -480,25 +487,26 @@ body.wada-3 .n-dot { background:#3A6E8A;box-shadow:0 0 8px rgba(58,110,138,.5) }
 body.wada-4 .n-dot { background:#7A5A9A;box-shadow:0 0 8px rgba(122,90,154,.5) }
 .n-links {
   display: flex; flex-direction: column;
-  gap: 28px;
+  gap: 26px;
   list-style: none; padding: 0; margin: 0;
 }
 .n-links a {
   font-family: 'Cabinet Grotesk', sans-serif;
-  font-size: 17px;
-  font-weight: 500;
-  letter-spacing: 1px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(240, 237, 230, .5);
+  color: rgba(240, 237, 230, .45);
   text-decoration: none;
-  transition: color .25s, font-weight .2s, letter-spacing .25s;
+  transition: color .3s, letter-spacing .3s, font-size .3s;
   display: block;
 }
-.n-links a:hover { color: rgba(240,237,230,.85); }
+.n-links a:hover { color: rgba(240,237,230,.8); }
 .n-links a.active {
-  color: #fff;
+  color: #ffffff;
+  font-size: 15px;
+  letter-spacing: 4px;
   font-weight: 800;
-  letter-spacing: 2px;
 }
 .n-links a:hover {
   color: #fff;
@@ -1410,18 +1418,24 @@ footer {
 
 /* ═══ SKETCHBOOK page-curl flip (Paper-app style) ═══ */
 #flip-track {
-  height: 300vh;          /* 3 pages worth of scroll, tighter = no long gap */
+  min-height: 100vh;
   position: relative;
   z-index: 2;
-}
-#flip-stage {
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  margin-top: 12vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  padding: 80px 24px;
+}
+#flip-stage {
+  position: relative;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
 }
 .flip-label {
   position: absolute; top: 48px; left: 0; right: 0;
@@ -1452,6 +1466,8 @@ footer {
   inset: 0;
   transform-origin: left center;
   transform-style: preserve-3d;
+  transition: transform .9s cubic-bezier(.645,.045,.355,1);
+  cursor: pointer;
   will-change: transform;
 }
 .fpage:nth-child(1){ z-index:5 }
@@ -1545,11 +1561,11 @@ footer {
 /* ═══ Persistent background figure — draws on scroll, fades before busy sections ═══ */
 #bg-figure {
   position: fixed;
-  top: 58%;
-  right: 10vw;
+  top: 50%;
+  right: 5vw;
   transform: translateY(-50%);
-  width: clamp(280px, 30vw, 440px);
-  height: auto;
+  height: clamp(420px, 82vh, 760px);   /* larger — clear first-layer presence */
+  width: auto;
   z-index: 0;
   pointer-events: none;
   opacity: 0;
@@ -1559,7 +1575,7 @@ footer {
 
 #bgf-path {
   fill: none;
-  stroke: rgba(240, 237, 230, .24);    /* faint off-white, like the 01 numbers */
+  stroke: rgba(240,237,230,.40);
   stroke-width: 5;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -1617,9 +1633,9 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 
 <!-- ═══ Hero figure — draws in, then a guide line draws down (visual flow) ═══ -->
 <div id="bg-figure">
-  <svg id="bgf-svg" viewBox="0 0 233.208795 405.880884" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+  <svg id="bgf-svg" viewBox="0 0 233.208795 405.880884" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" style="height:100%;width:auto;display:block;overflow:visible">
     <g transform="translate(-132.626958,441.880884) scale(0.100000,-0.100000)">
-      <path id="bgf-path" pathLength="1" d="M2335 4408 c-167 -39 -212 -54 -304 -98 -209 -101 -362 -259 -461 -474 -138 -300 -212 -732 -239 -1401 -12 -279 -3 -366 56 -580 28 -101 87 -227 141 -297 52 -69 151 -145 234 -181 68 -30 80 -32 191 -32 64 1 117 -2 117 -5 0 -3 -31 -39 -68 -80 l-69 -74 -56 13 c-31 7 -72 9 -94 5 -59 -11 -126 -49 -152 -88 -21 -32 -23 -43 -17 -100 7 -59 6 -65 -16 -82 -45 -36 -168 -148 -168 -154 0 -4 14 -16 31 -29 35 -26 37 -26 134 58 33 28 63 51 66 51 4 0 38 -30 75 -68 41 -40 92 -79 126 -95 31 -15 59 -31 62 -35 3 -5 -31 -48 -74 -96 -44 -47 -80 -88 -80 -90 0 -3 16 -15 36 -27 l37 -22 30 34 c131 153 159 180 173 168 29 -24 12 -91 -36 -146 -17 -19 -30 -44 -30 -56 0 -36 35 -67 75 -67 58 0 81 58 51 131 -21 53 -29 149 -13 149 32 0 71 -80 83 -169 5 -42 9 -49 20 -40 21 18 17 74 -12 145 l-26 65 26 24 c50 46 61 126 26 183 -22 36 -20 44 21 82 25 22 159 186 208 253 23 32 46 55 51 52 5 -3 30 -38 57 -78 55 -83 69 -101 139 -177 51 -55 67 -89 78 -167 3 -23 17 -58 30 -78 l24 -35 -44 -67 c-70 -106 -91 -183 -51 -183 7 0 31 36 52 81 54 109 65 117 65 45 0 -37 -7 -69 -20 -93 -11 -21 -20 -45 -20 -54 0 -27 40 -69 65 -69 51 0 74 93 35 143 -14 18 -19 39 -19 76 1 28 3 51 5 51 1 0 18 -9 36 -19 18 -10 47 -22 64 -25 19 -4 54 -31 94 -71 36 -36 70 -65 77 -65 7 0 24 5 38 12 l25 11 -45 45 c-25 24 -45 50 -45 58 0 8 21 27 48 42 62 35 161 138 190 196 13 25 29 46 35 46 7 0 49 -39 94 -87 108 -115 118 -105 78 77 -58 264 -234 504 -450 612 -72 36 -144 58 -217 66 l-63 7 2 50 c1 28 10 92 19 144 16 92 17 95 68 145 28 28 75 77 104 109 l52 59 53 -56 c29 -31 60 -56 70 -56 12 0 17 -8 17 -30 0 -28 -1 -29 -25 -18 -19 8 -31 8 -50 0 -41 -19 -31 -52 20 -69 26 -8 30 -14 27 -40 -4 -34 1 -40 40 -47 40 -7 71 20 63 55 -6 26 -4 29 18 29 24 0 57 27 57 48 0 18 -39 34 -69 27 -20 -4 -30 -2 -34 8 -7 19 2 29 47 52 104 53 104 228 0 408 -38 65 -41 88 -18 167 9 33 18 115 21 205 l5 150 34 32 c38 36 42 57 17 108 -19 39 -32 43 -68 19 -30 -20 -38 -15 -66 41 -47 95 -154 187 -259 224 -19 6 -80 16 -135 22 -163 16 -263 75 -326 191 l-34 63 0 280 0 280 32 3 c117 11 385 -123 586 -293 43 -37 81 -64 84 -61 18 18 -141 192 -251 275 -106 80 -156 105 -251 131 -44 12 -111 39 -148 62 l-69 40 -121 -48 c-259 -101 -297 -120 -402 -204 -117 -94 -208 -203 -279 -333 -45 -83 -106 -222 -106 -243 0 -15 -38 -25 -46 -13 -8 13 16 126 43 197 32 86 106 232 150 295 57 81 200 224 282 279 274 187 626 217 881 75 52 -29 171 -114 215 -154 125 -113 271 -352 346 -569 55 -158 66 -211 110 -539 6 -44 9 -118 6 -165 -4 -47 -11 -269 -16 -495 -6 -225 -17 -454 -24 -508 -8 -54 -10 -100 -5 -103 4 -3 40 -8 79 -11 67 -6 71 -5 66 13 -43 146 -49 266 -42 774 9 592 -5 792 -75 1063 -44 172 -139 368 -233 479 -173 206 -501 340 -821 337 -61 -1 -129 -6 -151 -11z m113 -560 l-3 -293 -29 -59 c-61 -124 -131 -175 -298 -217 -82 -21 -122 -37 -157 -63 -52 -38 -101 -101 -101 -130 0 -15 7 -12 37 15 55 48 149 86 252 103 53 8 106 23 125 36 56 34 142 134 167 194 12 31 26 56 31 56 4 0 15 -15 24 -32 31 -61 85 -117 145 -153 67 -39 106 -50 234 -64 180 -21 313 -121 374 -282 63 -164 19 -480 -98 -714 -57 -116 -86 -158 -171 -249 -55 -58 -90 -81 -90 -58 -2 63 -36 213 -61 267 -5 11 -15 38 -23 60 -15 43 -175 393 -254 555 l-27 55 -50 0 -50 0 -33 -70 c-95 -204 -106 -216 -204 -223 -78 -6 -110 10 -202 97 -53 52 -67 61 -61 41 26 -91 107 -182 179 -201 40 -11 117 -5 149 12 32 18 30 11 -82 -261 -28 -69 -64 -155 -78 -192 -15 -38 -32 -68 -37 -68 -32 0 -152 178 -196 291 -33 82 -89 319 -90 377 0 17 -5 32 -11 32 -13 0 -7 -122 12 -246 l11 -71 -45 -42 c-113 -105 -128 -305 -27 -380 62 -46 64 -68 6 -63 -70 6 -93 -48 -30 -74 27 -12 34 -19 29 -34 -7 -23 26 -60 56 -60 39 0 59 19 59 55 0 30 3 35 23 35 29 0 47 18 47 47 0 30 -31 46 -65 33 -21 -8 -27 -7 -32 7 -4 9 -2 18 5 21 34 11 77 51 87 81 6 19 16 36 22 38 5 2 35 -26 66 -62 59 -69 59 -70 72 -215 3 -36 17 -127 32 -203 17 -85 23 -141 17 -146 -5 -5 -55 -14 -112 -20 -124 -12 -188 1 -270 55 -107 72 -208 240 -259 434 l-28 105 0 425 c0 453 4 506 51 620 26 64 30 57 38 -60 9 -158 58 -353 118 -472 22 -44 30 -47 52 -14 15 23 14 28 -13 88 -71 159 -96 293 -96 513 0 228 30 356 126 545 50 97 143 219 214 282 142 123 328 201 498 207 l28 1 -3 -292z m128 -1175 c70 -145 189 -441 181 -449 -7 -7 -35 42 -126 220 -92 180 -96 186 -122 186 -17 0 -19 8 -19 78 0 124 12 119 86 -35z m-116 48 c0 -82 -6 -101 -30 -101 -13 0 -26 -19 -46 -72 -15 -40 -37 -99 -50 -132 -32 -80 -68 -231 -60 -251 15 -40 44 25 62 140 6 39 40 142 71 218 18 42 40 48 48 15 3 -13 5 -293 3 -623 l-3 -600 -26 -50 c-15 -27 -41 -67 -58 -89 -17 -21 -31 -42 -31 -46 0 -5 -58 -67 -128 -139 -90 -92 -135 -131 -151 -131 -35 0 -126 49 -164 89 -63 66 -66 60 117 247 91 93 166 176 166 185 0 9 -18 112 -40 229 -43 230 -48 301 -25 397 13 57 87 244 105 268 4 6 13 26 18 45 10 34 65 166 102 245 26 57 70 162 70 168 0 21 22 57 35 57 12 0 15 -14 15 -69z m78 -173 c5 -7 29 -50 53 -95 88 -167 99 -186 131 -241 81 -141 101 -209 100 -327 -1 -49 -7 -115 -13 -145 -7 -30 -12 -120 -13 -200 -1 -132 1 -149 21 -187 21 -39 78 -93 99 -93 5 0 38 -21 74 -46 36 -25 88 -60 116 -79 61 -40 66 -51 52 -102 -16 -61 -70 -118 -149 -157 -71 -35 -72 -36 -103 -18 -60 34 -273 260 -321 342 -94 161 -90 126 -92 708 -2 350 1 512 8 512 14 0 57 -100 75 -176 20 -89 32 -116 45 -108 14 8 6 128 -10 148 -16 18 -101 237 -101 259 0 20 13 22 28 5z m-694 -323 c20 -50 36 -106 36 -125 0 -47 -47 -100 -87 -100 -115 2 -134 229 -26 308 15 11 31 18 34 14 3 -4 23 -48 43 -97z m1464 35 c14 -38 26 -99 29 -146 l6 -80 -32 -27 c-18 -15 -39 -27 -47 -27 -24 0 -67 26 -98 59 l-30 31 46 92 c26 51 52 110 59 131 19 54 40 44 67 -33z m-1580 -389 c-2 -9 -11 -17 -21 -19 -21 -4 -35 27 -17 38 19 12 42 0 38 -19z m140 2 c2 -7 -4 -16 -12 -19 -19 -7 -49 14 -40 28 8 13 46 6 52 -9z m1479 -9 c8 -21 -13 -42 -28 -27 -13 13 -5 43 11 43 6 0 13 -7 17 -16z m-139 -11 c-4 -21 -36 -29 -51 -14 -9 9 -8 14 3 21 25 16 52 12 48 -7z m-1410 -56 c4 -20 -25 -34 -40 -19 -15 15 -1 44 19 40 10 -2 19 -11 21 -21z m1472 -28 c0 -12 -7 -19 -19 -19 -27 0 -34 15 -15 34 19 19 34 12 34 -15z m-298 -300 c136 -28 293 -149 394 -303 26 -39 56 -83 66 -98 10 -15 24 -44 32 -65 51 -136 63 -174 56 -178 -17 -11 -130 133 -130 166 0 9 -17 43 -39 76 -46 71 -92 98 -151 88 -38 -6 -44 -3 -142 72 -57 43 -123 91 -146 107 -40 27 -72 70 -72 96 0 17 39 50 60 50 10 0 43 -5 72 -11z m-1180 -346 c-8 -102 80 -233 199 -294 38 -19 53 -21 121 -16 76 6 78 6 78 -16 0 -29 -33 -83 -61 -97 -13 -7 -49 -11 -88 -8 -172 9 -358 180 -369 339 -5 69 12 103 61 125 51 22 63 15 59 -33z m1466 -67 c5 -54 -24 -141 -60 -181 -41 -47 -29 -56 19 -15 49 42 68 72 83 126 14 48 24 54 40 25 16 -31 12 -96 -10 -158 -43 -123 -164 -212 -290 -213 -47 0 -74 5 -97 20 -35 21 -96 98 -88 110 3 4 25 11 50 14 136 21 278 144 316 274 15 51 33 50 37 -2z"/>
+      <path id="bgf-path" d="M2335 4408 c-167 -39 -212 -54 -304 -98 -209 -101 -362 -259 -461 -474 -138 -300 -212 -732 -239 -1401 -12 -279 -3 -366 56 -580 28 -101 87 -227 141 -297 52 -69 151 -145 234 -181 68 -30 80 -32 191 -32 64 1 117 -2 117 -5 0 -3 -31 -39 -68 -80 l-69 -74 -56 13 c-31 7 -72 9 -94 5 -59 -11 -126 -49 -152 -88 -21 -32 -23 -43 -17 -100 7 -59 6 -65 -16 -82 -45 -36 -168 -148 -168 -154 0 -4 14 -16 31 -29 35 -26 37 -26 134 58 33 28 63 51 66 51 4 0 38 -30 75 -68 41 -40 92 -79 126 -95 31 -15 59 -31 62 -35 3 -5 -31 -48 -74 -96 -44 -47 -80 -88 -80 -90 0 -3 16 -15 36 -27 l37 -22 30 34 c131 153 159 180 173 168 29 -24 12 -91 -36 -146 -17 -19 -30 -44 -30 -56 0 -36 35 -67 75 -67 58 0 81 58 51 131 -21 53 -29 149 -13 149 32 0 71 -80 83 -169 5 -42 9 -49 20 -40 21 18 17 74 -12 145 l-26 65 26 24 c50 46 61 126 26 183 -22 36 -20 44 21 82 25 22 159 186 208 253 23 32 46 55 51 52 5 -3 30 -38 57 -78 55 -83 69 -101 139 -177 51 -55 67 -89 78 -167 3 -23 17 -58 30 -78 l24 -35 -44 -67 c-70 -106 -91 -183 -51 -183 7 0 31 36 52 81 54 109 65 117 65 45 0 -37 -7 -69 -20 -93 -11 -21 -20 -45 -20 -54 0 -27 40 -69 65 -69 51 0 74 93 35 143 -14 18 -19 39 -19 76 1 28 3 51 5 51 1 0 18 -9 36 -19 18 -10 47 -22 64 -25 19 -4 54 -31 94 -71 36 -36 70 -65 77 -65 7 0 24 5 38 12 l25 11 -45 45 c-25 24 -45 50 -45 58 0 8 21 27 48 42 62 35 161 138 190 196 13 25 29 46 35 46 7 0 49 -39 94 -87 108 -115 118 -105 78 77 -58 264 -234 504 -450 612 -72 36 -144 58 -217 66 l-63 7 2 50 c1 28 10 92 19 144 16 92 17 95 68 145 28 28 75 77 104 109 l52 59 53 -56 c29 -31 60 -56 70 -56 12 0 17 -8 17 -30 0 -28 -1 -29 -25 -18 -19 8 -31 8 -50 0 -41 -19 -31 -52 20 -69 26 -8 30 -14 27 -40 -4 -34 1 -40 40 -47 40 -7 71 20 63 55 -6 26 -4 29 18 29 24 0 57 27 57 48 0 18 -39 34 -69 27 -20 -4 -30 -2 -34 8 -7 19 2 29 47 52 104 53 104 228 0 408 -38 65 -41 88 -18 167 9 33 18 115 21 205 l5 150 34 32 c38 36 42 57 17 108 -19 39 -32 43 -68 19 -30 -20 -38 -15 -66 41 -47 95 -154 187 -259 224 -19 6 -80 16 -135 22 -163 16 -263 75 -326 191 l-34 63 0 280 0 280 32 3 c117 11 385 -123 586 -293 43 -37 81 -64 84 -61 18 18 -141 192 -251 275 -106 80 -156 105 -251 131 -44 12 -111 39 -148 62 l-69 40 -121 -48 c-259 -101 -297 -120 -402 -204 -117 -94 -208 -203 -279 -333 -45 -83 -106 -222 -106 -243 0 -15 -38 -25 -46 -13 -8 13 16 126 43 197 32 86 106 232 150 295 57 81 200 224 282 279 274 187 626 217 881 75 52 -29 171 -114 215 -154 125 -113 271 -352 346 -569 55 -158 66 -211 110 -539 6 -44 9 -118 6 -165 -4 -47 -11 -269 -16 -495 -6 -225 -17 -454 -24 -508 -8 -54 -10 -100 -5 -103 4 -3 40 -8 79 -11 67 -6 71 -5 66 13 -43 146 -49 266 -42 774 9 592 -5 792 -75 1063 -44 172 -139 368 -233 479 -173 206 -501 340 -821 337 -61 -1 -129 -6 -151 -11z m113 -560 l-3 -293 -29 -59 c-61 -124 -131 -175 -298 -217 -82 -21 -122 -37 -157 -63 -52 -38 -101 -101 -101 -130 0 -15 7 -12 37 15 55 48 149 86 252 103 53 8 106 23 125 36 56 34 142 134 167 194 12 31 26 56 31 56 4 0 15 -15 24 -32 31 -61 85 -117 145 -153 67 -39 106 -50 234 -64 180 -21 313 -121 374 -282 63 -164 19 -480 -98 -714 -57 -116 -86 -158 -171 -249 -55 -58 -90 -81 -90 -58 -2 63 -36 213 -61 267 -5 11 -15 38 -23 60 -15 43 -175 393 -254 555 l-27 55 -50 0 -50 0 -33 -70 c-95 -204 -106 -216 -204 -223 -78 -6 -110 10 -202 97 -53 52 -67 61 -61 41 26 -91 107 -182 179 -201 40 -11 117 -5 149 12 32 18 30 11 -82 -261 -28 -69 -64 -155 -78 -192 -15 -38 -32 -68 -37 -68 -32 0 -152 178 -196 291 -33 82 -89 319 -90 377 0 17 -5 32 -11 32 -13 0 -7 -122 12 -246 l11 -71 -45 -42 c-113 -105 -128 -305 -27 -380 62 -46 64 -68 6 -63 -70 6 -93 -48 -30 -74 27 -12 34 -19 29 -34 -7 -23 26 -60 56 -60 39 0 59 19 59 55 0 30 3 35 23 35 29 0 47 18 47 47 0 30 -31 46 -65 33 -21 -8 -27 -7 -32 7 -4 9 -2 18 5 21 34 11 77 51 87 81 6 19 16 36 22 38 5 2 35 -26 66 -62 59 -69 59 -70 72 -215 3 -36 17 -127 32 -203 17 -85 23 -141 17 -146 -5 -5 -55 -14 -112 -20 -124 -12 -188 1 -270 55 -107 72 -208 240 -259 434 l-28 105 0 425 c0 453 4 506 51 620 26 64 30 57 38 -60 9 -158 58 -353 118 -472 22 -44 30 -47 52 -14 15 23 14 28 -13 88 -71 159 -96 293 -96 513 0 228 30 356 126 545 50 97 143 219 214 282 142 123 328 201 498 207 l28 1 -3 -292z m128 -1175 c70 -145 189 -441 181 -449 -7 -7 -35 42 -126 220 -92 180 -96 186 -122 186 -17 0 -19 8 -19 78 0 124 12 119 86 -35z m-116 48 c0 -82 -6 -101 -30 -101 -13 0 -26 -19 -46 -72 -15 -40 -37 -99 -50 -132 -32 -80 -68 -231 -60 -251 15 -40 44 25 62 140 6 39 40 142 71 218 18 42 40 48 48 15 3 -13 5 -293 3 -623 l-3 -600 -26 -50 c-15 -27 -41 -67 -58 -89 -17 -21 -31 -42 -31 -46 0 -5 -58 -67 -128 -139 -90 -92 -135 -131 -151 -131 -35 0 -126 49 -164 89 -63 66 -66 60 117 247 91 93 166 176 166 185 0 9 -18 112 -40 229 -43 230 -48 301 -25 397 13 57 87 244 105 268 4 6 13 26 18 45 10 34 65 166 102 245 26 57 70 162 70 168 0 21 22 57 35 57 12 0 15 -14 15 -69z m78 -173 c5 -7 29 -50 53 -95 88 -167 99 -186 131 -241 81 -141 101 -209 100 -327 -1 -49 -7 -115 -13 -145 -7 -30 -12 -120 -13 -200 -1 -132 1 -149 21 -187 21 -39 78 -93 99 -93 5 0 38 -21 74 -46 36 -25 88 -60 116 -79 61 -40 66 -51 52 -102 -16 -61 -70 -118 -149 -157 -71 -35 -72 -36 -103 -18 -60 34 -273 260 -321 342 -94 161 -90 126 -92 708 -2 350 1 512 8 512 14 0 57 -100 75 -176 20 -89 32 -116 45 -108 14 8 6 128 -10 148 -16 18 -101 237 -101 259 0 20 13 22 28 5z m-694 -323 c20 -50 36 -106 36 -125 0 -47 -47 -100 -87 -100 -115 2 -134 229 -26 308 15 11 31 18 34 14 3 -4 23 -48 43 -97z m1464 35 c14 -38 26 -99 29 -146 l6 -80 -32 -27 c-18 -15 -39 -27 -47 -27 -24 0 -67 26 -98 59 l-30 31 46 92 c26 51 52 110 59 131 19 54 40 44 67 -33z m-1580 -389 c-2 -9 -11 -17 -21 -19 -21 -4 -35 27 -17 38 19 12 42 0 38 -19z m140 2 c2 -7 -4 -16 -12 -19 -19 -7 -49 14 -40 28 8 13 46 6 52 -9z m1479 -9 c8 -21 -13 -42 -28 -27 -13 13 -5 43 11 43 6 0 13 -7 17 -16z m-139 -11 c-4 -21 -36 -29 -51 -14 -9 9 -8 14 3 21 25 16 52 12 48 -7z m-1410 -56 c4 -20 -25 -34 -40 -19 -15 15 -1 44 19 40 10 -2 19 -11 21 -21z m1472 -28 c0 -12 -7 -19 -19 -19 -27 0 -34 15 -15 34 19 19 34 12 34 -15z m-298 -300 c136 -28 293 -149 394 -303 26 -39 56 -83 66 -98 10 -15 24 -44 32 -65 51 -136 63 -174 56 -178 -17 -11 -130 133 -130 166 0 9 -17 43 -39 76 -46 71 -92 98 -151 88 -38 -6 -44 -3 -142 72 -57 43 -123 91 -146 107 -40 27 -72 70 -72 96 0 17 39 50 60 50 10 0 43 -5 72 -11z m-1180 -346 c-8 -102 80 -233 199 -294 38 -19 53 -21 121 -16 76 6 78 6 78 -16 0 -29 -33 -83 -61 -97 -13 -7 -49 -11 -88 -8 -172 9 -358 180 -369 339 -5 69 12 103 61 125 51 22 63 15 59 -33z m1466 -67 c5 -54 -24 -141 -60 -181 -41 -47 -29 -56 19 -15 49 42 68 72 83 126 14 48 24 54 40 25 16 -31 12 -96 -10 -158 -43 -123 -164 -212 -290 -213 -47 0 -74 5 -97 20 -35 21 -96 98 -88 110 3 4 25 11 50 14 136 21 278 144 316 274 15 51 33 50 37 -2z"/>
     </g>
   </svg>
 </div>
@@ -1773,7 +1789,7 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
     </div>
 
     <div class="flip-count"><span id="flipCnt">01</span> / 04</div>
-    <div class="flip-hint">Scroll to turn the page</div>
+    <div class="flip-hint">Click the page to turn &middot; or use &#8592; &#8594;</div>
   </div>
 </div>
 
@@ -2151,100 +2167,67 @@ function doForm(e){
 
 
 /* =========================================================
-   Hero figure — TRUE sequential outline draw.
-   The traced figure has many subpaths; we split them and
-   draw each one after another so it visibly "draws" like a
-   hand sketching. Scroll reverses/fades it.
+   Hero figure — single-path outline draw. The traced path is
+   ONE connected path (320 segments); we measure its true length
+   and animate the stroke from hidden to fully drawn. Guaranteed
+   to complete because the final frame forces full reveal.
+   Reverses + fades on scroll.
 ========================================================= */
 (function(){
-  var orig  = document.getElementById('bgf-path');
+  var fig   = document.getElementById('bgf-path');
   var layer = document.getElementById('bg-figure');
-  var svg   = document.getElementById('bgf-svg');
-  if(!orig || !layer || !svg) return;
+  if(!fig || !layer) return;
 
-  var g = orig.parentNode;
-  var fullD = orig.getAttribute('d');
-  // split into subpaths on M/m (keep the command)
-  var subs = fullD.match(/[Mm][^Mm]*/g) || [fullD];
-  // remove the original single path
-  orig.style.display = 'none';
+  // keep the path whole — do NOT split (subpaths use relative coords)
+  fig.style.fill = 'none';
+  fig.style.stroke = 'rgba(240,237,230,.40)';
+  fig.style.strokeWidth = '5';
+  fig.setAttribute('stroke-linecap','round');
+  fig.setAttribute('stroke-linejoin','round');
 
-  // create a child path per subpath
-  var paths = subs.map(function(d){
-    var p = document.createElementNS('http://www.w3.org/2000/svg','path');
-    p.setAttribute('d', d);
-    p.setAttribute('fill','none');
-    p.setAttribute('stroke','rgba(240,237,230,.34)');
-    p.setAttribute('stroke-width','5');
-    p.setAttribute('stroke-linecap','round');
-    p.setAttribute('stroke-linejoin','round');
-    g.appendChild(p);
-    return p;
-  });
-
-  // setup dash for each
-  var lens = paths.map(function(p){
-    var L = p.getTotalLength() || 1;
-    p.style.strokeDasharray = L;
-    p.style.strokeDashoffset = L;
-    p.style.transition = 'none';
-    return L;
-  });
+  var L = fig.getTotalLength();
+  if(!L || L < 1){ L = 62281; }          // fallback to known length
+  fig.style.strokeDasharray = L;
+  fig.style.strokeDashoffset = L;        // fully hidden
+  fig.style.transition = 'none';
 
   function clamp(v,a,b){ return Math.min(Math.max(v,a),b); }
+  function ease(p){ return p<0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2; }
 
-  // total length for proportional sequential reveal
-  var totalLen = lens.reduce(function(a,b){ return a+b; }, 0);
-
-  // reveal up to a global progress 0..1 across all subpaths in order
   function reveal(prog){
-    var drawn = prog * totalLen;
-    var acc = 0;
-    for(var i=0;i<paths.length;i++){
-      var L = lens[i];
-      if(drawn >= acc + L){
-        paths[i].style.strokeDashoffset = 0;          // fully drawn
-      } else if(drawn <= acc){
-        paths[i].style.strokeDashoffset = L;          // not started
-      } else {
-        paths[i].style.strokeDashoffset = (acc + L - drawn); // mid-draw
-      }
-      acc += L;
-    }
+    var e = ease(clamp(prog,0,1));
+    fig.style.strokeDashoffset = String(L * (1 - e));
   }
 
   reveal(0);
   layer.style.opacity = '0';
-
   var introDone = false;
 
-  // INTRO: animate progress 0→1 over ~3.8s (visible sequential draw)
+  // INTRO — draws to COMPLETION over 4s, regardless of scroll
   var t0 = null;
   function intro(ts){
     if(t0===null) t0 = ts;
-    var p = clamp((ts - t0)/3800, 0, 1);
-    // always finish the draw; don't abort on scroll
-    reveal(p);
+    var p = clamp((ts - t0)/4000, 0, 1);
     layer.style.opacity = String(Math.min(p*2, 1));
-    if(p < 1 && (window.scrollY||0) < window.innerHeight*0.5){
+    reveal(p);
+    if(p < 1){
       requestAnimationFrame(intro);
     } else {
-      reveal(1);            // complete the figure fully
+      fig.style.strokeDashoffset = '0';   // FORCE fully drawn
       introDone = true;
     }
   }
   setTimeout(function(){ requestAnimationFrame(intro); }, 500);
 
-  // SCROLL: un-draw + fade as you scroll down screen 1→3; reverse on up
+  // SCROLL — un-draw + fade going down; redraw going up (only after intro completes)
   var ticking = false;
   function onScroll(){
     ticking = false;
+    if(!introDone) return;
     var y = window.scrollY || window.pageYOffset;
     var H = window.innerHeight;
-    if(introDone){
-      var shown = clamp(1 - (y/(H*0.9)), 0, 1);  // 1 at top, 0 by end screen1
-      reveal(shown);
-    }
+    var shown = clamp(1 - (y/(H*0.9)), 0, 1);
+    reveal(shown);
     var fade;
     if(y <= H) fade = 1;
     else if(y >= H*3) fade = 0;
@@ -2296,35 +2279,51 @@ function doForm(e){
   onScroll();
 })();
 
-/* === SKETCHBOOK page flip (scroll-driven) === */
+/* === SKETCHBOOK — click to flip, pages stay so you can read === */
 (function(){
-  var track = document.getElementById('flip-track');
   var pages = Array.prototype.slice.call(document.querySelectorAll('.fpage'));
   var cnt = document.getElementById('flipCnt');
-  if(!track || !pages.length) return;
+  var prev = document.getElementById('flipPrev');
+  var next = document.getElementById('flipNext');
+  if(!pages.length) return;
   var TOTAL = pages.length;
-  pages.forEach(function(p,i){ p.style.zIndex = String(TOTAL - i); });
-  function onFlip(){
-    var rect = track.getBoundingClientRect();
-    var trackH = track.offsetHeight - window.innerHeight;
-    var scrolled = Math.min(Math.max(-rect.top, 0), trackH);
-    var progress = trackH > 0 ? scrolled / trackH : 0;
-    var turned = progress * TOTAL;
+  var cur = 0;   // how many pages are flipped
+
+  function render(){
     pages.forEach(function(p,i){
-      var local = Math.min(Math.max(turned - i, 0), 1);
-      p.style.transform = 'rotateY(' + (local * -180) + 'deg)';
-      p.style.zIndex = String(local > 0.5 ? i : TOTAL - i);
+      if(i < cur){
+        p.style.transform = 'rotateY(-180deg)';
+        p.style.zIndex = String(i);
+      } else {
+        p.style.transform = 'rotateY(0deg)';
+        p.style.zIndex = String(TOTAL - i);
+      }
     });
-    if(cnt) cnt.textContent = String(Math.min(TOTAL, Math.floor(turned)+1)).padStart(2,'0');
+    if(cnt) cnt.textContent = String(Math.min(cur+1, TOTAL)).padStart(2,'0');
   }
-  window.addEventListener('scroll', onFlip, {passive:true});
-  window.addEventListener('resize', onFlip);
-  onFlip();
+  render();
+
+  function go(dir){
+    cur = Math.min(Math.max(cur + dir, 0), TOTAL - 1);
+    render();
+  }
+
+  // click right half of the book = next, left half = previous
   pages.forEach(function(p){
     p.addEventListener('click', function(e){
-      if(e.target.closest('a')) return;
-      if(p.dataset.href) window.location.href = p.dataset.href;
+      if(e.target.closest('a')) return;   // let case-study links work
+      var rect = p.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      if(x > rect.width * 0.5) go(1); else go(-1);
     });
+  });
+  if(next) next.addEventListener('click', function(){ go(1); });
+  if(prev) prev.addEventListener('click', function(){ go(-1); });
+
+  // arrow keys when book in view
+  window.addEventListener('keydown', function(e){
+    if(e.key==='ArrowRight') go(1);
+    if(e.key==='ArrowLeft') go(-1);
   });
 })();
 </script>
