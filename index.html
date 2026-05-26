@@ -907,14 +907,21 @@ footer {
             footer{padding:16px 24px}
 }
 @media(max-width:760px){
-  nav{padding:14px 22px}
-  .n-links{display:none}
-  .ham{display:flex}
+  nav{
+    position:fixed; top:0; left:0; right:0; bottom:auto;
+    flex-direction:row; justify-content:center; align-items:center;
+    gap:16px; padding:14px 16px;
+    background:rgba(26,46,74,.72); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    transform:none !important; opacity:1 !important; pointer-events:auto !important;
+  }
+  .n-links{display:flex !important; flex-direction:row; gap:16px; flex-wrap:wrap; justify-content:center}
+  .n-links a{font-size:10px; letter-spacing:1.5px; padding-bottom:3px}
+  .ham{display:none !important}
   .h-text{padding:0 22px 64px;max-width:100%}
   .h-panel{clip-path:polygon(38% 0,100% 0,100% 100%,14% 100%)}
   .h-name{font-size:clamp(42px,12vw,74px)}
   .ps-content{padding:32px 22px}
-          .cf-row{grid-template-columns:1fr}
+  .cf-row{grid-template-columns:1fr}
   .bio-stats{flex-wrap:wrap;gap:22px}
 }
 
@@ -1586,18 +1593,10 @@ footer {
   opacity: 0;
   transition: opacity .5s ease;
 }
-@media (max-width: 900px) {
-  #bg-figure { right: 0; height: 60vh; opacity: .45; }
-}
-@media (max-width: 640px) {
-  #bg-figure { display: none; }
-}
-@media (max-width: 900px) {
-  #bg-figure { right: 2vw; height: 50vh; opacity: .5; }
-}
-@media (max-width: 640px) {
-  #bg-figure { display: none; }
-}
+
+
+
+
 #bgf-svg { width: 100%; height: auto; display: block; overflow: visible; }
 
 #bgf-path {
@@ -1609,9 +1608,7 @@ footer {
 }
 /* fade the whole layer out as we approach the busy sketchbook */
 #bg-figure.fade-out { opacity: 0; }
-@media (max-width: 860px) {
-  #bg-figure { right: 2vw; width: 60vw; opacity: .6; }
-}
+
 
 
 .n-links li {
@@ -1630,6 +1627,22 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 @media (max-width: 900px) {
   #writing, footer, #socials-strip { padding-left: 24px !important; }
   #rband { padding-left: 0 !important; }
+}
+
+
+@media (max-width: 900px) {
+  #bg-figure {
+    right: 50%;
+    transform: translate(50%, -50%);   /* center it on mobile */
+    height: clamp(360px, 56vh, 520px);
+    opacity: .28;                       /* faint, sits behind text */
+  }
+}
+
+
+@media (max-width: 760px) {
+  #hero { align-items: center; padding-top: 60px; }
+  .h-text { padding-bottom: 0 !important; }
 }
 
 </style>
