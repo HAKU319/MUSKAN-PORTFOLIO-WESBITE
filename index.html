@@ -509,7 +509,7 @@ body.wada-4 .n-dot { background:#7A5A9A;box-shadow:0 0 8px rgba(122,90,154,.5) }
   position: absolute;
   left: 0; bottom: 0;
   width: 0; height: 1.5px;
-  background: rgba(240,237,230,.85);
+  background: #6e8a66;
   transition: width .4s cubic-bezier(.22,1,.36,1);
 }
 .n-links a:hover { color: rgba(240,237,230,.85); }
@@ -686,7 +686,7 @@ body.wada-1 body.wada-2 body.wada-3 body.wada-4 .cl-h em { font-style:italic;col
   position:relative;
   z-index:3;
   background:#2C4A6E;
-}
+padding-left:160px;}
 .rb-ln { background:rgba(240,237,230,.08) }
 .rb-a,.rb-b,.rb-c { padding:60px 52px;display:flex;flex-direction:column;justify-content:center }
 .rb-c { background:rgba(172,184,165,.05) }
@@ -727,7 +727,7 @@ body.wada-1 body.wada-2 body.wada-3 body.wada-4 .cl-h em { font-style:italic;col
 
 /* ── WRITING — Eugene Wan dark atmospheric ────── */
 #writing {
-  padding:88px 52px;
+  padding:88px 52px 88px 200px;
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E"),
     linear-gradient(155deg,var(--forest) 0%,#060e0a 100%);
@@ -879,7 +879,7 @@ background:#2C4A6E;z-index:2;}
 .cf-ok { font-family:'Cabinet Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--teal);padding:10px 0;display:none }
 
 footer {
-  padding:20px 52px;
+  padding:20px 52px 20px 200px;
   background:#1a2e4a;
   display:flex; align-items:center; justify-content:space-between;
   border-top:1px solid rgba(172,184,165,.12);
@@ -1177,7 +1177,7 @@ footer {
    SOCIALS STRIP — bottom of contact
 ═══════════════════════════════════════════════════════════ */
 #socials-strip {
-  padding:40px 52px 140px;
+  padding:40px 52px 140px 200px;
   display:flex; flex-direction:column;
   align-items:center; gap:24px;
   position:relative;
@@ -1625,6 +1625,12 @@ nav.show .n-links li:nth-child(2) { transition-delay: .16s; }
 nav.show .n-links li:nth-child(3) { transition-delay: .24s; }
 nav.show .n-links li:nth-child(4) { transition-delay: .32s; }
 nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
+
+
+@media (max-width: 900px) {
+  #writing, footer, #socials-strip { padding-left: 24px !important; }
+  #rband { padding-left: 0 !important; }
+}
 
 </style>
 </head>
@@ -2221,7 +2227,7 @@ function doForm(e){
   var t0 = null;
   function intro(ts){
     if(t0===null) t0 = ts;
-    var p = clamp((ts - t0)/6500, 0, 1);
+    var p = clamp((ts - t0)/8500, 0, 1);
     layer.style.opacity = String(Math.min(p*1.6, 1));
     reveal(p);
     if(p < 1){ requestAnimationFrame(intro); }
