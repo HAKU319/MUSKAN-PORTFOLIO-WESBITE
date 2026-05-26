@@ -439,28 +439,25 @@ body.cd #cur-dot { background:var(--mist) }
 /* ── NAV — Oscar Tao: barely there ───────────────── */
 nav {
   position: fixed;
-  top: 50%;
+  top: 90px;               /* uses the top space instead of vertical-center */
   left: 44px;
-  transform: translateY(-50%) translateX(-16px);
   z-index: 500;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 30px;
-  /* NO box — sits directly on the page background */
-  background: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  gap: 24px;
+  background: none;        /* NO box */
   border: none;
-  width: auto;
   padding: 0;
+  width: auto;
   opacity: 0;
   pointer-events: none;
+  transform: translateX(-14px);
   transition: opacity .7s ease, transform .7s cubic-bezier(.22,1,.36,1);
 }
 nav.show {
   opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  transform: translateX(0);
   pointer-events: auto;
 }
 nav.show {
@@ -496,18 +493,29 @@ body.wada-4 .n-dot { background:#7A5A9A;box-shadow:0 0 8px rgba(122,90,154,.5) }
   font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(240, 237, 230, .45);
+  color: rgba(240, 237, 230, .5);
   text-decoration: none;
-  transition: color .3s, letter-spacing .3s, font-size .3s;
-  display: block;
+  display: inline-block;
+  position: relative;
+  padding-bottom: 6px;
+  transition: color .3s, letter-spacing .3s;
 }
-.n-links a:hover { color: rgba(240,237,230,.8); }
+/* animated underline — like the line under NEW YORK */
+.n-links a::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 0; height: 1.5px;
+  background: rgba(240,237,230,.85);
+  transition: width .4s cubic-bezier(.22,1,.36,1);
+}
+.n-links a:hover { color: rgba(240,237,230,.85); }
+.n-links a:hover::after { width: 28px; }
 .n-links a.active {
   color: #ffffff;
-  font-size: 15px;
   letter-spacing: 4px;
-  font-weight: 800;
 }
+.n-links a.active::after { width: 100%; }  /* full underline on active */
 .n-links a:hover {
   color: #fff;
   padding-left: 8px;
@@ -1438,8 +1446,10 @@ footer {
   gap: 30px;
 }
 .flip-label {
-  position: absolute; top: 48px; left: 0; right: 0;
-  text-align: center; z-index: 5; pointer-events: none;
+  position: relative;
+  text-align: center;
+  margin-bottom: 36px;
+  z-index: 5;
 }
 .flip-eyebrow {
   font-family: 'Cabinet Grotesk', sans-serif;
@@ -1449,10 +1459,12 @@ footer {
 }
 .flip-h {
   font-family: 'Fraunces', serif;
-  font-size: clamp(34px, 5vw, 64px);
-  font-weight: 300; font-style: italic;
-  color: rgba(240,237,230,.85);
+  font-size: clamp(36px, 5.5vw, 68px);
+  font-weight: 400; font-style: italic;
+  color: rgba(240,237,230,.92);
+  letter-spacing: -1px;
 }
+.flip-h em { font-style: italic; color: rgba(240,237,230,.6); font-weight: 300; }
 .flip-h em { font-style: italic; color: rgba(240,237,230,.78); }
 
 #book {
@@ -1561,15 +1573,21 @@ footer {
 /* ═══ Persistent background figure — draws on scroll, fades before busy sections ═══ */
 #bg-figure {
   position: fixed;
-  top: 50%;
-  right: 5vw;
+  top: 46%;                 /* nudged slightly up for diagonal balance vs bottom-left text */
+  right: 8vw;
   transform: translateY(-50%);
-  height: clamp(420px, 82vh, 760px);   /* larger — clear first-layer presence */
+  height: clamp(420px, 70vh, 640px);   /* a little bigger, still fits */
   width: auto;
   z-index: 0;
   pointer-events: none;
   opacity: 0;
-  transition: opacity .6s ease;
+  transition: opacity .5s ease;
+}
+@media (max-width: 900px) {
+  #bg-figure { right: 2vw; height: 50vh; opacity: .5; }
+}
+@media (max-width: 640px) {
+  #bg-figure { display: none; }
 }
 #bgf-svg { width: 100%; height: auto; display: block; overflow: visible; }
 
@@ -1780,15 +1798,10 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
         </div>
       </div>
 
-      <div class="fpage fpage-end">
-        <div class="fpage-face" style="align-items:center;justify-content:center;text-align:center">
-          <div class="fp-title" style="font-size:clamp(26px,3.4vw,38px)">End of the<br>sketchbook</div>
-          <div class="fp-desc" style="margin-top:18px;text-align:center;max-width:none">Keep scrolling to explore the rest.</div>
-        </div>
-      </div>
+      
     </div>
 
-    <div class="flip-count"><span id="flipCnt">01</span> / 04</div>
+    <div class="flip-count"><span id="flipCnt">01</span> / 03</div>
     <div class="flip-hint">Click the page to turn &middot; or use &#8592; &#8594;</div>
   </div>
 </div>
@@ -2167,72 +2180,58 @@ function doForm(e){
 
 
 /* =========================================================
-   Hero figure — single-path outline draw. The traced path is
-   ONE connected path (320 segments); we measure its true length
-   and animate the stroke from hidden to fully drawn. Guaranteed
-   to complete because the final frame forces full reveal.
-   Reverses + fades on scroll.
+   Hero figure — draws on load (like being sketched), then the
+   disappearance is SYNCED to scroll: as you scroll down through
+   the first screen, the outline un-draws + fades in lockstep
+   with scroll position. Scroll back up = it redraws.
 ========================================================= */
 (function(){
   var fig   = document.getElementById('bgf-path');
   var layer = document.getElementById('bg-figure');
   if(!fig || !layer) return;
 
-  // keep the path whole — do NOT split (subpaths use relative coords)
   fig.style.fill = 'none';
-  fig.style.stroke = 'rgba(240,237,230,.40)';
-  fig.style.strokeWidth = '5';
   fig.setAttribute('stroke-linecap','round');
   fig.setAttribute('stroke-linejoin','round');
 
   var L = fig.getTotalLength();
-  if(!L || L < 1){ L = 62281; }          // fallback to known length
+  if(!L || L < 1){ L = 62281; }
   fig.style.strokeDasharray = L;
-  fig.style.strokeDashoffset = L;        // fully hidden
+  fig.style.strokeDashoffset = L;
   fig.style.transition = 'none';
 
   function clamp(v,a,b){ return Math.min(Math.max(v,a),b); }
   function ease(p){ return p<0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2; }
-
-  function reveal(prog){
-    var e = ease(clamp(prog,0,1));
-    fig.style.strokeDashoffset = String(L * (1 - e));
-  }
+  function reveal(prog){ fig.style.strokeDashoffset = String(L * (1 - ease(clamp(prog,0,1)))); }
 
   reveal(0);
   layer.style.opacity = '0';
   var introDone = false;
 
-  // INTRO — draws to COMPLETION over 4s, regardless of scroll
+  // INTRO: sketch it in over 4s, runs to full completion
   var t0 = null;
   function intro(ts){
     if(t0===null) t0 = ts;
     var p = clamp((ts - t0)/4000, 0, 1);
-    layer.style.opacity = String(Math.min(p*2, 1));
+    layer.style.opacity = String(Math.min(p*1.6, 1));
     reveal(p);
-    if(p < 1){
-      requestAnimationFrame(intro);
-    } else {
-      fig.style.strokeDashoffset = '0';   // FORCE fully drawn
-      introDone = true;
-    }
+    if(p < 1){ requestAnimationFrame(intro); }
+    else { fig.style.strokeDashoffset = '0'; introDone = true; }
   }
   setTimeout(function(){ requestAnimationFrame(intro); }, 500);
 
-  // SCROLL — un-draw + fade going down; redraw going up (only after intro completes)
+  // SCROLL-SYNCED disappear: over the first viewport of scrolling,
+  // the figure un-draws (1→0) and fades, locked to scroll position.
   var ticking = false;
   function onScroll(){
     ticking = false;
     if(!introDone) return;
     var y = window.scrollY || window.pageYOffset;
     var H = window.innerHeight;
-    var shown = clamp(1 - (y/(H*0.9)), 0, 1);
-    reveal(shown);
-    var fade;
-    if(y <= H) fade = 1;
-    else if(y >= H*3) fade = 0;
-    else fade = 1 - ((y-H)/(H*2));
-    layer.style.opacity = String(clamp(fade,0,1));
+    // progress through first screen: 0 at top, 1 by one full viewport
+    var sp = clamp(y / H, 0, 1);
+    reveal(1 - sp);                 // un-draw synced to scroll
+    layer.style.opacity = String(1 - sp);  // fade synced to scroll
   }
   window.addEventListener('scroll', function(){
     if(!ticking){ requestAnimationFrame(onScroll); ticking=true; }
