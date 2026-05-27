@@ -1486,26 +1486,8 @@ footer {
 
 
 /* ═══ SKETCHBOOK page-curl flip (Paper-app style) ═══ */
-#flip-track {
-  min-height: 100vh;
-  position: relative;
-  z-index: 2;
-  margin-top: 12vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 24px;
-}
-#flip-stage {
-  position: relative;
-  width: 100%;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 30px;
-}
+
+
 .flip-label {
   position: relative;
   text-align: center;
@@ -1528,39 +1510,14 @@ footer {
 .flip-h em { font-style: italic; color: rgba(240,237,230,.6); font-weight: 300; }
 .flip-h em { font-style: italic; color: rgba(240,237,230,.78); }
 
-#book {
-  position: relative;
-  width: min(440px, 86vw);
-  height: min(580px, 68vh);
-  perspective: 2400px;
-}
-.fpage {
-  position: absolute;
-  inset: 0;
-  transform-origin: left center;
-  transform-style: preserve-3d;
-  transition: transform .9s cubic-bezier(.645,.045,.355,1);
-  cursor: pointer;
-  will-change: transform;
-}
-.fpage:nth-child(1){ z-index:5 }
-.fpage:nth-child(2){ z-index:4 }
-.fpage:nth-child(3){ z-index:3 }
-.fpage:nth-child(4){ z-index:2 }
-.fpage-face {
-  position: absolute; inset: 0;
-  backface-visibility: hidden; -webkit-backface-visibility: hidden;
-  border-radius: 4px 10px 10px 4px;
-  overflow: hidden;
-  background: linear-gradient(135deg, #f4ead5 0%, #ece0c6 100%);
-  box-shadow: 0 18px 50px rgba(0,0,0,.4), inset 0 0 40px rgba(180,150,100,.08);
-  display: flex; flex-direction: column;
-  padding: 46px 40px;
-}
-.fpage-face::before {
-  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 55px;
-  background: linear-gradient(90deg, rgba(120,90,50,.22), transparent);
-}
+
+
+
+
+
+
+
+
 .fp-cat {
   font-family: 'Cabinet Grotesk', sans-serif;
   font-size: 8px; font-weight: 700;
@@ -1618,8 +1575,8 @@ footer {
   pointer-events: none;
 }
 @media (max-width: 600px) {
-  #book { width: 86vw; height: 64vh; }
-  .fpage-face { padding: 36px 28px; }
+  
+  
 }
 
 
@@ -1693,7 +1650,54 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
   .h-text { padding-bottom: 0 !important; }
 }
 
+
+/* ═══ SKETCHBOOK — StPageFlip realistic book ═══ */
+#flip-track {
+  min-height: 100vh;
+  position: relative;
+  z-index: 2;
+  margin-top: 12vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  padding: 80px 20px;
+}
+.flip-label { position: relative; text-align: center; }
+#book-wrap {
+  width: 100%;
+  max-width: 920px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 560px;
+}
+/* page faces */
+.sb-page { background: linear-gradient(125deg,#f6ecd8 0%,#ece0c6 100%); overflow: hidden; }
+.sb-inner { position: relative; width: 100%; height: 100%; padding: 46px 40px; display: flex; flex-direction: column; }
+.sb-edge { position: absolute; top: 0; bottom: 0; left: 0; width: 46px; background: linear-gradient(90deg,rgba(120,90,50,.20),transparent); pointer-events: none; }
+.sb-cat { font-family:'Cabinet Grotesk',sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(58,37,21,.5); margin-bottom: 18px; }
+.sb-accent { width: 30px; height: 2px; margin-bottom: 18px; }
+.sb-title { font-family:'Fraunces',serif; font-size: clamp(26px,3.4vw,40px); font-weight: 800; font-style: italic; color: #2a1a0e; line-height: 1; letter-spacing: -1px; }
+.sb-sub { display: block; font-style: normal; font-weight: 300; font-size: .5em; color: rgba(58,37,21,.55); margin-top: 8px; }
+.sb-desc { font-family:'Cabinet Grotesk',sans-serif; font-size: 13px; line-height: 1.7; color: rgba(58,37,21,.62); margin-top: 22px; }
+.sb-cta { display: inline-block; margin-top: auto; font-family:'Cabinet Grotesk',sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(58,37,21,.75); text-decoration: none; border-bottom: 1px solid rgba(58,37,21,.4); padding-bottom: 4px; align-self: flex-start; }
+.sb-num { position: absolute; bottom: 28px; right: 34px; font-family:'Fraunces',serif; font-size: 13px; font-style: italic; color: rgba(58,37,21,.4); }
+/* cover pages */
+.sb-cover { background: linear-gradient(135deg,#1f3a5c,#16293f); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #ece0c6; padding: 50px; }
+.sb-cover h2 { font-family:'Fraunces',serif; font-style: italic; font-weight: 300; font-size: 32px; line-height: 1.1; }
+.sb-cover .sb-csub { font-family:'Cabinet Grotesk',sans-serif; font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: rgba(236,224,198,.5); margin-top: 18px; }
+.sb-cover .sb-crule { width: 40px; height: 1px; background: rgba(236,224,198,.4); margin: 20px 0; }
+/* controls */
+.flip-controls { display: flex; gap: 16px; align-items: center; }
+.flip-controls button { background: none; border: 1px solid rgba(240,237,230,.3); color: rgba(240,237,230,.8); width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 16px; transition: .2s; }
+.flip-controls button:hover { background: rgba(240,237,230,.1); border-color: rgba(240,237,230,.6); }
+.flip-count { font-family:'Cabinet Grotesk',sans-serif; font-size: 11px; letter-spacing: 2px; color: rgba(240,237,230,.5); font-weight: 700; min-width: 60px; text-align: center; }
+.flip-hint { font-family:'Cabinet Grotesk',sans-serif; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: rgba(240,237,230,.4); }
+
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 </head>
 <body>
 
@@ -1835,54 +1839,19 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 <!-- ═══ ACADEMIC PROJECTS — Compact slide deck ═══ -->
 <!-- ═══ ACADEMIC — Sketchbook page-curl flip ═══ -->
 <div id="flip-track">
-  <div id="flip-stage">
-    <div class="flip-label">
-      <div class="flip-h">Research &amp; <em>experiments</em></div>
-    </div>
-
-    <div id="book">
-      <div class="fpage" data-href="spotify.html">
-        <div class="fpage-face">
-          <div class="fp-cat">UX Research &nbsp;&middot;&nbsp; Thesis &nbsp;&middot;&nbsp; 2024</div>
-          <div class="fp-accent" style="background:#2C4A6E"></div>
-          <div class="fp-title">Spotify Research<span class="fp-sub">Feature Design</span></div>
-          <div class="fp-desc">End-to-end UX — research, flows, wireframes and interactive prototype. A feature born from listening to real users.</div>
-          <a href="spotify.html" class="fp-cta">View Case Study &#8594;</a>
-          <div class="fp-num">01</div>
-        </div>
-      </div>
-
-      <div class="fpage" data-href="piano-vr.html">
-        <div class="fpage-face">
-          <div class="fp-cat">VR / XR Design &nbsp;&middot;&nbsp; 2025</div>
-          <div class="fp-accent" style="background:#3D5C2A"></div>
-          <div class="fp-title">Piano VR App<span class="fp-sub">Menu Redesign</span></div>
-          <div class="fp-desc">Spatial UX redesign — navigation architecture, information hierarchy and immersive user flows.</div>
-          <a href="piano-vr.html" class="fp-cta">View Case Study &#8594;</a>
-          <div class="fp-num">02</div>
-        </div>
-      </div>
-
-      <div class="fpage" data-href="vr-accessibility.html">
-        <div class="fpage-face">
-          <div class="fp-cat">VR &nbsp;&middot;&nbsp; AI &nbsp;&middot;&nbsp; Accessibility &nbsp;&middot;&nbsp; 2024</div>
-          <div class="fp-accent" style="background:#4A3070"></div>
-          <div class="fp-title">VR Accessibility<span class="fp-sub">AI Object Descriptions</span></div>
-          <div class="fp-desc">AI-powered real-time 3D object descriptions inside VR. Making immersive spaces inclusive for everyone.</div>
-          <a href="vr-accessibility.html" class="fp-cta">View Case Study &#8594;</a>
-          <div class="fp-num">03</div>
-        </div>
-      </div>
-
-      
-    </div>
-
-    <div class="flip-count"><span id="flipCnt">01</span> / 03</div>
-    <div class="flip-hint">Click the page to turn &middot; or use &#8592; &#8594;</div>
+  <div class="flip-label">
+    <div class="flip-h">Research &amp; <em>experiments</em></div>
   </div>
+  <div id="book-wrap"><div id="sketchbook"></div></div>
+  <div class="flip-controls">
+    <button id="sbPrev" aria-label="Previous page">&#8249;</button>
+    <span class="flip-count"><span id="flipCnt">1</span> / 5</span>
+    <button id="sbNext" aria-label="Next page">&#8250;</button>
+  </div>
+  <div class="flip-hint">Drag a page corner to turn it &middot; like real paper</div>
 </div>
 
-<svg class="brush" style="display:block;margin-top:-2px" viewBox="0 0 1440 16" preserveAspectRatio="none" style="height:16px" xmlns="http://www.w3.org/2000/svg">
+<svg class="brush" style="display:block;margin-top:-2px" viewBox="0 0 1440 16" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M0 9C120 5 240 13 360 8C480 3 600 12 720 7C840 2 960 11 1080 7C1200 3 1320 10 1440 8" stroke="rgba(240,237,230,.18)" stroke-width="2" fill="none" stroke-linecap="round"/>
 </svg>
 
@@ -2362,53 +2331,7 @@ function doForm(e){
   onScroll();
 })();
 
-/* === SKETCHBOOK — click to flip, pages stay so you can read === */
-(function(){
-  var pages = Array.prototype.slice.call(document.querySelectorAll('.fpage'));
-  var cnt = document.getElementById('flipCnt');
-  var prev = document.getElementById('flipPrev');
-  var next = document.getElementById('flipNext');
-  if(!pages.length) return;
-  var TOTAL = pages.length;
-  var cur = 0;   // how many pages are flipped
 
-  function render(){
-    pages.forEach(function(p,i){
-      if(i < cur){
-        p.style.transform = 'rotateY(-180deg)';
-        p.style.zIndex = String(i);
-      } else {
-        p.style.transform = 'rotateY(0deg)';
-        p.style.zIndex = String(TOTAL - i);
-      }
-    });
-    if(cnt) cnt.textContent = String(Math.min(cur+1, TOTAL)).padStart(2,'0');
-  }
-  render();
-
-  function go(dir){
-    cur = Math.min(Math.max(cur + dir, 0), TOTAL - 1);
-    render();
-  }
-
-  // click right half of the book = next, left half = previous
-  pages.forEach(function(p){
-    p.addEventListener('click', function(e){
-      if(e.target.closest('a')) return;   // let case-study links work
-      var rect = p.getBoundingClientRect();
-      var x = e.clientX - rect.left;
-      if(x > rect.width * 0.5) go(1); else go(-1);
-    });
-  });
-  if(next) next.addEventListener('click', function(){ go(1); });
-  if(prev) prev.addEventListener('click', function(){ go(-1); });
-
-  // arrow keys when book in view
-  window.addEventListener('keydown', function(e){
-    if(e.key==='ArrowRight') go(1);
-    if(e.key==='ArrowLeft') go(-1);
-  });
-})();
 
 /* safety: ensure hero text is visible even if the figure animation fails */
 setTimeout(function(){
@@ -2417,6 +2340,61 @@ setTimeout(function(){
   if(t && !t.classList.contains('reveal')) t.classList.add('reveal');
   if(cta && !cta.classList.contains('reveal')) cta.classList.add('reveal');
 }, 8000);
+
+/* === SKETCHBOOK — StPageFlip realistic book === */
+(function(){
+  var pages = [
+    {type:'cover'},
+    {href:'spotify.html', cat:'UX Research \u00b7 Thesis \u00b7 2024', accent:'#2C4A6E', title:'Spotify Research', sub:'Feature Design', desc:'End-to-end UX \u2014 research, flows, wireframes and interactive prototype. A feature born from listening to real users.', num:'01'},
+    {href:'piano-vr.html', cat:'VR / XR Design \u00b7 2025', accent:'#3D5C2A', title:'Piano VR App', sub:'Menu Redesign', desc:'Spatial UX redesign \u2014 navigation architecture, information hierarchy and immersive user flows.', num:'02'},
+    {href:'vr-accessibility.html', cat:'VR \u00b7 AI \u00b7 Accessibility \u00b7 2024', accent:'#4A3070', title:'VR Accessibility', sub:'AI Object Descriptions', desc:'AI-powered real-time 3D object descriptions inside VR. Making immersive spaces inclusive for everyone.', num:'03'},
+    {type:'back'}
+  ];
+  function buildPage(p){
+    var el = document.createElement('div');
+    if(p.type==='cover'){
+      el.className='sb-page sb-cover';
+      el.innerHTML='<h2>Research &amp;<br>experiments</h2><div class="sb-crule"></div><div class="sb-csub">Sketchbook \u00b7 Muskan KC</div>';
+    } else if(p.type==='back'){
+      el.className='sb-page sb-cover';
+      el.innerHTML='<div class="sb-csub">More work at</div><h2 style="font-size:24px;margin-top:10px">muskankc.com</h2>';
+    } else {
+      el.className='sb-page';
+      el.innerHTML='<div class="sb-edge"></div><div class="sb-inner">'+
+        '<div class="sb-cat">'+p.cat+'</div>'+
+        '<div class="sb-accent" style="background:'+p.accent+'"></div>'+
+        '<div class="sb-title">'+p.title+'<span class="sb-sub">'+p.sub+'</span></div>'+
+        '<div class="sb-desc">'+p.desc+'</div>'+
+        '<a class="sb-cta" href="'+p.href+'">View Case Study \u2192</a>'+
+        '<div class="sb-num">'+p.num+'</div></div>';
+    }
+    return el;
+  }
+  function initBook(){
+    var el = document.getElementById('sketchbook');
+    if(!el) return;
+    if(typeof St === 'undefined' || !St.PageFlip){
+      // fallback: show pages stacked as simple cards so it's never blank
+      el.style.display='flex'; el.style.flexDirection='column'; el.style.gap='16px';
+      pages.forEach(function(p){ if(p.type) return; var card=buildPage(p); card.style.height='auto'; card.style.minHeight='320px'; card.style.width='min(440px,86vw)'; card.style.borderRadius='6px'; el.appendChild(card); });
+      return;
+    }
+    var pf = new St.PageFlip(el, {
+      width:400, height:540, size:'stretch',
+      minWidth:280, maxWidth:480, minHeight:380, maxHeight:600,
+      maxShadowOpacity:0.5, showCover:true, mobileScrollSupport:true,
+      drawShadow:true, flippingTime:800, usePortrait:true
+    });
+    pf.loadFromHTML(pages.map(buildPage));
+    var pg = document.getElementById('flipCnt');
+    pf.on('flip', function(e){ if(pg) pg.textContent = (e.data+1); });
+    var n=document.getElementById('sbNext'), pv=document.getElementById('sbPrev');
+    if(n) n.onclick=function(){ pf.flipNext(); };
+    if(pv) pv.onclick=function(){ pf.flipPrev(); };
+  }
+  if(document.readyState==='complete') initBook();
+  else window.addEventListener('load', initBook);
+})();
 </script>
 </body>
 </html>
