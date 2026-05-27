@@ -480,15 +480,7 @@ footer.cs-footer {
 }
 
 
-/* ═══ Side space — empty bands on left and right for future side animation ═══ */
-@media (min-width: 1000px) {
-  body::before, body::after {
-    content: ''; position: fixed; top: 0; bottom: 0; width: calc((100vw - 760px) / 2 - 40px);
-    z-index: 0; pointer-events: none;
-  }
-  body::before { left: 0; }
-  body::after  { right: 0; }
-}
+
 
 
 .bw-video-title {
@@ -516,9 +508,50 @@ footer.cs-footer {
   .bw-vt-label { font-size: 9px; }
 }
 
+
+/* ═══ Paw prints walking down the sides ═══ */
+.paw-track {
+  position: fixed;
+  top: 0; bottom: 0;
+  width: 60px;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.paw-track--left  { left: 0; }
+.paw-track--right { right: 0; }
+/* hide on narrow screens — they'd crowd the content */
+@media (max-width: 999px) {
+  .paw-track { display: none; }
+}
+.paw {
+  position: absolute;
+  width: 26px; height: 28px;
+  color: rgba(240,237,230,.22);
+  opacity: 0;
+  /* the walking animation */
+  animation: pawWalk var(--dur, 16s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+.paw svg { width: 100%; height: 100%; display: block; }
+.paw--alt { transform: scaleX(-1); }   /* alternate left/right paw */
+@keyframes pawWalk {
+  0%   { transform: translateY(-60px) rotate(var(--rot,0deg)); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateY(110vh) rotate(var(--rot,0deg)); opacity: 0; }
+}
+/* the offsets pair up: alternating left/right footsteps */
+.paw:nth-child(odd)  { left: 6px; }
+.paw:nth-child(even) { left: 28px; }
+
 </style>
 </head>
 <body>
+<!-- Paw prints walking down both sides -->
+<div class="paw-track paw-track--left" aria-hidden="true"></div>
+<div class="paw-track paw-track--right" aria-hidden="true"></div>
+
 
 <a href="/" class="nav-back">&larr; Back to portfolio</a>
 <div class="nav-actions">
@@ -704,6 +737,38 @@ footer.cs-footer {
     }, { threshold: 0.25 });
     els.forEach(function(el){ io.observe(el); });
   } else { els.forEach(function(el){ el.classList.add('in'); }); }
+})();
+</script>
+
+<script>
+(function(){
+  var pawSVG = '<svg viewBox="0 0 40 44" xmlns="http://www.w3.org/2000/svg" fill="currentColor">'+
+    '<ellipse cx="20" cy="32" rx="9" ry="8"/>'+
+    '<ellipse cx="20" cy="10" rx="3.2" ry="4.5"/>'+
+    '<ellipse cx="10" cy="15" rx="3" ry="4"/>'+
+    '<ellipse cx="30" cy="15" rx="3" ry="4"/>'+
+    '<ellipse cx="6"  cy="25" rx="2.7" ry="3.5"/>'+
+    '<ellipse cx="34" cy="25" rx="2.7" ry="3.5"/></svg>';
+  function fillTrack(track){
+    if(!track) return;
+    var COUNT = 12;       // paws walking down each side
+    var TOTAL_DUR = 22;   // seconds for one full walk
+    for(var i = 0; i < COUNT; i++){
+      var p = document.createElement('div');
+      p.className = 'paw' + (i%2 ? ' paw--alt' : '');
+      // small rotation variance per step
+      var rot = (i%2 ? -10 : 10) + (Math.random()*8 - 4);
+      // each paw delayed so they form a continuous walk
+      var delay = -(i * (TOTAL_DUR / COUNT));
+      p.style.setProperty('--rot', rot + 'deg');
+      p.style.setProperty('--delay', delay + 's');
+      p.style.setProperty('--dur', TOTAL_DUR + 's');
+      p.innerHTML = pawSVG;
+      track.appendChild(p);
+    }
+  }
+  fillTrack(document.querySelector('.paw-track--left'));
+  fillTrack(document.querySelector('.paw-track--right'));
 })();
 </script>
 </body>
