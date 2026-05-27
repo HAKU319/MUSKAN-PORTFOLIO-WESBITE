@@ -564,7 +564,7 @@ body.wada-1 body.wada-2 body.wada-3 body.wada-4 .h-panel::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  transform: translateY(-8vh);
+  transform: translateY(-14vh);
 }
 /* children start hidden, fade + rise in when .reveal is added */
 .h-text > * {
@@ -579,10 +579,22 @@ body.wada-1 body.wada-2 body.wada-3 body.wada-4 .h-panel::after {
 .h-text.reveal > *:nth-child(4){ transition-delay:.46s; }
 /* the CTA (sibling of h-text) fades in too */
 .h-cta {
-  opacity: 0;
+  display:inline-flex; align-items:center; gap:10px;
+  font-family:'Cabinet Grotesk',sans-serif; font-size:11px;
+  font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--ink); text-decoration:none;
+  border:2px solid rgba(12,25,16,.2); padding:14px 30px;
+  background:rgba(172,184,165,.16); backdrop-filter:blur(10px);
+  overflow:hidden;
+  position:absolute; bottom:14vh; left:50%;
+  transform:translateX(-50%);
+  z-index:4;
+  opacity:0;
   transition: opacity 1s ease .7s, border-color .25s;
 }
-.h-cta.reveal { opacity: 1; }
+.h-cta.reveal { opacity:1; }
+.h-cta:hover { border-color:rgba(12,25,16,.5); }
+
 .h-eyebrow {
   font-family:'Cabinet Grotesk',sans-serif; font-size:10px;
   font-weight:700; letter-spacing:4px; text-transform:uppercase;
@@ -1622,10 +1634,12 @@ footer {
 /* ═══ Persistent background figure — draws on scroll, fades before busy sections ═══ */
 #bg-figure {
   position: fixed;
-  top: 72%;                 /* shifted down so the top/head isn't cut off */
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  height: 140vh;            /* big, like before */
+  height: 96vh;             /* bigger + wider, still fits fully */
+  max-height: 96vh;
+  max-width: 96vw;          /* never overflow sideways either */
   width: auto;
   z-index: 0;
   pointer-events: none;
@@ -1670,7 +1684,7 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 
 
 @media (max-width: 900px) {
-  #bg-figure { height: 110vh; top: 60%; opacity: .20; }
+  #bg-figure { height: 78vh; max-height: 78vh; max-width: 94vw; top: 50%; opacity: .20; }
 }
 
 
