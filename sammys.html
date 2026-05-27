@@ -515,25 +515,26 @@ footer.cs-footer {
 /* ═══ Hand-paw bond figure — hero title animation ═══ */
 .hero { position: relative; }
 .hero-figure {
-  position: absolute;
+  position: fixed;                /* fixed so scroll-disappear works */
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  height: 110%;                /* bigger — fills the hero generously */
-  max-height: 780px;
+  height: 100vh;                  /* cover the WHOLE screen */
+  max-height: 100vh;
   width: auto;
-  max-width: 92vw;
+  max-width: 96vw;
   z-index: 0;
   pointer-events: none;
   opacity: 0;
-  transition: opacity .6s ease;
+  transition: opacity .5s ease;
 }
+.hero-figure.in { opacity: 1; }
 .hero-figure.in { opacity: 1; }
 .hero-figure.in { opacity: 1; }
 #hp-svg, #hd-svg { width: auto; height: 100%; display: block; overflow: visible; }
 #hp-svg path, #hd-svg path {
   fill: none;
-  stroke: rgba(240,237,230,.32);
-  stroke-width: 6;
+  stroke: rgba(240,237,230,.95);    /* darker - was .32 */
+  stroke-width: 4;                /* thinner so single line reads clean */
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -587,8 +588,8 @@ footer.cs-footer {
 }
 .outcome-figure #hp-svg path {
   fill: none;
-  stroke: rgba(240,237,230,.85);
-  stroke-width: 5;
+  stroke: rgba(240,237,230,.95);
+  stroke-width: 3.5;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -604,6 +605,13 @@ footer.cs-footer {
   font-family: 'Cabinet Grotesk', sans-serif;
   font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
   text-transform: uppercase; color: rgba(240,237,230,.5);
+}
+
+
+/* live-cta inside the outcome-figure (centered under the caption) */
+.outcome-figure .live-cta {
+  margin-top: 28px;
+  display: inline-flex;
 }
 
 </style>
@@ -849,12 +857,12 @@ footer.cs-footer {
       <span class="of-cap-l">The bond</span>
       <span class="of-cap-s">Every interface decision came back to this</span>
     </div>
-  </div>
-
-  <a href="https://www.sammysseniorsanctuary.org/" target="_blank" class="live-cta">
+  
+    <a href="https://www.sammysseniorsanctuary.org/" target="_blank" class="live-cta">
     <span class="live-cta-l">View the live redesign</span>
     <span class="live-cta-u">sammysseniorsanctuary.org &#8599;</span>
   </a>
+  </div>
 </section>
 
 
@@ -890,14 +898,11 @@ footer.cs-footer {
   } else { els.forEach(function(el){ el.classList.add('in'); }); }
 })();
 
-/* === Hand-paw figure: draws on load, then hero title fades in === */
+/* === Hero dogs figure: draws on load, then SCROLL-SYNCED disappear === */
 (function(){
   var feat = document.getElementById('heroFigure');
   var hero = document.querySelector('.hero');
-  if(!feat || !hero){
-    if(hero) hero.classList.add('reveal');
-    return;
-  }
+  if(!feat || !hero){ if(hero) hero.classList.add('reveal'); return; }
   var svg = feat.querySelector('#hd-svg');
   if(!svg){ hero.classList.add('reveal'); return; }
   var paths = Array.prototype.slice.call(svg.querySelectorAll('path'));
@@ -908,27 +913,42 @@ footer.cs-footer {
     p.style.transition = 'none';
     return L;
   });
+  function clamp(v,a,b){ return Math.min(Math.max(v,a),b); }
   function ease(t){ return t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
   function reveal(prog){
-    var e = ease(Math.min(Math.max(prog,0),1));
+    var e = ease(clamp(prog,0,1));
     paths.forEach(function(p, i){ p.style.strokeDashoffset = String(lengths[i] * (1 - e)); });
   }
   reveal(0);
   feat.classList.add('in');
-
-  var t0 = null, titleShown = false;
+  var introDone = false;
+  var t0=null, titleShown=false;
   function step(ts){
     if(t0===null) t0 = ts;
-    var p = Math.min((ts - t0) / 5500, 1);
+    var p = clamp((ts - t0) / 5500, 0, 1);
     reveal(p);
     if(p >= 0.55 && !titleShown){ titleShown = true; hero.classList.add('reveal'); }
     if(p < 1) requestAnimationFrame(step);
-    else { paths.forEach(function(pa,i){ pa.style.strokeDashoffset='0'; }); }
+    else { paths.forEach(function(pa){ pa.style.strokeDashoffset='0'; }); introDone = true; }
   }
   setTimeout(function(){ requestAnimationFrame(step); }, 400);
-
-  // safety: if anything fails, reveal the title after 5s
   setTimeout(function(){ if(!titleShown) hero.classList.add('reveal'); }, 5000);
+
+  // SCROLL-SYNCED disappear (like namaste on home)
+  var ticking = false;
+  function onScroll(){
+    ticking = false;
+    if(!introDone) return;
+    var y = window.scrollY || window.pageYOffset;
+    var H = window.innerHeight;
+    var sp = clamp(y / H, 0, 1);
+    reveal(1 - sp);
+    feat.style.opacity = String(1 - sp);
+  }
+  window.addEventListener('scroll', function(){
+    if(!ticking){ requestAnimationFrame(onScroll); ticking = true; }
+  }, {passive:true});
+  window.addEventListener('resize', onScroll);
 })();
 
 </script>
