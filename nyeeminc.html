@@ -362,6 +362,62 @@ footer.cs-footer {
 .hero.reveal .hero-sub     { opacity: 1; transform: translateY(0); transition-delay: .4s; }
 .hero.reveal .hero-meta    { opacity: 1; transform: translateY(0); transition-delay: .55s; }
 
+
+/* ═══ Blended video (melts into bg) ═══ */
+.blend-video {
+  margin: 10px auto 0; max-width: 860px; position: relative;
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 1.1s cubic-bezier(.22,1,.36,1), transform 1.1s cubic-bezier(.22,1,.36,1);
+}
+.blend-video.in { opacity: 1; transform: translateY(0); }
+.bv-label { text-align: center; margin-bottom: 26px; display: flex; flex-direction: column; gap: 7px; }
+.bv-name { font-family: 'Fraunces', serif; font-style: italic; font-size: 24px; color: rgba(240,237,230,.92); }
+.bv-sub { font-family: 'Cabinet Grotesk', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(240,237,230,.5); }
+.bv-stage { position: relative; border-radius: 14px; overflow: hidden; }
+.bv-stage::before { content: ''; position: absolute; inset: -8%; background: radial-gradient(ellipse at center, rgba(220,140,60,.22), transparent 70%); filter: blur(40px); z-index: -1; }
+.bv-media {
+  width: 100%; height: auto; display: block;
+  -webkit-mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, #000 60%, transparent 100%);
+          mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, #000 60%, transparent 100%);
+}
+.bv-stage::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(to bottom, #2C1008 0%, transparent 14%, transparent 86%, #2C1008 100%),
+    linear-gradient(to right,  #2C1008 0%, transparent 10%, transparent 90%, #2C1008 100%);
+  opacity: .9;
+}
+
+/* ═══ Before & After grid ═══ */
+.ba-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 36px; margin-top: 40px; align-items: start; }
+.ba-label { display: inline-block; font-family: 'Cabinet Grotesk', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; padding: 6px 14px; border-radius: 100px; margin-bottom: 18px; }
+.ba-before { background: rgba(220,170,60,.14); color: rgba(240,237,230,.85); border: 1px solid rgba(220,170,60,.35); }
+.ba-after  { background: rgba(200,120,70,.18); color: rgba(240,237,230,.95); border: 1px solid rgba(200,120,70,.45); }
+.ba-list { list-style: none; padding: 0; margin: 0; }
+.ba-list li { position: relative; padding: 10px 0 10px 22px; font-size: 14px; line-height: 1.55; color: rgba(240,237,230,.78); border-bottom: 1px solid rgba(240,237,230,.08); }
+.ba-list li:last-child { border-bottom: none; }
+.ba-list li::before { content: ''; position: absolute; left: 0; top: 18px; width: 10px; height: 1px; background: rgba(240,237,230,.4); }
+.ba-list li em { color: rgba(240,237,230,.55); font-style: italic; }
+.ba-divider { width: 1px; background: linear-gradient(to bottom, transparent, rgba(240,237,230,.18), transparent); align-self: stretch; }
+
+/* ═══ What changed: from → to ═══ */
+.changed-grid { margin-top: 48px; display: flex; flex-direction: column; gap: 14px; }
+.changed-item { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; padding: 20px 26px; background: rgba(240,237,230,.04); border: 1px solid rgba(240,237,230,.1); border-radius: 12px; transition: border-color .3s ease, background .3s ease; }
+.changed-item:hover { border-color: rgba(240,237,230,.22); background: rgba(240,237,230,.06); }
+.changed-from { font-family: 'Cabinet Grotesk', sans-serif; font-size: 14px; color: rgba(240,237,230,.5); text-align: right; }
+.changed-arrow { font-family: 'Fraunces', serif; font-size: 20px; color: rgba(220,150,80,.9); }
+.changed-to { font-family: 'Cabinet Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: rgba(240,237,230,.92); text-align: left; }
+
+@media (max-width: 768px) {
+  .blend-video { max-width: 94vw; }
+  .bv-name { font-size: 19px; }
+  .ba-grid { grid-template-columns: 1fr; gap: 24px; }
+  .ba-divider { display: none; }
+  .changed-item { grid-template-columns: 1fr; gap: 8px; text-align: center; padding: 18px; }
+  .changed-from, .changed-to { text-align: center; }
+  .changed-arrow { transform: rotate(90deg); }
+}
+
 </style>
 </head>
 <body>
@@ -427,6 +483,19 @@ footer.cs-footer {
   <p class="cs-p">The old site didn&rsquo;t reflect any of that. It felt like a generic film school template &mdash; functional but emotionally flat. It told you what the company did. It didn&rsquo;t make you feel what the company was about.</p>
 
   <div class="cs-pull">The brief was simple: make a website that feels like a film.</div>
+</section>
+
+<section class="cs">
+  <div class="blend-video" id="oldSiteVideo">
+    <div class="bv-label">
+      <span class="bv-name">NyeemInc. &mdash; the original site</span>
+      <span class="bv-sub">Before the redesign</span>
+    </div>
+    <div class="bv-stage">
+      <video class="bv-media" src="nyeem_old_demo.mp4" poster="nyeem_old_poster.jpg"
+             autoplay muted loop playsinline preload="metadata"></video>
+    </div>
+  </div>
 </section>
 
 <!-- ─── goals ─── -->
@@ -522,6 +591,59 @@ footer.cs-footer {
 
 <!-- ─── outcome ─── -->
 <section class="cs">
+  <div class="cs-eyebrow">Before &amp; After</div>
+  <h2 class="cs-h">From a loud template to a cinematic identity.</h2>
+  <div class="ba-grid">
+    <div class="ba-col">
+      <div class="ba-label ba-before">Before</div>
+      <ul class="ba-list">
+        <li>Bright yellow background with a scrolling <em>&ldquo;NYEEMIMC.&rdquo;</em> marquee</li>
+        <li>Embedded YouTube player as the hero &mdash; no framing or context</li>
+        <li>Loud repeating banners: <em>&ldquo;The results of audacious ambition&rdquo;</em></li>
+        <li>Everything on one long page &mdash; films, about, statement all stacked</li>
+        <li>No clear separation of Films, TV &amp; Podcast</li>
+        <li>Energetic, but it read like a flyer &mdash; not a film company</li>
+      </ul>
+    </div>
+    <div class="ba-divider"></div>
+    <div class="ba-col">
+      <div class="ba-label ba-after">After</div>
+      <ul class="ba-list">
+        <li>Dark, cinematic palette that feels like the screen itself</li>
+        <li>Bold editorial hero: <em>&ldquo;Stories from the screen.&rdquo;</em></li>
+        <li>Seven focused pages &mdash; Films, TV, Podcast, About, The Circuit, Contact</li>
+        <li>Festival laurels (Cannes, CUNY, Amsterdam) given real prominence</li>
+        <li>Each project introduced with title, logline &amp; trailer</li>
+        <li>Calm, confident, and unmistakably a production house</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="changed-grid">
+    <div class="changed-item">
+      <div class="changed-from">Yellow flyer aesthetic</div>
+      <div class="changed-arrow">&#8594;</div>
+      <div class="changed-to">Dark, cinematic identity</div>
+    </div>
+    <div class="changed-item">
+      <div class="changed-from">Scrolling marquee banners</div>
+      <div class="changed-arrow">&#8594;</div>
+      <div class="changed-to">Editorial typographic hero</div>
+    </div>
+    <div class="changed-item">
+      <div class="changed-from">One long stacked page</div>
+      <div class="changed-arrow">&#8594;</div>
+      <div class="changed-to">Seven focused, organised pages</div>
+    </div>
+    <div class="changed-item">
+      <div class="changed-from">Awards buried in the scroll</div>
+      <div class="changed-arrow">&#8594;</div>
+      <div class="changed-to">Festival circuit front &amp; centre</div>
+    </div>
+  </div>
+</section>
+
+<section class="cs">
   <div class="cs-eyebrow">The Outcome</div>
   <h2 class="cs-h">A website that feels like a film.</h2>
   <p class="cs-p">Live at <a href="https://nyeeminc.com/" target="_blank" style="color:rgba(240,237,230,.85);border-bottom:1px solid rgba(240,237,230,.4)">nyeeminc.com</a>. Seven pages, fully responsive, hand-coded. Updated as the company adds new films and the festival circuit grows.</p>
@@ -590,6 +712,19 @@ footer.cs-footer {
   }
   setTimeout(function(){ requestAnimationFrame(step); }, 400);
   setTimeout(function(){ if(!titleShown) hero.classList.add('reveal'); }, 5000);
+})();
+</script>
+
+<script>
+(function(){
+  var el = document.getElementById('oldSiteVideo');
+  if(!el) return;
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){ el.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.2 });
+    io.observe(el);
+  } else { el.classList.add('in'); }
 })();
 </script>
 </body>
