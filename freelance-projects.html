@@ -427,11 +427,173 @@ em { font-style:italic; color:rgba(240,237,230,.65); font-weight:300 }
   .newspaper-badge { font-size: 7.5px; padding: 5px 9px; }
 }
 
+
+/* ══════════════════════════════
+   CINEMATIC GRAFFITI INTRO
+══════════════════════════════ */
+.cinema-hero {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* becomes active when in view */
+}
+.cinema-hero.done {
+  pointer-events: none;
+  position: absolute;
+}
+.cinema-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('./graffiti-wall.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.52) saturate(1.15);
+  will-change: transform;
+  transform-origin: center center;
+}
+.cinema-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.15;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+.cinema-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    to bottom,
+    rgba(20,16,12,0.6) 0%,
+    transparent 25%,
+    transparent 65%,
+    rgba(20,16,12,0.95) 100%
+  );
+}
+.cinema-title-wrap {
+  position: relative;
+  z-index: 5;
+  text-align: center;
+  will-change: opacity, transform;
+}
+.cinema-eyebrow {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: rgba(200,131,42,0.9);
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: cFadeUp 0.6s ease 0.3s forwards;
+}
+.cinema-heading {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(64px, 12vw, 160px);
+  line-height: 0.92;
+  letter-spacing: -3px;
+
+  /* outlined — starts hollow */
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(240,237,230,0.95);
+  text-stroke: 2px rgba(240,237,230,0.95);
+
+  opacity: 0;
+  transform: translateY(24px);
+  animation: cFadeUp 0.85s ease 0.5s forwards;
+  transition: color 0.7s ease, -webkit-text-stroke 0.7s ease;
+}
+.cinema-heading em {
+  display: block;
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(200,131,42,0.95);
+  text-stroke: 2px rgba(200,131,42,0.95);
+  transition: color 0.7s ease, -webkit-text-stroke 0.7s ease;
+}
+/* After 1.6s the text fills in */
+.cinema-heading.filled {
+  color: rgba(240,237,230,0.95);
+  -webkit-text-stroke: 0px transparent;
+}
+.cinema-heading.filled em {
+  color: rgba(200,131,42,0.95);
+  -webkit-text-stroke: 0px transparent;
+}
+
+.cinema-scroll-cue {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(240,237,230,0.4);
+  opacity: 0;
+  animation: cFadeUp 0.5s ease 1.3s forwards;
+}
+.cinema-scroll-line {
+  width: 1px;
+  height: 44px;
+  background: linear-gradient(to bottom, rgba(200,131,42,0.7), transparent);
+  animation: cPulse 2s ease-in-out infinite;
+}
+@keyframes cFadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes cPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.15); }
+}
+
+/* When scrolling, the page below needs to show */
+body {
+  overflow-x: hidden;
+}
+
 </style>
 </head>
 <body>
 
 <div class="wall"></div>
+
+<!-- ══ CINEMATIC GRAFFITI WALL INTRO ══ -->
+<div class="cinema-hero" id="cinemaHero">
+  <div class="cinema-bg" id="cinemaBg"></div>
+  <div class="cinema-grain"></div>
+  <div class="cinema-vignette"></div>
+  <div class="cinema-title-wrap" id="cinemaTitleWrap">
+    <div class="cinema-eyebrow">Freelance &middot; Graphic Design</div>
+    <h1 class="cinema-heading" id="cinemaHeading">
+      Freelance
+      <em>Projects</em>
+    </h1>
+  </div>
+  <div class="cinema-scroll-cue">
+    <span>Scroll</span>
+    <div class="cinema-scroll-line"></div>
+  </div>
+</div>
+<!-- Spacer so page content starts below the cinematic intro -->
+<div style="height: 100vh;" id="cinemaSpacer"></div>
+
+
 <div class="paint-outline" aria-hidden="true">
   <svg id="paint-svg" viewBox="0 0 1100.000000 825.000000" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
   <g id="paint-g" transform="translate(0.000000,825.000000) scale(0.100000,-0.100000)">
@@ -753,5 +915,51 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLB
   }
 })();
 </script>
+
+<script>
+/* ══ CINEMATIC INTRO SCROLL LOGIC ══ */
+(function(){
+  var hero   = document.getElementById('cinemaHero');
+  var bg     = document.getElementById('cinemaBg');
+  var title  = document.getElementById('cinemaTitleWrap');
+  var hdg    = document.getElementById('cinemaHeading');
+  var spacer = document.getElementById('cinemaSpacer');
+
+  if(!hero) return;
+
+  // Fill text after 1.6s
+  setTimeout(function(){ hdg && hdg.classList.add('filled'); }, 1600);
+
+  function onScroll(){
+    var scrollY  = window.scrollY || window.pageYOffset;
+    var vh       = window.innerHeight;
+    var progress = Math.min(scrollY / vh, 1); // 0→1 over one viewport
+
+    // Parallax on background — moves slower
+    if(bg) bg.style.transform = 'scale(1.06) translateY(' + (scrollY * 0.28) + 'px)';
+
+    // Title fades out and floats upward
+    if(title){
+      var op = Math.max(0, 1 - progress * 2.4);
+      var ty = scrollY * -0.22;
+      title.style.opacity  = op;
+      title.style.transform = 'translateY(' + ty + 'px)';
+    }
+
+    // Once fully scrolled past, convert from fixed to absolute so it doesn't overlay content
+    if(progress >= 1){
+      hero.style.position = 'absolute';
+      hero.style.top      = '0';
+    } else {
+      hero.style.position = 'fixed';
+      hero.style.top      = '0';
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll(); // init
+})();
+</script>
+
 </body>
 </html>
