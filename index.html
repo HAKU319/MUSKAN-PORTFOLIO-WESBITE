@@ -368,7 +368,11 @@
   .owner-wrap { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.2fr; gap: 70px; align-items: flex-start; padding: 0 70px; }
   .owner-media { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; justify-content: center; padding: 60px 0; }
   .owner-portrait-frame {
-    position: relative; width: 100%; max-width: 460px; aspect-ratio: 3/4; overflow: hidden; background: transparent; -webkit-mask-image: radial-gradient(ellipse 95% 95% at center, #000 60%, transparent 100%); mask-image: radial-gradient(ellipse 95% 95% at center, #000 60%, transparent 100%);
+    position: relative; width: 100%; max-width: 460px; aspect-ratio: 3/4; overflow: hidden; background: transparent;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 85%, transparent 100%), radial-gradient(ellipse 100% 96% at center, #000 60%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 85%, transparent 100%), radial-gradient(ellipse 100% 96% at center, #000 60%, transparent 100%);
+    mask-composite: intersect;
   }
   .owner-portrait-inner { width: 100%; height: 100%; overflow: hidden; position: relative; }
   .owner-portrait-img, .owner-storefront-img { position: absolute; inset: 0; width: 100%; height: 100%; transform: scale(1) translateZ(0); transform-origin: center center; display: block; transition: opacity 0.4s ease; }
@@ -491,7 +495,7 @@
     body.sidebar-active .main { padding-left: 0 !important; }
 
     /* Lock horizontal scrolling — vertical only */
-    html, body { overflow-x: hidden !important; max-width: 100%; overscroll-behavior-x: none; }
+    html, body { overflow-x: hidden !important; max-width: 100%; overscroll-behavior-x: none; touch-action: pan-y pinch-zoom; }
     /* Gallery strip: avoid 100vw (scrollbar overflow), stay within viewport */
     .slideshow-viewport-container { width: 100% !important; margin-left: 0 !important; }
     
@@ -525,9 +529,9 @@
     .menu-toggle { background: none; border: 1px solid var(--burgundy); color: var(--burgundy); padding: 8px 12px; cursor: pointer; font-size: 16px; }
     
     .mobile-overlay {
-      display: flex; position: fixed; inset: 0; top: 70px; background: var(--cream); z-index: 99; flex-direction: column; padding: 40px 24px; gap: 30px; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex; position: fixed; inset: 0; top: 70px; background: var(--cream); z-index: 99; flex-direction: column; padding: 40px 24px; gap: 30px; transform: translateX(100%); visibility: hidden; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.4s;
     }
-    .mobile-overlay.open { transform: translateX(0); }
+    .mobile-overlay.open { transform: translateX(0); visibility: visible; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s; }
     .mobile-overlay-nav { display: flex; flex-direction: column; gap: 20px; align-items: center; }
     .mobile-overlay-nav a { font-size: 16px; text-transform: uppercase; letter-spacing: 3px; color: var(--burgundy-dark); text-decoration: none; font-weight: 500; }
     .mobile-overlay-reviews {
@@ -551,7 +555,7 @@
     .owner-text { padding: 0 0 10px !important; }
     body.flowers-active .owner-text { padding: 30px 14px !important; }
     .owner-mobile-photos { display: flex !important; flex-direction: column; gap: 20px; max-width: 440px; margin: 30px auto 0; }
-    .owner-mobile-photos img { width: 100%; height: auto; -webkit-mask-image: radial-gradient(ellipse 95% 95% at center, #000 65%, transparent 100%); mask-image: radial-gradient(ellipse 95% 95% at center, #000 65%, transparent 100%); }
+    .owner-mobile-photos img { width: 100%; height: auto; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%), radial-gradient(ellipse 100% 96% at center, #000 62%, transparent 100%); -webkit-mask-composite: source-in; mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%), radial-gradient(ellipse 100% 96% at center, #000 62%, transparent 100%); mask-composite: intersect; }
     
     .hygiene-grid { grid-template-columns: 1fr !important; gap: 30px !important; padding: 0 4px !important; }
     .hygiene-text { padding: 0 0 10px !important; }
@@ -598,6 +602,7 @@
 
   /* 3D coverflow gallery */
   .slideshow-viewport-container { padding: 50px 0; }
+  .work-subtitle { font-family: var(--font-display); font-style: italic; font-size: clamp(16px, 2.2vw, 21px); color: var(--rose); letter-spacing: .3px; margin-top: 2px; }
   .slideshow-card-node:hover { box-shadow: 0 40px 64px -28px rgba(74,40,40,0.6), 0 0 0 1px rgba(107,46,46,0.08); }
   .slideshow-card-node { box-shadow: 0 38px 60px -30px rgba(74,40,40,0.6), 0 0 0 1px rgba(107,46,46,0.06); }
   .slideshow-hover-overlay-pane i, .slideshow-hover-overlay-pane span {
@@ -1019,6 +1024,7 @@
       <div class="section-center">
         <h2 class="section-title" style="margin-bottom:8px;">Painted Here</h2>
         <div class="section-rule center" style="margin-bottom:16px;"></div>
+        <p class="work-subtitle">fresh little works of art, straight from our chairs &#9825;</p>
       </div>
 
       <div class="slideshow-viewport-container">
@@ -1115,8 +1121,8 @@
         </div>
         <div class="hygiene-media">
           <div class="hygiene-frame spotlight-frame">
-            <img src="sanitation photo.jpg" alt="Sterilized manicure tools inside our clean tray setup" class="hygiene-img-1 scroll-zoom-img" id="hygieneImg1">
-            <img src="sanitation photo two.jpg" alt="Clean tools prepared securely for service" class="hygiene-img-2 scroll-zoom-img" id="hygieneImg2">
+            <img src="sanitation-1.jpg" alt="Sterilized manicure tools inside our clean tray setup" class="hygiene-img-1 scroll-zoom-img" id="hygieneImg1">
+            <img src="sanitation-2.jpg" alt="Clean tools prepared securely for service" class="hygiene-img-2 scroll-zoom-img" id="hygieneImg2">
             <div class="hygiene-media-label" id="hygieneMediaLabel">STERILIZED · READY</div>
             <div class="tilt-glare"></div>
           </div>
