@@ -1,0 +1,2664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>Studio 57 — Nail Bar & Spa</title>
+
+<!-- Favicon set -->
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#6b2e2e">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Italianno&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  :root {
+    --sage: #dbe5d4;
+    --sage-soft: #e8efe3;
+    --sage-dark: #b8c4a8;
+    --sage-darker: #8a9479;
+    --cream: #f0ede6;
+    --cream-warm: #f5ebe3;
+    --cream-pale: #faf6ef;
+    --burgundy: #6b2e2e;
+    --burgundy-dark: #4a2828;
+    --blush: #d4a8b0;
+    --rose: #b88a8a;
+    --warm-brown: #6b5750;
+    --warm-tan: #c8b4a8;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-script: 'Italianno', 'Brush Script MT', cursive;
+    --font-body: 'Inter', -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-body);
+    color: var(--burgundy-dark);
+    background: var(--cream);
+    line-height: 1.6;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* LAYOUT - sidebar LEFT */
+  .layout {
+    display: block; /* sidebar is fixed-position, main fills the viewport */
+    min-height: 100vh;
+    position: relative;
+  }
+
+  .sidebar {
+    background: var(--cream);
+    padding: 40px 32px 32px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 50;
+    box-shadow: 4px 0 24px rgba(74, 40, 40, 0.06);
+  }
+  .sidebar-top {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+  /* Social icons at the top - styled distinctively, side by side */
+  .sidebar-social {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .sidebar-social a {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1.5px solid var(--burgundy);
+    color: var(--burgundy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    text-decoration: none;
+    transition: border-color 0.32s ease,
+                transform 0.32s cubic-bezier(.34,1.56,.64,1),
+                box-shadow 0.32s ease,
+                color 0.32s ease;
+    position: relative;
+    opacity: 1;
+  }
+  .sidebar-social a i {
+    transition: transform 0.32s cubic-bezier(.34,1.56,.64,1);
+    line-height: 1;
+  }
+  /* INSTAGRAM hover: real IG gradient (yellow -> pink -> purple) */
+  .sidebar-social a[aria-label="Instagram"]:hover {
+    border-color: transparent;
+    background: linear-gradient(45deg,
+      #f09433 0%,
+      #e6683c 25%,
+      #dc2743 50%,
+      #cc2366 75%,
+      #bc1888 100%);
+    color: #fff;
+    transform: translateY(-4px) scale(1.15);
+    box-shadow: 0 10px 24px rgba(220, 39, 67, 0.5);
+  }
+  /* TIKTOK hover: real TikTok colors (cyan + red on black) */
+  .sidebar-social a[aria-label="TikTok"]:hover {
+    border-color: transparent;
+    background: #000;
+    color: #fff;
+    transform: translateY(-4px) scale(1.15);
+    box-shadow:
+      2px 2px 0 #ff0050,
+      -2px -2px 0 #00f2ea,
+      0 10px 24px rgba(0, 0, 0, 0.4);
+  }
+  .sidebar-social a:hover i {
+    transform: scale(1.1);
+  }
+  .sidebar-footer {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--sage-darker);
+    margin-top: auto;
+  }
+  .sidebar-reviews {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--burgundy);
+    padding: 12px 14px;
+    border: 1px solid var(--burgundy);
+    transition: all 0.22s cubic-bezier(.2,.7,.3,1);
+    background: transparent;
+  }
+  .sidebar-reviews i {
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: transform 0.22s ease;
+  }
+  .sidebar-reviews span {
+    font-size: 9px;
+    letter-spacing: 1.6px;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+  .sidebar-reviews:hover {
+    background: var(--burgundy);
+    color: var(--cream-warm);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(107, 46, 46, 0.25);
+  }
+  .sidebar-reviews:hover i {
+    transform: scale(1.1) rotate(-4deg);
+  }
+  .logo-mark {
+    width: 110px; height: 110px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 0;
+    transition: transform 0.4s ease;
+    background: transparent;
+    border: none;
+  }
+  .logo-mark img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  /* Fallback if logo.png fails to load */
+  .logo-fallback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%; height: 100%;
+    border: 1.5px solid var(--burgundy);
+    background: var(--cream-warm);
+    color: var(--pink);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .logo-mark:hover { transform: rotate(-4deg) scale(1.04); }
+  .logo-name {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 24px;
+    color: var(--burgundy);
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+  .logo-sub {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    color: var(--sage-darker);
+    font-weight: 400;
+  }
+  /* More spacious nav now that the logo is gone */
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .nav-link {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--burgundy-dark);
+    text-decoration: none;
+    border-left: 1.5px solid transparent;
+    padding-left: 16px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+  .nav-link:hover, .nav-link.active {
+    color: var(--burgundy);
+    border-left-color: var(--burgundy);
+    padding-left: 24px;
+    font-weight: 500;
+  }
+  .sidebar-footer {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--sage-darker);
+  }
+  .social-icons {
+    display: flex; gap: 14px;
+    color: var(--burgundy);
+    font-size: 18px;
+    margin-top: 10px;
+  }
+  .social-icons a { color: inherit; transition: color 0.2s; }
+  .social-icons a:hover { color: var(--rose); }
+
+  /* Hero logo - sits centered in the hero, above the BOOK button */
+  .hero-logo {
+    display: block;
+    line-height: 0;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    margin-bottom: 60px;
+    opacity: 0.88;
+  }
+  .hero-logo:hover {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+  .hero-logo img {
+    width: clamp(240px, 22vw, 340px);
+    height: auto;
+    display: block;
+    /* Neon-glow stacked drop-shadow — slow pulse */
+    animation: logoNeon 4.5s ease-in-out infinite;
+  }
+  @keyframes logoNeon {
+    0%, 100% {
+      filter:
+        drop-shadow(0 8px 28px rgba(0, 0, 0, 0.45))
+        drop-shadow(0 0 8px rgba(212, 133, 154, 0.35))
+        drop-shadow(0 0 18px rgba(212, 133, 154, 0.18));
+    }
+    50% {
+      filter:
+        drop-shadow(0 8px 28px rgba(0, 0, 0, 0.45))
+        drop-shadow(0 0 16px rgba(212, 133, 154, 0.55))
+        drop-shadow(0 0 32px rgba(212, 133, 154, 0.32))
+        drop-shadow(0 0 50px rgba(212, 133, 154, 0.15));
+    }
+  }
+  @media (max-width: 900px) {
+    .hero-logo { margin-bottom: 40px; }
+    .hero-logo img { width: clamp(180px, 52vw, 260px); }
+  }
+
+  .main {
+    background: var(--cream);
+    min-width: 0;
+    padding-left: 0;
+    transition: padding-left 0.7s cubic-bezier(.2,.85,.3,1);
+  }
+  body.sidebar-active .main { padding-left: 200px; }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    height: 100vh;
+    min-height: 580px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      linear-gradient(135deg, rgba(42,34,48,0.3), rgba(90,68,88,0.3)),
+      url('hero-poster.jpg') center/cover no-repeat,
+      linear-gradient(135deg, #2a2230, #3d2f3d, #5a4458);
+  }
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+  }
+  /* Hide iOS Safari's native video controls / play button overlay */
+  .hero-video::-webkit-media-controls,
+  .hero-video::-webkit-media-controls-panel,
+  .hero-video::-webkit-media-controls-play-button,
+  .hero-video::-webkit-media-controls-start-playback-button,
+  .footer-video::-webkit-media-controls,
+  .footer-video::-webkit-media-controls-panel,
+  .footer-video::-webkit-media-controls-play-button,
+  .footer-video::-webkit-media-controls-start-playback-button {
+    display: none !important;
+    -webkit-appearance: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    /* Layered gradients create a feathered/vignette frame:
+       - vertical: dark at top edge, fades to clear in middle, then to cream at bottom
+       - horizontal: cream at left edge, clear in middle, cream at right edge
+       Together they make the video blend on all 4 sides */
+    background:
+      linear-gradient(180deg,
+        rgba(0,0,0,0.22) 0%,
+        rgba(0,0,0,0.08) 12%,
+        rgba(0,0,0,0.0) 35%,
+        rgba(0,0,0,0.0) 55%,
+        rgba(240, 237, 230, 0.5) 85%,
+        var(--cream) 100%),
+      linear-gradient(90deg,
+        var(--cream) 0%,
+        rgba(240, 237, 230, 0.4) 6%,
+        rgba(240, 237, 230, 0.0) 14%,
+        rgba(240, 237, 230, 0.0) 86%,
+        rgba(240, 237, 230, 0.4) 94%,
+        var(--cream) 100%);
+    z-index: 1;
+    pointer-events: none;
+  }
+  .hero-content {
+    position: relative; z-index: 2; text-align: center;
+    color: var(--cream-warm);
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-style: italic; font-weight: 400;
+    font-size: clamp(64px, 10vw, 140px);
+    line-height: 1;
+    color: var(--pink);
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+    text-shadow: 0 2px 30px rgba(0,0,0,0.55), 0 0 60px rgba(212, 133, 154, 0.25);
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.18em;
+    font-feature-settings: 'lnum' 1;
+  }
+  .hero h1 .studio,
+  .hero h1 .num {
+    display: inline-block;
+    line-height: 1;
+    font-feature-settings: 'lnum' 1;
+  }
+  .hero h1 .num {
+    /* Cormorant's italic numerals optically sit slightly higher than the letter baseline.
+       This compensates so 5 and 7 truly align with Studio. */
+    transform: translateY(0.02em);
+  }
+  .hero-script {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: clamp(13px, 1.6vw, 18px);
+    color: var(--sage-dark);
+    line-height: 1;
+    letter-spacing: clamp(6px, 1vw, 12px);
+    text-transform: uppercase;
+    margin-bottom: 44px;
+    margin-left: clamp(6px, 1vw, 12px);
+    text-shadow: 0 2px 14px rgba(0,0,0,0.6);
+  }
+  .hero-invite {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(28px, 4.5vw, 52px);
+    color: var(--cream-warm);
+    line-height: 1.1;
+    margin-bottom: 36px;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.55);
+    letter-spacing: 0.5px;
+  }
+  @media (max-width: 600px) {
+    .hero-invite { font-size: clamp(24px, 7vw, 36px); margin-bottom: 28px; }
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 24px 60px;
+    border: 2px solid var(--pink);
+    color: var(--burgundy);
+    font-size: 16px;
+    letter-spacing: 5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.18s ease,
+                border-color 0.18s ease,
+                color 0.18s ease,
+                letter-spacing 0.18s ease,
+                box-shadow 0.18s ease;
+    background: var(--pink);
+    box-shadow:
+      0 12px 44px rgba(212, 133, 154, 0.45),
+      0 0 18px rgba(212, 133, 154, 0.4),
+      0 0 32px rgba(212, 133, 154, 0.2);
+    position: relative;
+    z-index: 3;
+    text-transform: uppercase;
+  }
+  .hero-cta::before {
+    content: "✦";
+    font-size: 14px;
+    letter-spacing: 0;
+    opacity: 0.95;
+    color: var(--burgundy);
+    animation: sparkle 5s ease-in-out infinite;
+  }
+  .hero-cta::after {
+    content: "→";
+    font-size: 20px;
+    letter-spacing: 0;
+    color: var(--burgundy);
+    transition: transform 0.2s ease;
+  }
+  .hero-cta:hover {
+    background: var(--cream-warm);
+    border-color: var(--burgundy);
+    color: var(--burgundy);
+    box-shadow:
+      0 18px 56px rgba(184, 94, 122, 0.45),
+      0 0 0 0 rgba(212, 133, 154, 0);
+    letter-spacing: 6px;
+  }
+  .hero-cta:hover::after { transform: translateX(8px); }
+  @keyframes ctaPulse {
+    0%, 100% {
+      box-shadow:
+        0 12px 44px rgba(212, 133, 154, 0.45),
+        0 0 18px rgba(212, 133, 154, 0.4),
+        0 0 32px rgba(212, 133, 154, 0.2);
+    }
+    50% {
+      box-shadow:
+        0 14px 52px rgba(212, 133, 154, 0.6),
+        0 0 28px rgba(212, 133, 154, 0.7),
+        0 0 58px rgba(212, 133, 154, 0.4),
+        0 0 90px rgba(212, 133, 154, 0.2);
+    }
+  }
+  @keyframes sparkle {
+    0%, 100% { opacity: 0.5; transform: scale(0.85) rotate(0deg); }
+    50%      { opacity: 1; transform: scale(1.15) rotate(180deg); }
+  }
+  .hero-scroll-hint {
+    position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+    color: var(--cream-warm); font-size: 11px; letter-spacing: 2px; opacity: 0.7;
+    animation: scrollBounce 2s ease-in-out infinite; z-index: 3;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+  }
+  @keyframes scrollBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  section { padding: 110px 70px; position: relative; }
+
+  /* Smooth blend between sections — soft fade where colors meet */
+  section + section::before {
+    content: "";
+    position: absolute;
+    top: -60px;
+    left: 0;
+    right: 0;
+    height: 60px;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(180deg, transparent 0%, currentColor 100%);
+    color: inherit;
+    opacity: 0;
+  }
+  /* Use the actual background color of THIS section to fade in from above */
+  .services + .owner::before        { background: linear-gradient(180deg, transparent, var(--cream-warm)); opacity: 0.6; }
+  .owner + .work::before            { background: linear-gradient(180deg, transparent, var(--sage-soft)); opacity: 0.6; }
+  .work + .hygiene::before          { background: linear-gradient(180deg, transparent, var(--cream)); opacity: 0.6; }
+  .hygiene + .visit::before         { background: linear-gradient(180deg, transparent, var(--cream-warm)); opacity: 0.6; }
+
+  /* Subtle full-page scroll smoothing */
+  html { scroll-behavior: smooth; }
+  .eyebrow {
+    font-size: 10px; letter-spacing: 4px; color: var(--sage-darker);
+    margin-bottom: 14px; text-transform: uppercase; font-weight: 400;
+  }
+  .section-title {
+    font-family: var(--font-display); font-style: italic; font-weight: 400;
+    font-size: clamp(34px, 4.5vw, 56px);
+    color: var(--burgundy);
+    line-height: 1.05;
+    margin-bottom: 18px;
+  }
+  .section-rule { width: 50px; height: 1px; background: var(--rose); margin-bottom: 26px; }
+  .section-rule.center { margin-left: auto; margin-right: auto; }
+  .section-center { text-align: center; margin-bottom: 60px; max-width: 640px; margin-left: auto; margin-right: auto; }
+  .section-intro {
+    font-family: var(--font-display); font-style: italic;
+    font-size: 17px; color: var(--sage-darker);
+    max-width: 480px; margin: 0 auto;
+  }
+
+  /* SERVICES — now comes second */
+  .services { background: var(--cream); }
+  .hours-strip {
+    text-align: center; margin-bottom: 50px;
+    font-family: var(--font-display); font-style: italic;
+    color: var(--sage-darker); font-size: 16px;
+    letter-spacing: 1px;
+  }
+  .hours-strip i {
+    color: var(--burgundy);
+    margin-right: 8px; font-size: 14px;
+    vertical-align: -1px;
+  }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 56px 70px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .service-card { background: transparent; padding: 0; border: none; }
+  .service-header {
+    display: flex; align-items: baseline; gap: 14px;
+    margin-bottom: 22px; padding-bottom: 14px;
+    border-bottom: 1px solid rgba(107, 46, 46, 0.25);
+  }
+  .service-icon {
+    width: 36px; height: 36px;
+    background: transparent;
+    border: 1px solid var(--burgundy);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--burgundy);
+    font-size: 16px; flex-shrink: 0;
+  }
+  .service-name {
+    font-family: var(--font-display); font-style: italic;
+    font-size: 30px; color: var(--burgundy); line-height: 1;
+  }
+  .service-list { display: flex; flex-direction: column; }
+  .service-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 14px;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px dotted rgba(107, 46, 46, 0.18);
+  }
+  .service-item:last-child { border-bottom: none; }
+  .service-title { font-size: 13px; color: var(--burgundy-dark); font-weight: 400; }
+  .service-duration {
+    font-size: 12px; color: var(--sage-darker);
+    font-style: italic; font-family: var(--font-display);
+  }
+  .service-price {
+    font-size: 16px; color: var(--burgundy); font-weight: 500;
+    font-family: var(--font-display);
+    min-width: 48px; text-align: right;
+  }
+  .subcat-label {
+    grid-column: 1 / -1;
+    padding-top: 16px; padding-bottom: 4px;
+    font-size: 9px; letter-spacing: 3px;
+    color: var(--sage-darker);
+    text-transform: uppercase;
+    border-bottom: none;
+  }
+  .subcat-label:first-child { padding-top: 0; }
+
+  /* Mobile-only photo block (hidden on desktop where crossfade does the work) */
+  .owner-text-storefront { display: none; }
+  .owner-mobile-photos { display: none; }
+
+  /* ===========================================================
+     CSS FALLING CHERRY BLOSSOM PETALS
+     - 18 petals drift down at different speeds, positions, sway
+     - No video file = bulletproof, works everywhere
+     - Petals fade in after user scrolls past hero
+     =========================================================== */
+  .flower-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s cubic-bezier(.4,0,.2,1);
+    overflow: hidden;
+  }
+  body.flowers-active .flower-bg {
+    opacity: 1;
+  }
+  /* Each petal is a pink ellipse with a darker dot in the center */
+  .petal {
+    position: absolute;
+    top: -40px;
+    width: 18px;
+    height: 14px;
+    background:
+      radial-gradient(ellipse at 30% 40%, rgba(255, 220, 230, 0.95) 0%, rgba(220, 165, 185, 0.85) 60%, rgba(184, 110, 140, 0.75) 100%);
+    border-radius: 70% 30% 70% 30% / 50% 50% 50% 50%;
+    opacity: 0.85;
+    will-change: transform;
+    animation-name: petalFall, petalSway;
+    animation-timing-function: linear, ease-in-out;
+    animation-iteration-count: infinite, infinite;
+    filter: drop-shadow(0 2px 4px rgba(184, 110, 140, 0.2));
+  }
+  @keyframes petalFall {
+    0%   { transform: translateY(0) rotate(0deg);   opacity: 0; }
+    8%   { opacity: 0.85; }
+    92%  { opacity: 0.85; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+  @keyframes petalSway {
+    0%, 100% { margin-left: 0; }
+    25%      { margin-left: 40px; }
+    50%      { margin-left: -20px; }
+    75%      { margin-left: 30px; }
+  }
+  /* Per-petal positioning, size, speed, delay — staggered so they look natural */
+  .petal-1  { left: 5%;  width: 16px; height: 12px; animation-duration: 14s, 5s;    animation-delay: 0s, 0s; }
+  .petal-2  { left: 12%; width: 22px; height: 17px; animation-duration: 18s, 7s;    animation-delay: -2s, -1s; }
+  .petal-3  { left: 19%; width: 14px; height: 11px; animation-duration: 11s, 4s;    animation-delay: -5s, -2s; }
+  .petal-4  { left: 26%; width: 20px; height: 16px; animation-duration: 16s, 6s;    animation-delay: -8s, -3s; }
+  .petal-5  { left: 33%; width: 18px; height: 14px; animation-duration: 13s, 5.5s;  animation-delay: -3s, 0s; }
+  .petal-6  { left: 40%; width: 24px; height: 18px; animation-duration: 20s, 8s;    animation-delay: -10s, -4s; }
+  .petal-7  { left: 47%; width: 15px; height: 12px; animation-duration: 12s, 4.5s;  animation-delay: -1s, -1.5s; }
+  .petal-8  { left: 54%; width: 19px; height: 15px; animation-duration: 17s, 6.5s;  animation-delay: -6s, -2.5s; }
+  .petal-9  { left: 61%; width: 13px; height: 10px; animation-duration: 10s, 4s;    animation-delay: -4s, -1s; }
+  .petal-10 { left: 68%; width: 21px; height: 16px; animation-duration: 15s, 5.8s;  animation-delay: -9s, -3.5s; }
+  .petal-11 { left: 75%; width: 17px; height: 13px; animation-duration: 14s, 5.2s;  animation-delay: -2s, -2s; }
+  .petal-12 { left: 82%; width: 23px; height: 18px; animation-duration: 19s, 7.5s;  animation-delay: -11s, -1s; }
+  .petal-13 { left: 89%; width: 16px; height: 12px; animation-duration: 13s, 4.8s;  animation-delay: -5s, -3s; }
+  .petal-14 { left: 95%; width: 18px; height: 14px; animation-duration: 16s, 6s;    animation-delay: -7s, 0s; }
+  .petal-15 { left: 9%;  width: 20px; height: 15px; animation-duration: 17s, 6.2s;  animation-delay: -12s, -2.5s; }
+  .petal-16 { left: 30%; width: 14px; height: 11px; animation-duration: 11s, 4.2s;  animation-delay: -8s, -1.8s; }
+  .petal-17 { left: 58%; width: 22px; height: 17px; animation-duration: 18s, 7s;    animation-delay: -3s, -3.5s; }
+  .petal-18 { left: 79%; width: 15px; height: 12px; animation-duration: 12s, 4.6s;  animation-delay: -6s, -1.2s; }
+
+  /* All sections become transparent so the flower bg shows through */
+  body.flowers-active .services,
+  body.flowers-active .owner,
+  body.flowers-active .work,
+  body.flowers-active .hygiene,
+  body.flowers-active .visit {
+    background: transparent !important;
+    transition: background 0.8s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* TEXT WRAPPERS get a local cream wash so blossoms dim behind reading content */
+  body.flowers-active .owner-text,
+  body.flowers-active .hygiene-text,
+  body.flowers-active .visit-text,
+  body.flowers-active .services .section-center,
+  body.flowers-active .work .section-center {
+    position: relative;
+    z-index: 2;
+  }
+  body.flowers-active .owner-text::before,
+  body.flowers-active .hygiene-text::before,
+  body.flowers-active .visit-text::before,
+  body.flowers-active .services .section-center::before,
+  body.flowers-active .work .section-center::before {
+    content: "";
+    position: absolute;
+    inset: -40px -50px;
+    background: radial-gradient(ellipse at center,
+      rgba(240, 237, 230, 0.85) 0%,
+      rgba(240, 237, 230, 0.55) 60%,
+      transparent 100%);
+    z-index: -1;
+    pointer-events: none;
+    filter: blur(8px);
+    border-radius: 50%;
+  }
+  /* Service cards also dim flowers locally so cards stay clean */
+  body.flowers-active .service-card,
+  body.flowers-active .map-frame,
+  body.flowers-active .ig-card,
+  body.flowers-active .owner-portrait-frame,
+  body.flowers-active .hygiene-frame,
+  body.flowers-active .hygiene-img-1,
+  body.flowers-active .hygiene-img-2 {
+    backdrop-filter: blur(2px);
+  }
+  body.flowers-active .service-card {
+    background: rgba(255, 253, 248, 0.7) !important;
+  }
+  /* Layout itself needs z-index so it's above flower bg */
+  .layout, .top-bar, .mobile-overlay, .site-footer {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ===========================================================
+     SPOTLIGHT-ON-IMAGE: when an image enters viewport center,
+     it pops forward with a soft glow; images outside viewport
+     center dim. Creates the "highlight what's in view" effect.
+     =========================================================== */
+  .spotlight-img {
+    transition: opacity 0.6s ease, filter 0.6s ease, transform 0.7s cubic-bezier(.2,.7,.3,1);
+    opacity: 0.55;
+    filter: saturate(0.85);
+  }
+  .spotlight-img.spotlight-active {
+    opacity: 1;
+    filter: saturate(1.05) drop-shadow(0 14px 36px rgba(74, 40, 40, 0.18));
+    transform: scale(1.01);
+  }
+  /* Frames that contain spotlight images */
+  .spotlight-frame {
+    transition: box-shadow 0.6s ease;
+  }
+  .spotlight-frame.spotlight-active {
+    box-shadow: 0 30px 80px rgba(74, 40, 40, 0.22),
+                0 0 0 1px rgba(212, 133, 154, 0.15);
+  }
+
+  /* OUR STORY — narrative with sticky-image scroll transition */
+  .owner {
+    background: var(--cream-warm);
+    padding: 0;
+    position: relative;
+  }
+  .owner-wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 70px;
+    align-items: flex-start;
+    padding: 0 70px;
+  }
+  /* image column is sticky: stays in place while user scrolls text */
+  .owner-media {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 0;
+  }
+  .owner-portrait-frame {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    background: var(--cream);
+  }
+  .owner-portrait-frame::before {
+    content: "";
+    position: absolute;
+    top: 14px; left: 14px;
+    width: 100%; height: 100%;
+    border: 1px solid var(--burgundy);
+    z-index: -1;
+    pointer-events: none;
+  }
+  .owner-portrait-inner {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .owner-portrait-img,
+  .owner-storefront-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: scale(1) translateZ(0);
+    transform-origin: center center;
+    backface-visibility: hidden;
+    display: block;
+    transition: opacity 0.4s ease;
+  }
+  /* Owner photo crops to fill the 3:4 frame */
+  .owner-portrait-img {
+    opacity: 1;
+    z-index: 2;
+    object-fit: cover;
+    object-position: center 30%;
+  }
+  /* Storefront shows fully (it's a taller image — contain so nothing is cut off) */
+  .owner-storefront-img {
+    opacity: 0;
+    z-index: 1;
+    object-fit: contain;
+    object-position: center center;
+    background: var(--cream);
+  }
+  /* caption label that updates per image */
+  .owner-media-label {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    z-index: 3;
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    color: var(--cream-warm);
+    background: rgba(74, 40, 40, 0.75);
+    padding: 6px 10px;
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s ease;
+  }
+  /* text column scrolls naturally */
+  .owner-text {
+    padding: 120px 0 140px;
+  }
+  .owner-text .section-title { font-size: clamp(36px, 4.6vw, 58px); }
+  .owner-text p {
+    font-family: var(--font-display);
+    font-size: 18px;
+    line-height: 1.8;
+    color: var(--burgundy-dark);
+    font-weight: 400;
+    margin-bottom: 18px;
+  }
+  .owner-text p:first-of-type {
+    font-style: italic;
+    color: var(--burgundy);
+    font-size: 22px;
+    line-height: 1.6;
+  }
+  .owner-text .signature {
+    font-family: var(--font-script);
+    font-size: 38px;
+    color: var(--burgundy);
+    line-height: 1;
+    margin-top: 24px;
+  }
+  .owner-text .signature-sub {
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    color: var(--sage-darker);
+    margin-top: 4px;
+  }
+  /* a divider between text sections within our story */
+  .owner-text-divider {
+    margin: 50px 0 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--burgundy) 50%, transparent);
+    opacity: 0.3;
+  }
+  .owner-text-eyebrow {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--sage-darker);
+    margin-bottom: 10px;
+    font-weight: 400;
+  }
+
+  /* OUR WORK — Instagram profile card */
+  .work { background: var(--sage-soft); text-align: center; }
+  .work .eyebrow { color: var(--burgundy); }
+  .work .section-rule { background: var(--burgundy); }
+
+  .ig-card {
+    display: block;
+    position: relative;
+    max-width: 760px;
+    margin: 28px auto 0;
+    aspect-ratio: 16 / 11;
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--cream-warm);
+    box-shadow: 0 18px 50px rgba(74, 40, 40, 0.22);
+    transition: transform 0.5s cubic-bezier(.2,.7,.3,1), box-shadow 0.5s ease;
+  }
+  .ig-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 28px 70px rgba(74, 40, 40, 0.3);
+  }
+
+  /* Mosaic background - 6 tiles arranged in a grid */
+  .ig-card-bg {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 2px;
+    background: var(--burgundy-dark);
+  }
+  .ig-tile {
+    display: block;
+    background-size: 130% 130%;
+    background-position: center;
+    transition: transform 0.7s cubic-bezier(.2,.7,.3,1), filter 0.5s ease;
+    animation: tileDrift 14s ease-in-out infinite;
+  }
+  @keyframes tileDrift {
+    0%   { background-position: 30% 30%; }
+    25%  { background-position: 70% 35%; }
+    50%  { background-position: 65% 70%; }
+    75%  { background-position: 35% 65%; }
+    100% { background-position: 30% 30%; }
+  }
+  .ig-tile-1 { background-image: linear-gradient(135deg, var(--pink), var(--rose)); animation-delay: 0s; }
+  .ig-tile-2 { background-image: linear-gradient(135deg, var(--burgundy), var(--burgundy-dark)); animation-delay: -2.3s; }
+  .ig-tile-3 { background-image: linear-gradient(135deg, #d8a4ab, var(--pink)); animation-delay: -4.6s; }
+  .ig-tile-4 { background-image: linear-gradient(135deg, var(--sage-mid), var(--sage-darker)); animation-delay: -6.9s; }
+  .ig-tile-5 { background-image: linear-gradient(135deg, #c8954a, var(--burgundy)); animation-delay: -9.2s; }
+  .ig-tile-6 { background-image: linear-gradient(135deg, var(--rose), #8a4a6e); animation-delay: -11.5s; }
+
+  .ig-card:hover .ig-tile { transform: scale(1.08); filter: brightness(1.05); }
+  .ig-card:hover .ig-tile-1 { transition-delay: 0s; }
+  .ig-card:hover .ig-tile-2 { transition-delay: 0.06s; }
+  .ig-card:hover .ig-tile-3 { transition-delay: 0.12s; }
+  .ig-card:hover .ig-tile-4 { transition-delay: 0.18s; }
+  .ig-card:hover .ig-tile-5 { transition-delay: 0.24s; }
+  .ig-card:hover .ig-tile-6 { transition-delay: 0.3s; }
+
+  /* Dark overlay so the text reads */
+  .ig-card-overlay {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at center, rgba(74,40,40,0.35) 0%, rgba(74,40,40,0.7) 100%),
+      linear-gradient(135deg, rgba(74,40,40,0.5), rgba(107,46,46,0.55));
+    transition: opacity 0.4s ease;
+  }
+  .ig-card:hover .ig-card-overlay { opacity: 0.85; }
+
+  /* Content stack */
+  .ig-card-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .ig-card-icon {
+    font-size: 44px;
+    color: var(--cream-warm);
+    line-height: 1;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 4px 14px rgba(0,0,0,0.4));
+  }
+  .ig-card-handle {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1;
+    color: var(--cream-warm);
+    text-shadow: 0 2px 14px rgba(0,0,0,0.5);
+  }
+  .ig-card-title {
+    font-family: var(--font-display);
+    font-size: clamp(15px, 1.6vw, 20px);
+    color: rgba(245, 235, 227, 0.9);
+    margin-top: 2px;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+  }
+  .ig-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 22px;
+    border: 1.5px solid rgba(245, 235, 227, 0.85);
+    background: rgba(245, 235, 227, 0.08);
+    backdrop-filter: blur(6px);
+    color: var(--cream-warm);
+    font-size: 11px;
+    letter-spacing: 3px;
+    transition: all 0.3s ease;
+  }
+  .ig-card-cta i { font-size: 14px; transition: transform 0.3s ease; }
+  .ig-card:hover .ig-card-cta {
+    background: var(--pink);
+    border-color: var(--pink);
+    letter-spacing: 4px;
+  }
+  .ig-card:hover .ig-card-cta i { transform: translate(2px, -2px); }
+
+  @media (max-width: 600px) {
+    .ig-card { aspect-ratio: 4 / 5; }
+    .ig-card-bg { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); }
+    .ig-tile-1 { grid-area: 1/1/2/2; }
+    .ig-tile-2 { grid-area: 1/2/2/3; }
+    .ig-tile-3 { grid-area: 2/1/3/2; }
+    .ig-tile-4 { grid-area: 2/2/3/3; }
+    .ig-tile-5 { grid-area: 3/1/4/2; }
+    .ig-tile-6 { grid-area: 3/2/4/3; }
+    .ig-card-content { padding: 28px 20px; }
+  }
+
+  .google-link { margin: 60px auto 0; text-align: center; }
+  .google-link a {
+    display: inline-flex; align-items: center; gap: 10px;
+    color: var(--burgundy); text-decoration: none;
+    font-size: 12px; letter-spacing: 2px;
+    padding: 12px 28px;
+    border: 1px solid var(--burgundy);
+    transition: all 0.3s ease;
+    background: transparent;
+  }
+  .google-link a:hover { background: var(--burgundy); color: var(--cream-warm); }
+  .google-link i { font-size: 16px; }
+
+  /* PRODUCTS */
+  .products {
+    background: var(--warm-brown);
+    color: var(--cream-warm);
+    position: relative;
+  }
+  .products .eyebrow { color: var(--warm-tan); }
+  .products .section-title { color: var(--cream-warm); }
+  .products .section-rule { background: var(--warm-tan); }
+  .products-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 70px; align-items: center;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .products-images { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .product-img {
+    aspect-ratio: 3/4;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cream-warm); font-size: 10px; letter-spacing: 1px;
+  }
+  .product-img-1 { background: linear-gradient(180deg, var(--blush), #8a4a4a); }
+  .product-img-2 { background: linear-gradient(180deg, #c8a890, #a08070); transform: translateY(24px); }
+  .products-text p {
+    font-family: var(--font-display);
+    font-size: 19px; line-height: 1.75;
+    color: #f0e6d8; font-weight: 300;
+  }
+
+  /* HYGIENE — narrative with sticky-image crossfade transition (same pattern as Our Story) */
+  .hygiene {
+    background: var(--cream);
+    padding: 0;
+    position: relative;
+  }
+  .hygiene .eyebrow { color: var(--burgundy); }
+  .hygiene .section-rule { background: var(--burgundy); }
+  .hygiene-grid {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 70px;
+    align-items: flex-start;
+    padding: 0 70px;
+  }
+  .hygiene-text {
+    padding: 140px 0 160px;
+  }
+  .hygiene-text p {
+    font-family: var(--font-display);
+    font-size: 19px; line-height: 1.75;
+    color: var(--burgundy-dark);
+    margin-bottom: 22px;
+  }
+  .hygiene-text p:first-of-type {
+    font-style: italic;
+    color: var(--burgundy);
+    font-size: 22px;
+    line-height: 1.6;
+  }
+  .hygiene-callout {
+    border-left: 2px solid var(--burgundy);
+    padding: 4px 0 4px 22px;
+    margin-top: 28px;
+  }
+  .hygiene-callout p {
+    font-size: 14px; line-height: 1.7;
+    color: var(--burgundy-dark);
+    font-family: var(--font-body);
+    margin: 0;
+    font-style: italic;
+  }
+
+  /* Sticky image column on the right */
+  .hygiene-media {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 0;
+  }
+  .hygiene-frame {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    background: var(--cream);
+    box-shadow: 0 18px 50px rgba(74, 40, 40, 0.15);
+  }
+  .hygiene-frame::before {
+    content: "";
+    position: absolute;
+    top: 14px; left: 14px;
+    width: 100%; height: 100%;
+    border: 1px solid var(--burgundy);
+    z-index: -1;
+    pointer-events: none;
+  }
+  /* Both images stack and crossfade */
+  .hygiene-img-1,
+  .hygiene-img-2 {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    transform: scale(1) translateZ(0);
+    transform-origin: center center;
+    backface-visibility: hidden;
+    display: block;
+    transition: opacity 0.4s ease;
+  }
+  .hygiene-img-1 { opacity: 1; z-index: 2; }
+  .hygiene-img-2 { opacity: 0; z-index: 1; }
+  /* Caption label that swaps per image */
+  .hygiene-media-label {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    z-index: 3;
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    color: var(--cream-warm);
+    background: rgba(74, 40, 40, 0.85);
+    padding: 6px 10px;
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s ease;
+    text-transform: uppercase;
+  }
+
+  /* VISIT */
+  .visit { background: var(--cream-warm); }
+  .visit-grid {
+    display: grid; grid-template-columns: 1fr 1.2fr;
+    gap: 70px; align-items: center;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .visit-info { display: flex; flex-direction: column; gap: 22px; margin-bottom: 32px; }
+  .info-row { display: flex; align-items: flex-start; gap: 16px; }
+  .info-icon {
+    width: 32px; height: 32px;
+    border: 1px solid var(--burgundy);
+    border-radius: 50%;
+    color: var(--burgundy);
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+  .info-text { font-size: 14px; color: var(--burgundy-dark); line-height: 1.6; padding-top: 6px; }
+  .info-text a { color: var(--burgundy); text-decoration: none; transition: color 0.2s; }
+  .info-text a:hover { color: var(--burgundy-dark); text-decoration: underline; }
+  .info-text strong {
+    display: block;
+    font-size: 9px; letter-spacing: 2px;
+    color: var(--sage-darker);
+    margin-bottom: 4px; font-weight: 500;
+  }
+  .hours-table {
+    display: flex; flex-direction: column;
+    gap: 4px;
+    margin-top: 2px;
+  }
+  .hours-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 4px 0;
+    border-bottom: 1px dotted rgba(107, 46, 46, 0.15);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .hours-row:last-child { border-bottom: none; }
+  .hours-row span:first-child {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--burgundy);
+    font-size: 15px;
+  }
+  .hours-row span:last-child {
+    color: var(--burgundy-dark);
+    font-variant-numeric: tabular-nums;
+  }
+  .visit-cta {
+    display: inline-block;
+    padding: 14px 36px;
+    background: var(--burgundy); color: var(--cream-warm);
+    font-size: 11px; letter-spacing: 3px;
+    text-decoration: none; transition: background 0.3s;
+  }
+  .visit-cta:hover { background: var(--burgundy-dark); }
+
+  /* ============= STOREFRONT EDITORIAL ============= */
+  .storefront-section {
+    position: relative;
+    padding: 0;
+    background: var(--cream);
+    overflow: hidden;
+  }
+  .storefront-header {
+    text-align: center;
+    padding: 90px 32px 50px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .storefront-header .eyebrow { color: var(--sage-darker); }
+  .storefront-frame {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    max-width: 1280px;
+    margin: 0 auto;
+    background: var(--cream-warm);
+  }
+  .storefront-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scale(1);
+    transform-origin: center center;
+    transition: none; /* JS-driven, no CSS transition */
+  }
+  .storefront-caption {
+    position: absolute;
+    left: 32px;
+    bottom: 32px;
+    z-index: 3;
+    color: var(--cream-warm);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(22px, 4vw, 38px);
+    line-height: 1.1;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.5);
+    max-width: 460px;
+    pointer-events: none;
+  }
+  .storefront-caption-sub {
+    display: block;
+    font-family: var(--font-body);
+    font-style: normal;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: rgba(245, 235, 227, 0.85);
+    margin-top: 12px;
+  }
+  .storefront-frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(180deg,
+      rgba(0,0,0,0) 40%,
+      rgba(0,0,0,0.45) 100%);
+  }
+  .storefront-footer {
+    text-align: center;
+    padding: 50px 32px 90px;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  .storefront-footer p {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 17px;
+    color: var(--burgundy-dark);
+    line-height: 1.65;
+  }
+
+  @media (max-width: 700px) {
+    .storefront-header { padding: 64px 24px 40px; }
+    .storefront-frame { aspect-ratio: 3 / 4; }
+    .storefront-caption { left: 22px; bottom: 22px; font-size: 22px; }
+    .storefront-footer { padding: 40px 24px 70px; }
+  }
+
+  .map-frame {
+    aspect-ratio: 4/3;
+    background: #e8e4d8;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(107, 46, 46, 0.1);
+  }
+  .map-frame iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    filter: saturate(0.85) contrast(0.95);
+  }
+
+  .site-footer {
+    position: relative;
+    text-align: center;
+    padding: 80px 30px 50px;
+    overflow: hidden;
+    background: var(--burgundy);
+    color: var(--cream);
+  }
+  .footer-video {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+  .footer-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg,
+        var(--cream) 0%,
+        rgba(240, 237, 230, 0.4) 8%,
+        rgba(107, 46, 46, 0.78) 30%,
+        rgba(107, 46, 46, 0.88) 70%,
+        rgba(74, 40, 40, 0.95) 100%);
+    z-index: 1;
+    pointer-events: none;
+  }
+  .footer-content {
+    position: relative;
+    z-index: 2;
+  }
+  .footer-mark { font-family: var(--font-display); font-style: italic; font-size: 38px; margin-bottom: 6px; }
+  .footer-sub { font-size: 11px; letter-spacing: 3px; color: var(--warm-tan); margin-bottom: 28px; }
+  .footer-logo {
+    width: clamp(140px, 18vw, 200px);
+    height: auto;
+    margin: 0 auto 28px;
+    display: block;
+    filter: drop-shadow(0 4px 20px rgba(0,0,0,0.35));
+  }
+  .footer-social { display: flex; justify-content: center; gap: 22px; margin-bottom: 24px; color: var(--warm-tan); font-size: 20px; }
+  .footer-social a { color: inherit; transition: color 0.2s; }
+  .footer-social a:hover { color: var(--cream-warm); }
+  .footer-copy { font-size: 10px; letter-spacing: 2px; color: var(--warm-tan); }
+
+  /* PROMO side tab */
+  .promo-tab {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    background: var(--burgundy);
+    color: var(--cream-warm);
+    padding: 14px 8px;
+    cursor: pointer;
+    z-index: 100;
+    border-radius: 4px 0 0 4px;
+    font-size: 10px;
+    letter-spacing: 3px;
+    border: none;
+    box-shadow: -2px 2px 12px rgba(74, 40, 40, 0.18);
+    transition: background 0.2s, padding 0.2s;
+    writing-mode: vertical-rl;
+    animation: tabSlideIn 0.6s ease-out 1.5s both;
+    transform: translateY(-50%);
+  }
+  .promo-tab:hover { background: var(--burgundy-dark); padding-left: 12px; }
+  @keyframes tabSlideIn {
+    from { opacity: 0; transform: translateY(-50%) translateX(20px); }
+    to { opacity: 1; transform: translateY(-50%) translateX(0); }
+  }
+  .promo-card {
+    position: fixed;
+    right: 50px; top: 50%;
+    transform: translateY(-50%) translateX(120%);
+    width: 220px;
+    background: var(--cream-warm);
+    border: 1px solid var(--burgundy);
+    box-shadow: -8px 8px 24px rgba(74, 40, 40, 0.18);
+    padding: 16px 16px 14px;
+    z-index: 101;
+    opacity: 0;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+    pointer-events: none;
+  }
+  .promo-card.open {
+    transform: translateY(-50%) translateX(0);
+    opacity: 1; pointer-events: auto;
+  }
+  .promo-close {
+    position: absolute; top: 6px; right: 8px;
+    color: var(--sage-darker); cursor: pointer;
+    background: none; border: none;
+    font-size: 16px; line-height: 1;
+    padding: 2px 4px; transition: color 0.2s;
+  }
+  .promo-close:hover { color: var(--burgundy); }
+  .promo-eyebrow {
+    font-size: 9px; letter-spacing: 2.5px;
+    color: var(--burgundy); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .promo-eyebrow i { font-size: 12px; }
+  .promo-row { display: flex; align-items: baseline; gap: 8px; padding: 6px 0; }
+  .promo-row + .promo-row { border-top: 1px solid rgba(107, 46, 46, 0.12); }
+  .promo-pct {
+    font-family: var(--font-display); font-style: italic;
+    color: var(--burgundy); font-size: 22px; line-height: 1;
+    flex-shrink: 0;
+  }
+  .promo-text {
+    font-size: 10px; color: var(--burgundy-dark); line-height: 1.4;
+  }
+  .promo-cta {
+    display: block; margin-top: 10px; text-align: center;
+    background: var(--burgundy); color: var(--cream-warm);
+    padding: 7px; font-size: 9px; letter-spacing: 2px;
+    text-decoration: none; transition: background 0.2s;
+  }
+  .promo-cta:hover { background: var(--burgundy-dark); }
+
+  /* TOP BAR (mobile only — hidden on desktop) */
+  .top-bar { display: none !important; }
+  .mobile-overlay { display: none; }
+
+  /* MOBILE & TABLET */
+  @media (max-width: 900px) {
+    /* Sidebar disappears, replaced by top bar */
+    .sidebar { display: none; }
+    .layout { display: block; }
+    .main { width: 100%; }
+    /* CRITICAL: kill the sidebar-active padding on mobile (no sidebar to make room for) */
+    body.sidebar-active .main { padding-left: 0; }
+    /* Mobile hero logo - sized to balance with the BOOK button below */
+    .hero-logo {
+      display: block;
+      margin: 0 auto 36px;
+      opacity: 0.92;
+    }
+    .hero-logo img {
+      width: clamp(180px, 56vw, 240px);
+      filter: drop-shadow(0 6px 22px rgba(0, 0, 0, 0.5));
+    }
+    body.is-loaded .hero-logo { opacity: 0.92; }
+    body.is-loaded .hero-logo:hover { opacity: 1; }
+
+    /* Mobile top bar */
+    .top-bar {
+      display: flex !important;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      background: var(--cream);
+      padding: 14px 22px;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(107, 46, 46, 0.1);
+      backdrop-filter: blur(10px);
+      background: rgba(240, 237, 230, 0.92);
+    }
+    .mobile-overlay { display: flex; }
+    /* Top-bar social icons (same brand-color treatment as desktop sidebar) */
+    .top-bar-social {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .top-bar-social a {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1.5px solid var(--burgundy);
+      color: var(--burgundy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      text-decoration: none;
+      transition: border-color 0.18s ease,
+                  transform 0.18s cubic-bezier(.34,1.56,.64,1),
+                  box-shadow 0.18s ease,
+                  color 0.18s ease,
+                  background 0.18s ease;
+    }
+    .top-bar-social a[aria-label="Instagram"]:hover,
+    .top-bar-social a[aria-label="Instagram"]:active {
+      border-color: transparent;
+      background: linear-gradient(45deg,
+        #f09433 0%,
+        #e6683c 25%,
+        #dc2743 50%,
+        #cc2366 75%,
+        #bc1888 100%);
+      color: #fff;
+      transform: translateY(-2px) scale(1.1);
+      box-shadow: 0 6px 14px rgba(220, 39, 67, 0.45);
+    }
+    .top-bar-social a[aria-label="TikTok"]:hover,
+    .top-bar-social a[aria-label="TikTok"]:active {
+      border-color: transparent;
+      background: #000;
+      color: #fff;
+      transform: translateY(-2px) scale(1.1);
+      box-shadow:
+        2px 2px 0 #ff0050,
+        -2px -2px 0 #00f2ea,
+        0 6px 14px rgba(0, 0, 0, 0.35);
+    }
+    .menu-toggle {
+      background: none;
+      border: 1px solid var(--burgundy);
+      color: var(--burgundy);
+      padding: 8px 11px;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .menu-toggle:hover { background: var(--burgundy); color: var(--cream-warm); }
+    .menu-toggle .icon-close { display: none; }
+    .menu-toggle.open .icon-menu { display: none; }
+    .menu-toggle.open .icon-close { display: inline-block; }
+
+    /* Full-screen overlay menu */
+    .mobile-overlay {
+      position: fixed;
+      inset: 0;
+      top: 65px;
+      background: var(--cream);
+      z-index: 85;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 32px 30px 40px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .mobile-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .mobile-overlay-logo { display: none; }
+    .mobile-overlay-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      align-items: center;
+      width: 100%;
+      max-width: 320px;
+    }
+    .mobile-overlay-nav .nav-link {
+      font-size: 14px;
+      padding: 14px 0;
+      letter-spacing: 3px;
+      width: 100%;
+      text-align: center;
+      border-left: none;
+      border-bottom: 1px solid rgba(107, 46, 46, 0.15);
+    }
+    .mobile-overlay-nav .nav-link:hover,
+    .mobile-overlay-nav .nav-link.active {
+      padding-left: 0;
+      color: var(--burgundy);
+      font-weight: 500;
+      border-bottom-color: var(--burgundy);
+    }
+    .mobile-overlay-social {
+      display: flex;
+      gap: 24px;
+      margin-top: 28px;
+      color: var(--burgundy);
+      font-size: 22px;
+    }
+    .mobile-overlay-reviews {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 12px 22px;
+      border: 1px solid var(--burgundy);
+      color: var(--burgundy);
+      text-decoration: none;
+      font-size: 10px;
+      letter-spacing: 2px;
+      font-weight: 500;
+      transition: all 0.22s ease;
+    }
+    .mobile-overlay-reviews i { font-size: 15px; }
+    .mobile-overlay-reviews:hover,
+    .mobile-overlay-reviews:active {
+      background: var(--burgundy);
+      color: var(--cream-warm);
+    }
+
+    /* Section adjustments */
+    section { padding: 70px 28px; }
+    .owner, .hygiene, .visit, .services, .work { padding: 80px 28px; }
+    /* Hero takes the visible viewport below the sticky top bar so the logo+BOOK pair centers properly */
+    .hero {
+      height: calc(100vh - 62px);
+      min-height: 520px;
+      max-height: 800px;
+    }
+    .hero-content {
+      width: 100%;
+      padding: 0 24px;
+    }
+    .hero h1 { font-size: clamp(56px, 14vw, 88px); }
+    .hero-script { font-size: clamp(11px, 3.2vw, 15px); letter-spacing: clamp(4px, 2.5vw, 8px); margin-bottom: 32px; }
+    .hero-cta {
+      padding: 18px 38px;
+      font-size: 12px;
+      letter-spacing: 3px;
+      gap: 10px;
+    }
+    .hero-cta::before { font-size: 11px; }
+    .hero-cta::after { font-size: 16px; }
+
+    .owner-wrap { grid-template-columns: 1fr; gap: 0; padding: 0; }
+    /* HIDE the top media block entirely on mobile — both photos appear at the end with the text */
+    .owner-media { display: none; }
+    .owner-text { padding: 0 0 30px; }
+    .owner-text-storefront { display: none; }
+    /* Both photos stacked at the bottom of the story, like hygiene mobile pattern */
+    .owner-text::after { content: none; } /* clear any old pseudo */
+    .owner-mobile-photos {
+      display: flex !important;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 380px;
+      margin: 36px auto 20px;
+    }
+    .owner-mobile-photos img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      display: block;
+      box-shadow: 0 12px 28px rgba(74, 40, 40, 0.15);
+    }
+    .services-grid { grid-template-columns: 1fr; gap: 48px; }
+    .hygiene-grid, .visit-grid { grid-template-columns: 1fr; gap: 36px; padding: 0; }
+    .hygiene-text { padding: 0 0 30px; }
+    /* Mobile: kill the sticky, show both hygiene photos stacked */
+    .hygiene-media {
+      position: relative;
+      top: auto;
+      height: auto;
+      padding: 0 0 50px;
+    }
+    .hygiene-frame {
+      max-width: 380px;
+      aspect-ratio: auto;
+      margin: 0 auto;
+      background: transparent;
+      box-shadow: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .hygiene-frame::before { display: none; }
+    /* On mobile both images stand alone */
+    .hygiene-img-1,
+    .hygiene-img-2 {
+      position: relative !important;
+      inset: auto;
+      opacity: 1 !important;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4/3;
+      box-shadow: 0 12px 28px rgba(74, 40, 40, 0.15);
+    }
+    .hygiene-media-label { display: none; }
+    .promo-card { width: calc(100vw - 60px); max-width: 240px; right: 50px; }
+    .site-footer { padding: 70px 28px 40px; }
+    .footer-mark { font-size: 32px; }
+
+    /* Softer mobile video vignette */
+    .hero-overlay {
+      background:
+        linear-gradient(180deg,
+          rgba(0,0,0,0.20) 0%,
+          rgba(0,0,0,0.05) 14%,
+          rgba(0,0,0,0.0) 40%,
+          rgba(0,0,0,0.0) 60%,
+          rgba(240, 237, 230, 0.55) 88%,
+          var(--cream) 100%);
+    }
+  }
+  @media (max-width: 480px) {
+    section { padding: 64px 22px; }
+    .owner, .hygiene, .visit, .services, .work { padding: 70px 22px; }
+    .top-bar { padding: 12px 18px; }
+    .top-bar-social a { width: 34px; height: 34px; font-size: 14px; }
+    .top-bar-social { gap: 8px; }
+    .mobile-overlay-nav .nav-link { font-size: 13px; padding: 14px 0; }
+    .promo-tab { font-size: 9px; letter-spacing: 2.5px; padding: 12px 6px; }
+  }
+  /* ===================================================================
+     ANIMATION SYSTEM
+     - Page-load animations (initial entrance)
+     - Scroll-reveal animations (elements fade up as they enter viewport)
+     - All hardware-accelerated, respects prefers-reduced-motion
+     =================================================================== */
+
+  /* Respect users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* ---- PAGE-LOAD ANIMATIONS (hero) ---- */
+  /* Hero video fades up from black */
+  .hero-video {
+    opacity: 0;
+    animation: heroVideoIn 1.4s cubic-bezier(.4,0,.2,1) 0.1s forwards;
+  }
+  @keyframes heroVideoIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* Hero overlay subtly fades in */
+  .hero-overlay {
+    opacity: 0;
+    animation: fadeInGentle 1.6s ease-out 0.3s forwards;
+  }
+  @keyframes fadeInGentle {
+    to { opacity: 1; }
+  }
+
+  /* Logo drops down from above */
+  .hero-logo {
+    opacity: 0;
+    transform: translateY(-30px);
+    transition: opacity 1.1s cubic-bezier(.2,.85,.3,1),
+                transform 1.1s cubic-bezier(.2,.85,.3,1);
+    transition-delay: 0.5s;
+  }
+  body.is-loaded .hero-logo {
+    opacity: 0.88;
+    transform: translateY(0);
+  }
+  body.is-loaded .hero-logo:hover {
+    transform: translateY(0) scale(1.04);
+    opacity: 1;
+  }
+
+  /* BOOK button entrance + hover transitions
+     KEY: only opacity/scale (transform) have the entrance delay;
+     hover-able properties (background, color, etc) respond INSTANTLY without delay. */
+  .hero-cta {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  body.is-loaded .hero-cta {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.9s cubic-bezier(.2,.85,.3,1) 1s,
+                transform 0.9s cubic-bezier(.2,.85,.3,1) 1s;
+    animation: ctaPulse 4.5s ease-in-out 2.5s infinite;
+  }
+  /* Once visible, hover state must respond fast */
+  body.is-loaded .hero-cta:hover {
+    transform: translateY(-2px) scale(1);
+    animation: none;
+  }
+
+  /* Scroll hint at bottom drifts up */
+  .hero-scroll-hint {
+    opacity: 0;
+    animation: scrollHintIn 1s ease-out 1.6s forwards,
+               scrollBounce 2s ease-in-out 2.6s infinite;
+  }
+  @keyframes scrollHintIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    to   { opacity: 0.7; transform: translateX(-50%) translateY(0); }
+  }
+
+  /* Sidebar starts hidden on first load — reveals only when user scrolls past hero */
+  .sidebar {
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: opacity 0.8s cubic-bezier(.2,.85,.3,1),
+                transform 0.9s cubic-bezier(.2,.85,.3,1);
+    pointer-events: none;
+  }
+  .sidebar.sidebar-visible {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  /* Sidebar children stagger after the sidebar slides in */
+  .sidebar-social {
+    opacity: 0;
+    transform: translateY(-12px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transition-delay: 0.3s;
+  }
+  .sidebar-visible .sidebar-social {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .sidebar-nav .nav-link {
+    opacity: 0;
+    transform: translateX(-12px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  }
+  .sidebar-visible .sidebar-nav .nav-link { opacity: 1; transform: translateX(0); }
+  .sidebar-visible .sidebar-nav .nav-link:nth-child(1) { transition-delay: 0.45s; }
+  .sidebar-visible .sidebar-nav .nav-link:nth-child(2) { transition-delay: 0.55s; }
+  .sidebar-visible .sidebar-nav .nav-link:nth-child(3) { transition-delay: 0.65s; }
+  .sidebar-visible .sidebar-nav .nav-link:nth-child(4) { transition-delay: 0.75s; }
+  .sidebar-visible .sidebar-nav .nav-link:nth-child(5) { transition-delay: 0.85s; }
+  .sidebar-visible .sidebar-nav .nav-link:nth-child(6) { transition-delay: 0.95s; }
+  .sidebar-footer {
+    opacity: 0;
+    transition: opacity 0.6s ease-out;
+    transition-delay: 1.05s;
+  }
+  .sidebar-visible .sidebar-footer { opacity: 1; }
+
+  /* Mobile top bar slides down from above */
+  .top-bar {
+    opacity: 0;
+    transform: translateY(-100%);
+    animation: topBarIn 0.8s cubic-bezier(.2,.85,.3,1) 0.4s forwards;
+  }
+  @keyframes topBarIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Promo tab: appears after user scrolls past hero */
+  .promo-tab {
+    opacity: 0;
+    transform: translateY(-50%) translateX(60px);
+    transition: opacity 0.7s cubic-bezier(.2,.85,.3,1),
+                transform 0.8s cubic-bezier(.2,.85,.3,1);
+  }
+  body.sidebar-active .promo-tab {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+    transition-delay: 0.4s;
+  }
+
+  /* ---- SCROLL-REVEAL SYSTEM ---- */
+  /* Any element with .reveal starts invisible, drops in when .in-view added by JS */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.9s cubic-bezier(.2,.7,.3,1),
+                transform 0.9s cubic-bezier(.2,.7,.3,1);
+    will-change: opacity, transform;
+  }
+  .reveal.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Stagger variants — apply via inline style="--reveal-delay: .15s" */
+  .reveal { transition-delay: var(--reveal-delay, 0s); }
+
+  /* Specialized reveal variants */
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-32px);
+    transition: opacity 0.9s cubic-bezier(.2,.7,.3,1),
+                transform 0.9s cubic-bezier(.2,.7,.3,1);
+  }
+  .reveal-left.in-view {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(32px);
+    transition: opacity 0.9s cubic-bezier(.2,.7,.3,1),
+                transform 0.9s cubic-bezier(.2,.7,.3,1);
+  }
+  .reveal-right.in-view {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .reveal-scale {
+    opacity: 0;
+    transform: scale(0.94);
+    transition: opacity 0.9s cubic-bezier(.2,.7,.3,1),
+                transform 0.9s cubic-bezier(.2,.7,.3,1);
+  }
+  .reveal-scale.in-view {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Auto-reveal section titles, eyebrows, rules, intros */
+  .eyebrow, .section-title, .section-rule, .section-intro {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s cubic-bezier(.2,.7,.3,1),
+                transform 0.8s cubic-bezier(.2,.7,.3,1);
+  }
+  .in-view-section .eyebrow         { opacity: 1; transform: translateY(0); transition-delay: 0s; }
+  .in-view-section .section-title   { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
+  .in-view-section .section-rule    { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+  .in-view-section .section-intro   { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
+
+  /* Service cards: fade up with stagger */
+  .service-card {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(.2,.7,.3,1),
+                transform 0.8s cubic-bezier(.2,.7,.3,1);
+  }
+  .service-card.in-view { opacity: 1; transform: translateY(0); }
+  .service-card.in-view:nth-child(1) { transition-delay: 0s; }
+  .service-card.in-view:nth-child(2) { transition-delay: 0.12s; }
+  .service-card.in-view:nth-child(3) { transition-delay: 0.24s; }
+  .service-card.in-view:nth-child(4) { transition-delay: 0.36s; }
+
+  /* IG card: scale in */
+  .ig-card {
+    opacity: 0;
+    transform: scale(0.94) translateY(20px);
+    transition: opacity 1s cubic-bezier(.2,.7,.3,1),
+                transform 1s cubic-bezier(.2,.7,.3,1),
+                box-shadow 0.5s ease;
+  }
+  .ig-card.in-view {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  /* Reapply the hover lift while preserving in-view state */
+  .ig-card.in-view:hover {
+    transform: translateY(-6px) scale(1.01);
+  }
+
+  /* Footer fade up */
+  .site-footer {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s cubic-bezier(.2,.7,.3,1);
+  }
+  .site-footer.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Hygiene & Visit grid columns slide from sides */
+  .hygiene-text, .visit-grid > div:first-child {
+    opacity: 0; transform: translateX(-28px);
+    transition: opacity 0.9s cubic-bezier(.2,.7,.3,1),
+                transform 0.9s cubic-bezier(.2,.7,.3,1);
+  }
+  .hygiene-img, .map-frame {
+    opacity: 0; transform: translateX(28px);
+    transition: opacity 0.9s cubic-bezier(.2,.7,.3,1),
+                transform 0.9s cubic-bezier(.2,.7,.3,1);
+  }
+  .in-view-section .hygiene-text,
+  .in-view-section .visit-grid > div:first-child,
+  .in-view-section .hygiene-img,
+  .in-view-section .map-frame {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0.2s;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- CSS-only falling cherry blossom petals (no video file required) -->
+<div class="flower-bg" id="flowerBg" aria-hidden="true">
+  <div class="petal petal-1"></div>
+  <div class="petal petal-2"></div>
+  <div class="petal petal-3"></div>
+  <div class="petal petal-4"></div>
+  <div class="petal petal-5"></div>
+  <div class="petal petal-6"></div>
+  <div class="petal petal-7"></div>
+  <div class="petal petal-8"></div>
+  <div class="petal petal-9"></div>
+  <div class="petal petal-10"></div>
+  <div class="petal petal-11"></div>
+  <div class="petal petal-12"></div>
+  <div class="petal petal-13"></div>
+  <div class="petal petal-14"></div>
+  <div class="petal petal-15"></div>
+  <div class="petal petal-16"></div>
+  <div class="petal petal-17"></div>
+  <div class="petal petal-18"></div>
+</div>
+
+<!-- Mobile top bar -->
+<header class="top-bar">
+  <div class="top-bar-social">
+    <a href="https://www.instagram.com/studio57nailbar/" target="_blank" rel="noopener" aria-label="Instagram">
+      <i class="ti ti-brand-instagram"></i>
+    </a>
+    <a href="https://www.tiktok.com/@studio57nailbar" target="_blank" rel="noopener" aria-label="TikTok">
+      <i class="ti ti-brand-tiktok"></i>
+    </a>
+  </div>
+  <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()" aria-label="Menu">
+    <span class="icon-menu"><i class="ti ti-menu-2"></i></span>
+    <span class="icon-close"><i class="ti ti-x"></i></span>
+  </button>
+</header>
+
+<!-- Mobile menu overlay -->
+<div class="mobile-overlay" id="mobileOverlay">
+  <nav class="mobile-overlay-nav">
+    <a href="#hero" class="nav-link" onclick="closeMobileMenu()">Home</a>
+    <a href="#services" class="nav-link" onclick="closeMobileMenu()">Services</a>
+    <a href="#owner" class="nav-link" onclick="closeMobileMenu()">Our Story</a>
+    <a href="#work" class="nav-link" onclick="closeMobileMenu()">Our Work</a>
+    <a href="#hygiene" class="nav-link" onclick="closeMobileMenu()">Hygiene</a>
+    <a href="#visit" class="nav-link" onclick="closeMobileMenu()">Visit</a>
+  </nav>
+  <div class="mobile-overlay-social">
+    <a href="https://www.instagram.com/studio57nailbar/" target="_blank" rel="noopener" aria-label="Instagram"><i class="ti ti-brand-instagram"></i></a>
+    <a href="https://www.tiktok.com/@studio57nailbar" target="_blank" rel="noopener" aria-label="TikTok"><i class="ti ti-brand-tiktok"></i></a>
+  </div>
+  <a href="https://www.google.com/search?sca_esv=26b92b3855b956f4&q=Studio+57+Nail+Bar+%26+Spa+Reviews&sa=X" target="_blank" rel="noopener" class="mobile-overlay-reviews">
+    <i class="ti ti-brand-google"></i>
+    <span>READ OUR GOOGLE REVIEWS</span>
+  </a>
+</div>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-social">
+        <a href="https://www.instagram.com/studio57nailbar/" target="_blank" rel="noopener" aria-label="Instagram" data-label="Instagram">
+          <i class="ti ti-brand-instagram"></i>
+        </a>
+        <a href="https://www.tiktok.com/@studio57nailbar" target="_blank" rel="noopener" aria-label="TikTok" data-label="TikTok">
+          <i class="ti ti-brand-tiktok"></i>
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#hero" class="nav-link active">Home</a>
+        <a href="#services" class="nav-link">Services</a>
+        <a href="#owner" class="nav-link">Our Story</a>
+        <a href="#work" class="nav-link">Our Work</a>
+        <a href="#hygiene" class="nav-link">Hygiene</a>
+        <a href="#visit" class="nav-link">Visit</a>
+      </nav>
+    </div>
+    <div class="sidebar-footer">
+      <a href="https://www.google.com/search?sca_esv=26b92b3855b956f4&q=Studio+57+Nail+Bar+%26+Spa+Reviews&sa=X" target="_blank" rel="noopener" class="sidebar-reviews">
+        <i class="ti ti-brand-google"></i>
+        <span>READ OUR<br>GOOGLE REVIEWS</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- 1. HERO -->
+    <section id="hero" class="hero" style="padding: 0;">
+      <video class="hero-video" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="hero-poster.jpg" disablepictureinpicture disableremoteplayback controlslist="nodownload noplaybackrate nofullscreen">
+        <source src="hero-mobile.mp4" type="video/mp4" media="(max-width: 900px)">
+        <source src="hero.mp4" type="video/mp4">
+      </video>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <a href="#hero" class="hero-logo" aria-label="Studio 57 Nail Bar &amp; Spa home">
+          <img src="logo-dark.png" alt="Studio 57 Nail Bar &amp; Spa" onerror="this.src='logo.png'">
+        </a>
+        <a href="https://book.squareup.com/appointments/39a56qq300x67k/location/L495F330V5272/services?buttonTextColor=000000&color=dde9d9&locale=en&referrer=so" target="_blank" rel="noopener" class="hero-cta">BOOK AN APPOINTMENT</a>
+      </div>
+      <div class="hero-scroll-hint">↓ SCROLL</div>
+    </section>
+
+    <!-- 2. SERVICES with hours -->
+    <section id="services" class="services">
+      <div class="section-center">
+        <div class="eyebrow">WHAT WE OFFER</div>
+        <h2 class="section-title">Our Services</h2>
+        <div class="section-rule center"></div>
+      </div>
+      <div class="hours-strip">
+        <i class="ti ti-clock"></i>Open daily · <a href="#visit" style="color:var(--burgundy); text-decoration: none;">see full hours</a>
+      </div>
+      <div class="services-grid">
+
+        <div class="service-card">
+          <div class="service-header">
+            <div class="service-icon"><i class="ti ti-hand-finger"></i></div>
+            <div class="service-name">Nails</div>
+          </div>
+          <div class="service-list">
+            <div class="subcat-label">Manicure</div>
+            <div class="service-item"><span class="service-title">Regular Manicure</span><span class="service-duration">30 min</span><span class="service-price">$12</span></div>
+            <div class="service-item"><span class="service-title">French Manicure</span><span class="service-duration">35 min</span><span class="service-price">$17</span></div>
+            <div class="service-item"><span class="service-title">Color Gel Manicure</span><span class="service-duration">40 min</span><span class="service-price">$35</span></div>
+            <div class="service-item"><span class="service-title">Shiny Buff Manicure</span><span class="service-duration">30 min</span><span class="service-price">$17</span></div>
+            <div class="service-item"><span class="service-title">Extensions Tip Set Gel</span><span class="service-duration">1h 30</span><span class="service-price">$70</span></div>
+            <div class="service-item"><span class="service-title">Change Color</span><span class="service-duration">15 min</span><span class="service-price">$8</span></div>
+            <div class="service-item"><span class="service-title">Kids Manicure</span><span class="service-duration">20 min</span><span class="service-price">$8</span></div>
+
+            <div class="subcat-label">Pedicure</div>
+            <div class="service-item"><span class="service-title">Regular Pedicure</span><span class="service-duration">45 min</span><span class="service-price">$25</span></div>
+            <div class="service-item"><span class="service-title">French Pedicure</span><span class="service-duration">50 min</span><span class="service-price">$30</span></div>
+            <div class="service-item"><span class="service-title">Color Gel Pedicure</span><span class="service-duration">50 min</span><span class="service-price">$45</span></div>
+            <div class="service-item"><span class="service-title">Change Polish Pedicure</span><span class="service-duration">15 min</span><span class="service-price">$15</span></div>
+            <div class="service-item"><span class="service-title">Buff and Shine Pedicure</span><span class="service-duration">45 min</span><span class="service-price">$30</span></div>
+            <div class="service-item"><span class="service-title">Callus Pedicure</span><span class="service-duration">20 min</span><span class="service-price">$12</span></div>
+            <div class="service-item"><span class="service-title">Kids Pedicure</span><span class="service-duration">20 min</span><span class="service-price">$20</span></div>
+
+            <div class="subcat-label">Spa Pedicure</div>
+            <div class="service-item"><span class="service-title">Lavender Spa Pedicure</span><span class="service-duration">1h 10</span><span class="service-price">$60</span></div>
+            <div class="service-item"><span class="service-title">Olive Sensation Spa Pedicure</span><span class="service-duration">1h 15</span><span class="service-price">$65</span></div>
+            <div class="service-item"><span class="service-title">Vitamin Recharge Spa Pedicure</span><span class="service-duration">1h 30</span><span class="service-price">$70</span></div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-header">
+            <div class="service-icon"><i class="ti ti-leaf"></i></div>
+            <div class="service-name">Waxing &amp; Threading</div>
+          </div>
+          <div class="service-list">
+            <div class="subcat-label">Waxing</div>
+            <div class="service-item"><span class="service-title">Eyebrow Wax</span><span class="service-duration">10 min</span><span class="service-price">$7</span></div>
+            <div class="service-item"><span class="service-title">Lip or Chin Wax</span><span class="service-duration">10 min</span><span class="service-price">$7</span></div>
+            <div class="service-item"><span class="service-title">Under Arm Wax</span><span class="service-duration">15 min</span><span class="service-price">$12</span></div>
+            <div class="service-item"><span class="service-title">Bikini Wax</span><span class="service-duration">20 min</span><span class="service-price">$20</span></div>
+            <div class="service-item"><span class="service-title">Half Arm Wax</span><span class="service-duration">30 min</span><span class="service-price">$25</span></div>
+            <div class="service-item"><span class="service-title">Half Leg Wax</span><span class="service-duration">30 min</span><span class="service-price">$25</span></div>
+            <div class="service-item"><span class="service-title">Chest Wax</span><span class="service-duration">30 min</span><span class="service-price">$30</span></div>
+            <div class="service-item"><span class="service-title">Full Arm Wax</span><span class="service-duration">40 min</span><span class="service-price">$35</span></div>
+            <div class="service-item"><span class="service-title">Brazilian Wax</span><span class="service-duration">40 min</span><span class="service-price">$40</span></div>
+            <div class="service-item"><span class="service-title">Full Leg Wax</span><span class="service-duration">45 min</span><span class="service-price">$50</span></div>
+            <div class="service-item"><span class="service-title">Full Back Wax</span><span class="service-duration">45 min</span><span class="service-price">$60</span></div>
+
+            <div class="subcat-label">Threading</div>
+            <div class="service-item"><span class="service-title">Lip Threading</span><span class="service-duration">10 min</span><span class="service-price">$5</span></div>
+            <div class="service-item"><span class="service-title">Chin Threading</span><span class="service-duration">10 min</span><span class="service-price">$5</span></div>
+            <div class="service-item"><span class="service-title">Eyebrow Threading</span><span class="service-duration">10 min</span><span class="service-price">$6</span></div>
+            <div class="service-item"><span class="service-title">Eyebrow &amp; Tinting</span><span class="service-duration">30 min</span><span class="service-price">$20</span></div>
+            <div class="service-item"><span class="service-title">Full Face Threading</span><span class="service-duration">30 min</span><span class="service-price">$25</span></div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-header">
+            <div class="service-icon"><i class="ti ti-sparkles"></i></div>
+            <div class="service-name">Facial &amp; Skincare</div>
+          </div>
+          <div class="service-list">
+            <div class="service-item"><span class="service-title">The Studio Glow Facial</span><span class="service-duration">45 min</span><span class="service-price">$55</span></div>
+            <div class="service-item"><span class="service-title">Lumière Red Light Session</span><span class="service-duration">20 min</span><span class="service-price">$40</span></div>
+            <div class="service-item"><span class="service-title">Lumière Red Light Add-On <em style="color:var(--sage-darker); font-style:italic; font-family:var(--font-display); font-size:11px;">(with facial only)</em></span><span class="service-duration">10 min</span><span class="service-price">$20</span></div>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-header">
+            <div class="service-icon"><i class="ti ti-flower"></i></div>
+            <div class="service-name">Massage &amp; Wellness</div>
+          </div>
+          <div class="service-list">
+            <div class="service-item"><span class="service-title">10-Minute Massage</span><span class="service-duration">10 min</span><span class="service-price">$12</span></div>
+            <div class="service-item"><span class="service-title">30-Minute Massage</span><span class="service-duration">30 min</span><span class="service-price">$35</span></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. OUR STORY -->
+    <section id="owner" class="owner scroll-zoom-section">
+      <div class="owner-wrap">
+        <div class="owner-media">
+          <div class="owner-portrait-frame spotlight-frame">
+            <div class="owner-portrait-inner">
+              <img src="owner.jpg" alt="Manita, owner of Studio 57" class="owner-portrait-img scroll-zoom-img spotlight-img" id="storyImgOwner">
+              <img src="storefront.jpg" alt="Studio 57 storefront on Woodside Avenue" class="owner-storefront-img scroll-zoom-img spotlight-img" id="storyImgStore">
+              <div class="owner-media-label" id="ownerMediaLabel">MANITA · OWNER</div>
+            </div>
+          </div>
+        </div>
+        <div class="owner-text">
+          <div class="eyebrow">OUR STORY</div>
+          <h2 class="section-title">A craft, carried across a continent.</h2>
+          <div class="section-rule"></div>
+          <p>Studio 57 started, like most beautiful things, with a quiet kind of patience.</p>
+          <p>Manita came to this country as an immigrant — a young woman in a new city, watching, learning, holding on to the small details that made her feel grounded. The shape of a nail. The weight of a brush. The way a steady hand could turn a hard week into a soft hour.</p>
+          <p>She picked up the craft early and never put it down. Years of careful work in other people's salons, learning every technique, every product, every kind of hand that needed care — until the day she could finally open a place of her own.</p>
+
+          <div class="owner-text-divider"></div>
+          <div class="owner-text-eyebrow">A SPACE OF HER OWN</div>
+          <h3 class="section-title" style="font-size: clamp(28px, 3.6vw, 42px); margin-bottom: 18px;">A small room with big intention.</h3>
+
+          <p>Studio 57 is that place. Tucked into the heart of Woodside — under the cherry blossoms, behind the glass door — it's a small room with a whole life of practice poured into every appointment.</p>
+          <p>The wall behind you holds hundreds of shades. The chair you sit in is hers. The hand on yours has been doing this longer than most.</p>
+          <p>Walk in, or book ahead. Either way, your seat is waiting.</p>
+
+          <div class="signature">— with love</div>
+          <div class="signature-sub">MANITA</div>
+
+          <!-- Mobile-only: both photos stacked at the end of the story -->
+          <div class="owner-mobile-photos">
+            <img src="owner.jpg" alt="Manita, owner of Studio 57">
+            <img src="storefront.jpg" alt="Studio 57 Nail Bar &amp; Spa storefront on Woodside Avenue">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. OUR WORK + Google reviews -->
+    <section id="work" class="work">
+      <div class="section-center">
+        <div class="eyebrow">OUR WORK</div>
+        <h2 class="section-title">Painted Here</h2>
+        <div class="section-rule center"></div>
+        <p class="section-intro">A few of the sets we've finished lately — see the full gallery on Instagram.</p>
+      </div>
+
+      <a href="https://www.instagram.com/studio57nailbar/" target="_blank" rel="noopener" class="ig-card spotlight-frame">
+        <div class="ig-card-bg" aria-hidden="true">
+          <span class="ig-tile ig-tile-1"></span>
+          <span class="ig-tile ig-tile-2"></span>
+          <span class="ig-tile ig-tile-3"></span>
+          <span class="ig-tile ig-tile-4"></span>
+          <span class="ig-tile ig-tile-5"></span>
+          <span class="ig-tile ig-tile-6"></span>
+        </div>
+        <div class="ig-card-overlay"></div>
+        <div class="ig-card-content">
+          <div class="ig-card-icon"><i class="ti ti-brand-instagram"></i></div>
+          <div class="ig-card-handle">@studio57nailbar</div>
+          <div class="ig-card-title">See every set we've painted</div>
+          <div class="ig-card-cta">
+            <span>VIEW ON INSTAGRAM</span>
+            <i class="ti ti-arrow-up-right"></i>
+          </div>
+        </div>
+      </a>
+    </section>
+
+    <!-- 5. HYGIENE -->
+    <section id="hygiene" class="hygiene scroll-zoom-section">
+      <div class="hygiene-grid">
+        <div class="hygiene-text">
+          <div class="eyebrow">YOUR SAFETY IS OUR PRIORITY</div>
+          <h2 class="section-title">Hygiene &amp; Sanitation</h2>
+          <div class="section-rule"></div>
+          <p>We adhere to strict hygiene and sanitation protocols to ensure a safe, healthy environment for every client who walks through our door.</p>
+          <p>Every tool that touches a client gets sterilized after each use. Stations are wiped down between appointments. Disposable liners go in fresh for every pedicure.</p>
+          <p>It's the part of the work no one sees — but it's the part we never skip.</p>
+          <div class="hygiene-callout">
+            <p>All tools are thoroughly sterilized after each use, and we use disposable liners for every pedicure.</p>
+          </div>
+        </div>
+        <div class="hygiene-media">
+          <div class="hygiene-frame spotlight-frame">
+            <img src="hygiene-1.jpg" alt="Sterilized manicure tools in disinfection tray" class="hygiene-img-1 scroll-zoom-img" id="hygieneImg1">
+            <img src="hygiene-2.jpg" alt="Clean tools and sanitizer prepared for service" class="hygiene-img-2 scroll-zoom-img" id="hygieneImg2">
+            <div class="hygiene-media-label" id="hygieneMediaLabel">STERILIZED · READY</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. VISIT -->
+    <section id="visit" class="visit">
+      <div class="visit-grid">
+        <div>
+          <div class="eyebrow">LOCATION &amp; CONTACT</div>
+          <h2 class="section-title">Visit Us Today</h2>
+          <div class="section-rule"></div>
+          <div class="visit-info">
+            <div class="info-row">
+              <div class="info-icon"><i class="ti ti-map-pin"></i></div>
+              <div class="info-text"><strong>FIND US</strong>5710 Woodside Ave<br>Woodside, NY 11377-3434</div>
+            </div>
+            <div class="info-row">
+              <div class="info-icon"><i class="ti ti-phone"></i></div>
+              <div class="info-text"><strong>CALL</strong><a href="tel:+16469393504">+1 646-939-3504</a></div>
+            </div>
+            <div class="info-row">
+              <div class="info-icon"><i class="ti ti-mail"></i></div>
+              <div class="info-text"><strong>EMAIL</strong><a href="mailto:studio57nailbarspa@gmail.com">studio57nailbarspa@gmail.com</a></div>
+            </div>
+            <div class="info-row">
+              <div class="info-icon"><i class="ti ti-clock"></i></div>
+              <div class="info-text">
+                <strong>HOURS</strong>
+                <div class="hours-table">
+                  <div class="hours-row"><span>Monday</span><span>10:00 am – 7:30 pm</span></div>
+                  <div class="hours-row"><span>Tuesday</span><span>10:00 am – 7:30 pm</span></div>
+                  <div class="hours-row"><span>Wednesday</span><span>10:00 am – 7:30 pm</span></div>
+                  <div class="hours-row"><span>Thursday</span><span>10:00 am – 7:30 pm</span></div>
+                  <div class="hours-row"><span>Friday</span><span>10:00 am – 7:30 pm</span></div>
+                  <div class="hours-row"><span>Saturday</span><span>10:00 am – 7:30 pm</span></div>
+                  <div class="hours-row"><span>Sunday</span><span>10:00 am – 6:00 pm</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <a href="https://book.squareup.com/appointments/39a56qq300x67k/location/L495F330V5272/services?buttonTextColor=000000&color=dde9d9&locale=en&referrer=so" target="_blank" rel="noopener" class="visit-cta">BOOK NOW</a>
+        </div>
+        <div class="map-frame">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.0!2d-73.9095864!3d40.745683!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25f6a17c17973%3A0xfa6d337cf392f1aa!2sStudio%2057%20Nail%20Bar%20%26%20Spa!5e0!3m2!1sen!2sus!4v1717000000000!5m2!1sen!2sus"
+            width="100%"
+            height="100%"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Studio 57 Nail Bar &amp; Spa location"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <video class="footer-video" autoplay muted loop playsinline webkit-playsinline preload="auto" disablepictureinpicture disableremoteplayback controlslist="nodownload noplaybackrate nofullscreen">
+        <source src="hero-mobile.mp4" type="video/mp4" media="(max-width: 900px)">
+        <source src="hero.mp4" type="video/mp4">
+      </video>
+      <div class="footer-overlay"></div>
+      <div class="footer-content">
+        <img src="logo-dark.png" alt="Studio 57 Nail Bar &amp; Spa" class="footer-logo" onerror="this.outerHTML='<div class=&quot;footer-mark&quot;>Studio 57</div><div class=&quot;footer-sub&quot;>NAIL BAR &amp;amp; SPA</div>'">
+        <div class="footer-copy">© 2026 STUDIO 57 NAIL BAR &amp; SPA · WOODSIDE, NY</div>
+      </div>
+    </footer>
+
+  </main>
+
+</div>
+
+<script>
+  // ---- Mobile menu toggle ----
+  function toggleMobileMenu() {
+    document.getElementById('menuToggle').classList.toggle('open');
+    document.getElementById('mobileOverlay').classList.toggle('open');
+    document.body.style.overflow = document.getElementById('mobileOverlay').classList.contains('open') ? 'hidden' : '';
+  }
+  function closeMobileMenu() {
+    document.getElementById('menuToggle').classList.remove('open');
+    document.getElementById('mobileOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ---- iOS-friendly video autoplay (Safari sometimes blocks even with autoplay attribute) ----
+  document.querySelectorAll('video').forEach(v => {
+    v.muted = true;
+    v.playsInline = true;
+    v.setAttribute('playsinline', '');
+    v.setAttribute('webkit-playsinline', '');
+    const playPromise = v.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        const tryPlay = () => { v.play().catch(() => {}); };
+        ['touchstart', 'click', 'scroll'].forEach(ev => {
+          window.addEventListener(ev, tryPlay, { once: true, passive: true });
+        });
+      });
+    }
+  });
+
+  const navLinks = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('section[id]');
+  function setActive() {
+    let current = '';
+    const scrollY = window.scrollY + 140;
+    sections.forEach(sec => { if (sec.offsetTop <= scrollY) current = sec.id; });
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+    });
+  }
+
+  // Scroll-driven zoom + crossfade animation for editorial photo sections.
+  // - Any img.scroll-zoom-img inside a .scroll-zoom-section gets a subtle scale-up
+  //   as its parent section passes through the viewport.
+  // - For Our Story specifically, we also crossfade between the owner photo and
+  //   the storefront photo as the user scrolls through the section.
+  const zoomImages = document.querySelectorAll('.scroll-zoom-img');
+  const inViewMap = new WeakMap();
+  let scrollPending = false;
+
+  const storyImgOwner  = document.getElementById('storyImgOwner');
+  const storyImgStore  = document.getElementById('storyImgStore');
+  const storyLabel     = document.getElementById('ownerMediaLabel');
+  const ownerSection   = document.getElementById('owner');
+
+  const hygieneImg1    = document.getElementById('hygieneImg1');
+  const hygieneImg2    = document.getElementById('hygieneImg2');
+  const hygieneLabel   = document.getElementById('hygieneMediaLabel');
+  const hygieneSection = document.getElementById('hygiene');
+
+  function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+  function easeInOut(t){ return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2; }
+
+  function updateZoom(img) {
+    if (!inViewMap.get(img)) return;
+    const section = img.closest('.scroll-zoom-section') || img.parentElement;
+    if (!section) return;
+    const rect = section.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const totalRange = vh + rect.height;
+    const scrolled = vh - rect.top;
+    const progress = clamp01(scrolled / totalRange);
+    const eased = easeInOut(progress);
+    // Subtle editorial zoom: 1.0 → 1.18 (more cinematic but doesn't crop too much)
+    const scale = 1 + (eased * 0.18);
+    img.style.transform = `scale(${scale.toFixed(3)}) translateZ(0)`;
+  }
+
+  // Generic crossfade engine for any sticky-image section
+  function crossfadeSection(section, img1, img2, label, labelA, labelB) {
+    if (!section || !img1 || !img2) return;
+    const rect = section.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const totalScrollable = rect.height - vh;
+    if (totalScrollable <= 0) return;
+    const scrolledIn = -rect.top;
+    const progress = clamp01(scrolledIn / totalScrollable);
+    let crossfade = 0;
+    if (progress < 0.35) crossfade = 0;
+    else if (progress > 0.70) crossfade = 1;
+    else crossfade = (progress - 0.35) / (0.70 - 0.35);
+    crossfade = easeInOut(crossfade);
+    img1.style.opacity = (1 - crossfade).toFixed(3);
+    img2.style.opacity = crossfade.toFixed(3);
+    if (label) label.textContent = crossfade > 0.5 ? labelB : labelA;
+  }
+
+  function updateStoryCrossfade() {
+    crossfadeSection(ownerSection, storyImgOwner, storyImgStore, storyLabel,
+      'MANITA · OWNER', 'STUDIO 57 · WOODSIDE AVE');
+  }
+
+  function updateHygieneCrossfade() {
+    crossfadeSection(hygieneSection, hygieneImg1, hygieneImg2, hygieneLabel,
+      'STERILIZED · READY', 'CLEAN · EVERY CLIENT');
+  }
+
+  function updateAll() {
+    zoomImages.forEach(updateZoom);
+    updateStoryCrossfade();
+    updateHygieneCrossfade();
+    updateSidebarReveal();
+    updateFlowerBg();
+    updateSpotlight();
+  }
+
+  // Reveal sidebar once user starts scrolling past the hero
+  const sidebarEl = document.querySelector('.sidebar');
+  const heroEl = document.getElementById('hero');
+  function updateSidebarReveal() {
+    if (!sidebarEl || !heroEl) return;
+    // Trigger once user has scrolled ~30% through the hero
+    const heroRect = heroEl.getBoundingClientRect();
+    const triggerPoint = heroRect.height * 0.3;
+    if (-heroRect.top > triggerPoint) {
+      sidebarEl.classList.add('sidebar-visible');
+      document.body.classList.add('sidebar-active');
+    } else if (window.scrollY < 50) {
+      // Re-hide if user scrolls all the way back to top
+      sidebarEl.classList.remove('sidebar-visible');
+      document.body.classList.remove('sidebar-active');
+    }
+  }
+
+  // ===========================================================
+  // FLOWER BACKGROUND: pure CSS falling petals.
+  // JS just toggles the .flowers-active class on body so the
+  // petals fade in once user scrolls past the hero.
+  // ===========================================================
+  const flowerBg = document.getElementById('flowerBg');
+  function updateFlowerBg() {
+    if (!flowerBg || !heroEl) return;
+    const heroRect = heroEl.getBoundingClientRect();
+    // Activate once user scrolls 50% through the hero (sidebar appears at 30%, flowers at 50%)
+    if (-heroRect.top > heroRect.height * 0.5) {
+      document.body.classList.add('flowers-active');
+    } else {
+      document.body.classList.remove('flowers-active');
+    }
+  }
+
+  // ===========================================================
+  // SPOTLIGHT EFFECT: when a spotlight-img enters the center band
+  // of the viewport, add .spotlight-active. When it leaves, remove.
+  // Creates the "highlight what you're looking at" effect.
+  // ===========================================================
+  const spotlightTargets = document.querySelectorAll('.spotlight-img, .spotlight-frame');
+  function updateSpotlight() {
+    if (!spotlightTargets.length) return;
+    const vh = window.innerHeight;
+    // The "spotlight zone" is the middle 60% of the viewport
+    const zoneTop = vh * 0.20;
+    const zoneBottom = vh * 0.80;
+    spotlightTargets.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      // Element's vertical center
+      const elCenter = rect.top + rect.height / 2;
+      const inZone = elCenter > zoneTop && elCenter < zoneBottom;
+      if (inZone) {
+        if (!el.classList.contains('spotlight-active')) {
+          el.classList.add('spotlight-active');
+        }
+      } else {
+        if (el.classList.contains('spotlight-active')) {
+          el.classList.remove('spotlight-active');
+        }
+      }
+    });
+  }
+
+  if (zoomImages.length && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        inViewMap.set(entry.target, entry.isIntersecting);
+        entry.target.style.willChange = entry.isIntersecting ? 'transform, opacity' : 'auto';
+        if (entry.isIntersecting) updateZoom(entry.target);
+      });
+    }, { rootMargin: '20% 0px 20% 0px' });
+    zoomImages.forEach(img => io.observe(img));
+  } else {
+    zoomImages.forEach(img => inViewMap.set(img, true));
+  }
+
+  function onScroll() {
+    if (!scrollPending) {
+      window.requestAnimationFrame(() => {
+        setActive();
+        updateAll();
+        scrollPending = false;
+      });
+      scrollPending = true;
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  setActive();
+  updateAll();
+
+  // Trigger entrance animations once the page settles
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.body.classList.add('is-loaded');
+    });
+  });
+
+  // ==========================================================
+  // SCROLL-REVEAL OBSERVER
+  // Adds .in-view to any .reveal element or any <section> with
+  // a section-title/eyebrow/etc, once it enters the viewport.
+  // ==========================================================
+  if ('IntersectionObserver' in window) {
+    // Observe individual reveal elements
+    const revealEls = document.querySelectorAll(
+      '.reveal, .reveal-left, .reveal-right, .reveal-scale, .service-card, .ig-card, .site-footer'
+    );
+    if (revealEls.length) {
+      const revealIO = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            revealIO.unobserve(entry.target); // animate once
+          }
+        });
+      }, { rootMargin: '0px 0px -80px 0px', threshold: 0.1 });
+      revealEls.forEach(el => revealIO.observe(el));
+    }
+
+    // Observe sections (for staggered title/eyebrow/rule reveal)
+    const animatedSections = document.querySelectorAll(
+      '#services, #owner, #work, #hygiene, #visit'
+    );
+    if (animatedSections.length) {
+      const sectionIO = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view-section');
+            sectionIO.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -100px 0px', threshold: 0.15 });
+      animatedSections.forEach(section => sectionIO.observe(section));
+    }
+  } else {
+    // Fallback for very old browsers — just show everything
+    document.querySelectorAll(
+      '.reveal, .reveal-left, .reveal-right, .reveal-scale, .service-card, .ig-card, .site-footer'
+    ).forEach(el => el.classList.add('in-view'));
+    document.querySelectorAll(
+      '#services, #owner, #work, #hygiene, #visit'
+    ).forEach(el => el.classList.add('in-view-section'));
+  }
+</script>
+
+</body>
+</html>
