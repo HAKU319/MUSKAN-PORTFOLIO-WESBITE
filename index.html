@@ -7,10 +7,8 @@
 <title>Muskan KC — UX/UI · Graphic · Web · XR</title>
 <meta name="description" content="Muskan KC — New York UX/UI designer, graphic designer, web and XR designer. MA NYIT. Available for freelance.">
 <link rel="canonical" href="https://muskankc.com/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Muskan KC","url":"https://muskankc.com","jobTitle":"UX/UI Designer","address":{"@type":"PostalAddress","addressLocality":"New York","addressRegion":"NY"},"sameAs":["http://www.linkedin.com/in/muskan-kc-0a56781a1","https://medium.com/@mkc_51000"]}
-
-
-
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Muskan KC","url":"https://muskankc.com","jobTitle":"UX/UI Designer","address":{"@type":"PostalAddress","addressLocality":"New York","addressRegion":"NY"},"sameAs":["http://www.linkedin.com/in/muskan-kc-0a56781a1","https://medium.com/@mkc_51000"]}</script>
+<script>
 /* ═══════════════════════════════════════════════════════════
    FULL-PAGE SANZO WADA COLOUR CYCLING
    8 colours from the Dictionary of Color Combinations.
@@ -77,10 +75,7 @@ function onBodyColourScroll() {
   var raw = prog * WADA_COLOURS.length;
   var idx = Math.floor(raw) % WADA_COLOURS.length;
   setBodyWada(idx);
-  
-
-
-/* Sync colour with active project slide */
+}
 
 window.addEventListener('scroll', onBodyColourScroll, {passive:true});
 /* Initial colour after intro */
@@ -271,12 +266,19 @@ setTimeout(function(){ setBodyWada(0); }, 2500);
   }
 
   function step(dir){
-    if(isLocked) return;
-    // at the boundary already, moving further out of range → release scroll
-    if((currentIndex === 0 && dir < 0) || (currentIndex === total - 1 && dir > 0)) return false;
-    isLocked = true;
-    goTo(currentIndex + dir);
-    setTimeout(function(){ isLocked = false; }, LOCK_MS);
+    // at the boundary already, moving further out of range → release
+    // control back to native scroll so the page can continue normally.
+    var atBoundary = (currentIndex === 0 && dir < 0) || (currentIndex === total - 1 && dir > 0);
+    if(atBoundary) return false;
+    // still inside the section: advance if we're not already mid-transition,
+    // but ALWAYS report "captured" so the caller keeps blocking native
+    // scroll even during the lock window — otherwise scroll leaks through
+    // mid-transition and the page skips past the section entirely.
+    if(!isLocked){
+      isLocked = true;
+      goTo(currentIndex + dir);
+      setTimeout(function(){ isLocked = false; }, LOCK_MS);
+    }
     return true;
   }
 
@@ -284,27 +286,39 @@ setTimeout(function(){ setBodyWada(0); }, 2500);
     if(!isActive()) return;
     if(Math.abs(e.deltaY) < 4) return;
     var dir = e.deltaY > 0 ? 1 : -1;
-    var moved = step(dir);
-    if(moved) e.preventDefault();
+    var captured = step(dir);
+    if(captured) e.preventDefault();
     // else: at the edge already — let the event fall through so the
     // page continues scrolling to the next/previous section normally
   }, { passive:false });
 
-  var touchStartX = 0, touchStartY = 0, touchHandled = false;
+  // Touch: mirrors the wheel behaviour above. Registered non-passive so
+  // preventDefault actually stops native scrolling while the section is
+  // capturing input — without this, touch scroll always slides straight
+  // through regardless of any JS logic.
+  var touchStartX = 0, touchStartY = 0;
   section.addEventListener('touchstart', function(e){
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
-    touchHandled = false;
   }, {passive:true});
   section.addEventListener('touchmove', function(e){
-    if(touchHandled || !isActive()) return;
+    if(!isActive()) return;
     var dx = touchStartX - e.touches[0].clientX;
     var dy = touchStartY - e.touches[0].clientY;
-    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40){
-      step(dx > 0 ? 1 : -1);
-      touchHandled = true;
+    if(Math.abs(dx) < 10 && Math.abs(dy) < 10) return; // let the gesture develop
+    var dir = Math.abs(dy) >= Math.abs(dx) ? (dy > 0 ? 1 : -1) : (dx > 0 ? 1 : -1);
+    var atBoundary = (currentIndex === 0 && dir < 0) || (currentIndex === total - 1 && dir > 0);
+    if(atBoundary) return; // let native scroll carry the page onward
+    e.preventDefault();
+    if(!isLocked && (Math.abs(dx) > 40 || Math.abs(dy) > 40)){
+      isLocked = true;
+      goTo(currentIndex + dir);
+      setTimeout(function(){ isLocked = false; }, LOCK_MS);
+      // rebase so one long swipe can step through several panels
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
     }
-  }, {passive:true});
+  }, {passive:false});
 
   window.addEventListener('keydown', function(e){
     if(!isActive()) return;
@@ -454,7 +468,7 @@ body {
   color: var(--mist);
   cursor: none;
   overflow-x: hidden;
-  transition: background-color 1.0s cubic-bezier(.4,0,.2,1);
+  transition: background-color 3.2s cubic-bezier(.4,0,.2,1);
 }
 
 /* ── CROSSHAIR CURSOR ─────────────────────────────
@@ -1127,12 +1141,6 @@ footer {
   margin:0;
 }
 .ci-h em { font-style:italic; color:rgba(240,237,230,.55); font-weight:200 }
-.ci-sub {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:14px; font-weight:500;
-  line-height:1.72; color:rgba(240,237,230,.4);
-  max-width:480px; margin:30px auto 0;
-}
 .ci-scroll-hint {
   position:absolute; bottom:38px; left:0; right:0;
   font-family:'Cabinet Grotesk',sans-serif;
@@ -1625,6 +1633,14 @@ footer {
 }
 .flip-h em { font-style: italic; color: rgba(240,237,230,.6); font-weight: 300; }
 .flip-h em { font-style: italic; color: rgba(240,237,230,.78); }
+.flip-sub {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 14px; font-weight: 500;
+  color: rgba(240,237,230,.42);
+  line-height: 1.7;
+  max-width: 480px;
+  margin: 18px auto 0;
+}
 
 
 
@@ -1772,13 +1788,13 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
   min-height: 100vh;
   position: relative;
   z-index: 2;
-  margin-top: 12vh;
+  margin-top: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 30px;
-  padding: 80px 20px;
+  padding: 60px 20px 80px;
 }
 .flip-label { position: relative; text-align: center; }
 #book-wrap {
@@ -1876,7 +1892,6 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 <section id="client-intro" data-nav="clients">
   <div class="ci-eyebrow">Clients &middot; Branding &middot; Graphic &amp; Freelance Work</div>
   <h2 class="ci-h">Clients &amp; <em>freelance</em>.</h2>
-  <p class="ci-sub">Real briefs. Real constraints. Real outcomes &mdash; websites, branding, posters and graphic design for a range of clients.</p>
   <div class="ci-scroll-hint">&darr; Scroll to explore</div>
 </section>
 
@@ -1919,11 +1934,11 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
         </div>
       </div>
 
-      <div class="hs-panel" data-href="freelance.html" data-title="Theater Artist" style="background:#7c93a3;">
+      <div class="hs-panel" data-href="freelance.html" data-title="Freelance Event Graphics" style="background:#7c93a3;">
         <div class="hs-content">
-          <div class="hs-cat">Theater Artist &middot; Portfolio &middot; Personal Brand</div>
-          <h2 class="hs-title">Theater Artist<br><em>Portfolio</em></h2>
-          <a class="hs-cta" href="freelance.html" onclick="event.stopPropagation()">View Project &#8594;</a>
+          <div class="hs-cat">Freelance &middot; Graphic Design &middot; Print &amp; Social</div>
+          <h2 class="hs-title">Freelance Event<br><em>Graphics</em></h2>
+          <a class="hs-cta" href="freelance.html" onclick="event.stopPropagation()">View Case Study &#8594;</a>
         </div>
       </div>
 
@@ -1943,7 +1958,8 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 <!-- ═══ ACADEMIC — Sketchbook page-curl flip ═══ -->
 <div id="flip-track">
   <div class="flip-label">
-    <div class="flip-h">Research &amp; <em>experiments</em></div>
+    <div class="flip-h">Research</div>
+    <p class="flip-sub">Research thesis projects conducted during my masters program.</p>
   </div>
   <div id="book-wrap"><div id="sketchbook"></div></div>
   <div class="flip-controls">
