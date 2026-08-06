@@ -210,23 +210,23 @@ setTimeout(function(){ setBodyWada(0); }, 2500);
 
 
 /* ═══════════════════════════════════════════════════════════
-   CASE STUDIES — horizontal scroll track
-   Wheel/swipe/arrow input steps exactly one panel at a time.
-   Only captures input while the section is actually in view —
-   scroll past the top or bottom edge and the page just continues
-   scrolling normally to the next/previous section, like any
-   other part of the page.
+   HORIZONTAL SCROLL TRACK — shared behaviour for both the
+   "What I Do" (services) and "Clients & freelance" (case studies)
+   sections. Wheel/swipe/arrow input steps exactly one panel at a
+   time. Only captures input while the section is actually in
+   view — scroll past the top or bottom edge and the page just
+   continues scrolling normally to the next/previous section.
 ═══════════════════════════════════════════════════════════ */
-(function(){
-  var section = document.getElementById('hscroll');
-  var track   = document.getElementById('hsTrack');
+function initHScroll(cfg){
+  var section = document.getElementById(cfg.sectionId);
+  var track   = document.getElementById(cfg.trackId);
   if(!section || !track) return;
 
   var panels = track.querySelectorAll('.hs-panel');
   var total  = panels.length;
-  var curNumEl = document.getElementById('hsCurNum');
-  var fillEl   = document.getElementById('hsHudFill');
-  var jumpNav  = document.getElementById('hsJumpNav');
+  var curNumEl = document.getElementById(cfg.curNumId);
+  var fillEl   = document.getElementById(cfg.hudFillId);
+  var jumpNav  = document.getElementById(cfg.jumpNavId);
 
   panels.forEach(function(p, i){
     var btn = document.createElement('button');
@@ -329,7 +329,8 @@ setTimeout(function(){ setBodyWada(0); }, 2500);
   jumpBtns.forEach(function(b){ b.addEventListener('click', function(){ goTo(parseInt(b.dataset.i)); }); });
 
   // click a panel (not its links) → colour-flood navigate, matching
-  // the flood transition used elsewhere on the site
+  // the flood transition used elsewhere on the site. Panels with no
+  // data-href (e.g. the services panels) simply do nothing on click.
   panels.forEach(function(p){
     p.addEventListener('click', function(e){
       if(e.target.closest('a, button')) return;
@@ -343,17 +344,8 @@ setTimeout(function(){ setBodyWada(0); }, 2500);
     });
   });
 
-  // toggle the "active" class (drives jump-nav / hud visibility)
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      section.classList.toggle('hs-active', e.isIntersecting && isActive());
-    });
-  }, { threshold:[0, 0.5, 1] });
-  io.observe(section);
-  window.addEventListener('scroll', function(){
-    section.classList.toggle('hs-active', isActive());
-  }, { passive:true });
-
+  // Start the render loop FIRST and unconditionally — this is what
+  // actually moves the panels, so nothing below may ever block it.
   var lastTs = null;
   function loop(ts){
     if(lastTs === null) lastTs = ts;
@@ -366,7 +358,28 @@ setTimeout(function(){ setBodyWada(0); }, 2500);
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
-})();
+
+  // toggle the "active" class (drives jump-nav / hud visibility) —
+  // wrapped defensively so an unsupported/blocked IntersectionObserver
+  // can never take the render loop above down with it.
+  try {
+    if('IntersectionObserver' in window){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          section.classList.toggle('hs-active', e.isIntersecting && isActive());
+        });
+      }, { threshold:[0, 0.5, 1] });
+      io.observe(section);
+    }
+  } catch(err) { /* jump-nav/hud just stay as-is; core scroll still works */ }
+  window.addEventListener('scroll', function(){
+    section.classList.toggle('hs-active', isActive());
+  }, { passive:true });
+}
+
+initHScroll({ sectionId:'wid-scroll', trackId:'widTrack', curNumId:'widCurNum', hudFillId:'widHudFill', jumpNavId:'widJumpNav' });
+initHScroll({ sectionId:'about',      trackId:'abtTrack', curNumId:'abtCurNum', hudFillId:'abtHudFill', jumpNavId:'abtJumpNav' });
+initHScroll({ sectionId:'hscroll',    trackId:'hsTrack',  curNumId:'hsCurNum',  hudFillId:'hsHudFill',  jumpNavId:'hsJumpNav'  });
 
 
 
@@ -834,10 +847,6 @@ body.wada-1 body.wada-2 body.wada-3 body.wada-4 .cl-h em { font-style:italic;col
 
 /* Skills tags on card 5 */
 
-/* Prev/next arrows */
-.ab-prev { left:52px }
-.ab-next { right:52px }
-
 /* Dot nav */
 
 
@@ -1161,25 +1170,34 @@ footer {
    while the track is actually in view; otherwise the page scrolls
    normally past it, so it behaves like a section, not a takeover.
 ═══════════════════════════════════════════════════════════ */
-#hscroll {
+/* ═══════════════════════════════════════════════════════════
+   HORIZONTAL SCROLL TRACK — shared pattern, reused by both
+   "What I Do" (services) and "Clients & freelance" (case studies).
+   Each host section just needs: position:relative + a height that
+   gives position:sticky its scroll "runway" (see .hs-host below).
+═══════════════════════════════════════════════════════════ */
+.hs-host {
   position:relative;
   /* extra height gives position:sticky a scroll "runway" to hold the
-     panel viewport in place while wheel input steps through panels;
-     without this buffer there's nothing for sticky to hold onto. */
-  height:300vh;
+     panel viewport in place while wheel input steps through panels.
+     Kept deliberately short — this buffer is only consumed by the
+     final release scroll once you're past the last/first panel, so
+     a large value here just feels like dead space before the next
+     section appears. */
+  height:140vh;
 }
-#hscroll .hs-viewport {
+.hs-viewport {
   position:sticky;
   top:0;
   height:100vh;
   overflow:hidden;
 }
-#hscroll .hs-track {
+.hs-track {
   height:100%;
   display:flex;
   will-change:transform;
 }
-#hscroll .hs-panel {
+.hs-panel {
   height:100%;
   flex:0 0 100%;
   display:flex; align-items:center; justify-content:center;
@@ -1189,53 +1207,53 @@ footer {
 }
 /* soft irregular age stains, like foxing on old paper — a few large
    blurred blotches per panel, not a uniform grain */
-#hscroll .hs-panel::before {
+.hs-panel::before {
   content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
   mix-blend-mode:multiply;
 }
-#hscroll .hs-panel:nth-child(1)::before {
+.hs-panel:nth-child(1)::before {
   background:
     radial-gradient(ellipse 260px 180px at 12% 88%, rgba(30,30,20,.14), transparent 70%),
     radial-gradient(ellipse 140px 320px at 78% 55%, rgba(20,25,20,.08), transparent 65%);
 }
-#hscroll .hs-panel:nth-child(2)::before {
+.hs-panel:nth-child(2)::before {
   background:
     radial-gradient(ellipse 220px 300px at 85% 60%, rgba(60,35,10,.12), transparent 68%),
     radial-gradient(ellipse 180px 140px at 8% 20%, rgba(60,35,10,.07), transparent 70%);
 }
-#hscroll .hs-panel:nth-child(3)::before {
+.hs-panel:nth-child(3)::before {
   background:
     radial-gradient(ellipse 200px 260px at 15% 30%, rgba(20,20,10,.1), transparent 68%),
     radial-gradient(ellipse 160px 220px at 90% 80%, rgba(20,20,10,.07), transparent 65%);
 }
-#hscroll .hs-panel:nth-child(4)::before {
+.hs-panel:nth-child(4)::before {
   background:
     radial-gradient(ellipse 240px 180px at 70% 10%, rgba(20,25,30,.09), transparent 70%),
     radial-gradient(ellipse 180px 260px at 20% 75%, rgba(20,25,30,.06), transparent 65%);
 }
-#hscroll .hs-panel:nth-child(5)::before {
+.hs-panel:nth-child(5)::before {
   background:
     radial-gradient(ellipse 200px 220px at 90% 40%, rgba(30,20,10,.1), transparent 68%),
     radial-gradient(ellipse 160px 180px at 10% 85%, rgba(30,20,10,.07), transparent 70%);
 }
-#hscroll .hs-content {
+.hs-content {
   position:relative; z-index:2;
   display:flex; flex-direction:column; align-items:center; text-align:center;
   padding:0 8%;
 }
-#hscroll .hs-cat {
+.hs-cat {
   font-family:'Cabinet Grotesk',sans-serif;
   font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase;
   color:rgba(0,0,0,.5); margin-bottom:18px;
 }
-#hscroll .hs-title {
+.hs-title {
   font-family:'Fraunces',serif; font-weight:800;
   font-size:clamp(30px,4.6vw,64px); line-height:1.0; letter-spacing:-1.5px;
   color:#161311; margin:0 0 26px;
   font-variation-settings:'opsz' 64,'WONK' 1;
 }
-#hscroll .hs-title em { font-style:italic; color:#5c3a2a; font-weight:200; }
-#hscroll .hs-cta {
+.hs-title em { font-style:italic; color:#5c3a2a; font-weight:200; }
+.hs-cta {
   font-family:'Cabinet Grotesk',sans-serif; font-weight:700;
   font-size:10.5px; letter-spacing:2px; text-transform:uppercase;
   color:rgba(22,19,17,.65); text-decoration:none;
@@ -1243,44 +1261,95 @@ footer {
   padding-bottom:3px;
   transition:color .25s, border-color .25s;
 }
-#hscroll .hs-cta:hover { color:#161311; border-color:rgba(22,19,17,.7); }
-#hscroll .hs-dual { display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center; }
-#hscroll .hs-divider { color:rgba(22,19,17,.3); font-size:12px; }
+.hs-cta:hover { color:#161311; border-color:rgba(22,19,17,.7); }
+.hs-dual { display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center; }
+.hs-divider { color:rgba(22,19,17,.3); font-size:12px; }
+.hs-list {
+  list-style:none; padding:0; margin:6px 0 0;
+  display:flex; flex-direction:column; gap:9px;
+  max-width:280px;
+}
+.hs-list li {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:13px; font-weight:500;
+  color:rgba(22,19,17,.65);
+  position:relative; padding-left:16px;
+}
+.hs-list li::before {
+  content:'·'; position:absolute; left:0; top:-2px;
+  font-weight:900; color:rgba(22,19,17,.4);
+}
+.hs-prose {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:14px; line-height:1.7;
+  color:rgba(22,19,17,.65);
+  max-width:340px; margin-top:2px;
+}
+.hs-stats { display:flex; gap:28px; flex-wrap:wrap; justify-content:center; margin-top:22px; }
+.hs-stats > div { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.hs-stat-n { font-family:'Fraunces',serif; font-weight:700; font-style:italic; font-size:26px; color:#161311; }
+.hs-stat-l { font-family:'Cabinet Grotesk',sans-serif; font-size:8px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(22,19,17,.5); }
+.hs-tags { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:340px; margin-top:4px; }
+.hs-tags span {
+  font-family:'Cabinet Grotesk',sans-serif; font-size:9px; font-weight:700;
+  letter-spacing:1px; text-transform:uppercase;
+  border:1px solid rgba(22,19,17,.18); padding:5px 11px;
+  color:rgba(22,19,17,.6);
+}
+
+/* small orientation label in the corner — replaces a full separate
+   intro screen, so the panels themselves are visible on the very
+   next scroll from whatever's above, not one screen later */
+.hs-section-label {
+  position:absolute; top:32px; left:32px; z-index:15;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700; letter-spacing:4px; text-transform:uppercase;
+  color:rgba(240,237,230,.55);
+  text-shadow:0 1px 3px rgba(0,0,0,.5);
+  opacity:0; transition:opacity .4s ease;
+  pointer-events:none;
+}
+.hs-host.hs-active .hs-section-label { opacity:1; }
+@media (max-width:760px){ .hs-section-label{ top:20px; left:20px; font-size:8px; letter-spacing:3px; } }
 
 /* named jump nav + hud — only visible while the track is in view */
-#hscroll .hs-jumpnav {
+.hs-jumpnav {
   position:absolute; bottom:64px; left:50%; transform:translateX(-50%);
   z-index:15; display:flex; gap:20px; flex-wrap:wrap; justify-content:center;
   max-width:70vw;
   opacity:0; pointer-events:none; transition:opacity .4s ease;
 }
-#hscroll.hs-active .hs-jumpnav { opacity:1; pointer-events:auto; }
-#hscroll .hs-jumpnav button {
+.hs-host.hs-active .hs-jumpnav { opacity:1; pointer-events:auto; }
+.hs-jumpnav button {
   background:none; border:none; cursor:pointer;
   font-family:'Fraunces', serif; font-size:13px; font-weight:600;
   color:rgba(240,237,230,.55);
   padding:4px 0; border-bottom:1px solid transparent; transition:color .25s, border-color .25s;
   text-shadow:0 1px 3px rgba(0,0,0,.5);
 }
-#hscroll .hs-jumpnav button.on { color:var(--teal); border-color:var(--teal); }
-#hscroll .hs-jumpnav button:hover { color:#fff; }
-@media (max-width:900px){ #hscroll .hs-jumpnav { display:none; } }
+.hs-jumpnav button.on { color:var(--teal); border-color:var(--teal); }
+.hs-jumpnav button:hover { color:#fff; }
+@media (max-width:900px){ .hs-jumpnav { display:none; } }
 
-#hscroll .hs-hud {
+.hs-hud {
   position:absolute; bottom:24px; left:0; right:0;
   display:flex; flex-direction:column; align-items:center; gap:8px; z-index:15;
   pointer-events:none;
   opacity:0; transition:opacity .4s ease;
 }
-#hscroll.hs-active .hs-hud { opacity:1; }
-#hscroll .hs-hud-count { font-family:'Fraunces', serif; font-size:12px; color:rgba(240,237,230,.7); text-shadow:0 1px 3px rgba(0,0,0,.6); }
-#hscroll .hs-hud-count b { color:#fff; font-weight:700; }
-#hscroll .hs-hud-bar { width:180px; height:2px; background:rgba(240,237,230,.25); position:relative; overflow:hidden; }
-#hscroll .hs-hud-fill { position:absolute; top:0; left:0; bottom:0; width:20%; background:var(--teal); box-shadow:0 0 8px var(--tglow); transition:width .12s linear; }
+.hs-host.hs-active .hs-hud { opacity:1; }
+.hs-hud-count { font-family:'Fraunces', serif; font-size:12px; color:rgba(240,237,230,.7); text-shadow:0 1px 3px rgba(0,0,0,.6); }
+.hs-hud-count b { color:#fff; font-weight:700; }
+.hs-hud-bar { width:180px; height:2px; background:rgba(240,237,230,.25); position:relative; overflow:hidden; }
+.hs-hud-fill { position:absolute; top:0; left:0; bottom:0; width:20%; background:var(--teal); box-shadow:0 0 8px var(--tglow); transition:width .12s linear; }
 
 @media (max-width:760px){
-  #hscroll .hs-panel { flex:0 0 88vw; }
+  .hs-panel { flex:0 0 88vw; }
 }
+
+/* Services panels aren't links to another page, so no pointer affordance */
+#wid-scroll .hs-panel { cursor:default; }
+#about .hs-panel { cursor:default; }
 
 /* ═══════════════════════════════════════════════════════════
    ACADEMIC PROJECTS — Compact slide deck
@@ -1289,73 +1358,6 @@ footer {
 
 
 
-
-/* ═══════════════════════════════════════════════════════════
-   ABOUT — Simple, quiet, single-screen
-═══════════════════════════════════════════════════════════ */
-#about {
-  min-height:80vh;
-  display:flex; align-items:center; justify-content:center;
-  padding:120px 60px;
-}
-.ab-inner {
-  max-width:780px;
-  width:100%;
-}
-.ab-eyebrow {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:9px; font-weight:700;
-  letter-spacing:5px; text-transform:uppercase;
-  color:rgba(240,237,230,.32); margin-bottom:24px;
-}
-.ab-h {
-  font-family:'Fraunces',serif;
-  font-size:clamp(36px,5.5vw,68px);
-  font-weight:800; font-style:italic;
-  color:rgba(240,237,230,.92); line-height:1.0;
-  letter-spacing:-1.5px;
-  font-variation-settings:'opsz' 68,'WONK' 1;
-  margin:0 0 30px;
-}
-.ab-h em { font-style:italic; color:rgba(240,237,230,.55); font-weight:200 }
-.ab-p {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:15px; font-weight:500;
-  line-height:1.78; color:rgba(240,237,230,.5);
-  margin:0 0 16px; max-width:580px;
-}
-.ab-meta {
-  display:flex; gap:36px; flex-wrap:wrap;
-  margin-top:34px; padding-top:24px;
-  border-top:1px solid rgba(240,237,230,.1);
-}
-.ab-meta > div {
-  display:flex; flex-direction:column; gap:4px;
-}
-.ab-meta-n {
-  font-family:'Fraunces',serif;
-  font-size:28px; font-weight:700;
-  color:rgba(240,237,230,.85); line-height:1;
-  font-variation-settings:'opsz' 28;
-}
-.ab-meta-l {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:8px; font-weight:700;
-  letter-spacing:2px; text-transform:uppercase;
-  color:rgba(240,237,230,.38);
-}
-.ab-skills {
-  display:flex; flex-wrap:wrap; gap:6px;
-  margin-top:28px;
-}
-.ab-skills span {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:9px; font-weight:700;
-  letter-spacing:1px; text-transform:uppercase;
-  border:1px solid rgba(240,237,230,.12);
-  padding:4px 11px;
-  color:rgba(240,237,230,.38);
-}
 
 /* ═══════════════════════════════════════════════════════════
    SOCIALS STRIP — bottom of contact
@@ -1396,254 +1398,13 @@ footer {
 /* Responsive */
 @media (max-width:760px) {
   #client-intro { padding:90px 24px 60px }
-  #hscroll .hs-title { font-size:clamp(28px,9vw,48px); letter-spacing:-1px }
-  #hscroll .hs-cat { font-size:8px; }
-        #about { padding:80px 24px }
-  .ab-meta { gap:20px }
+  .hs-title { font-size:clamp(28px,9vw,48px); letter-spacing:-1px }
+  .hs-cat { font-size:8px; }
   #socials-strip { padding:40px 24px 60px }
 }
 
 
-/* ═══ WHAT I DO — Pinned papers, Sanzo Wada muted palette ═══ */
-#what-i-do {
-  padding:100px 24px 140px;
-  position:relative;
-}
-.wid-head {
-  text-align:center;
-  margin-bottom:80px;
-  max-width:680px;
-  margin-left:auto; margin-right:auto;
-}
-.wid-eyebrow {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:9px; font-weight:700;
-  letter-spacing:5px; text-transform:uppercase;
-  color:rgba(240,237,230,.32); margin-bottom:18px;
-}
-.wid-h {
-  font-family:'Fraunces',serif;
-  font-size:clamp(40px,6vw,82px);
-  font-weight:800; font-style:italic;
-  color:rgba(240,237,230,.92);
-  line-height:1.0; letter-spacing:-2px;
-  font-variation-settings:'opsz' 82,'WONK' 1;
-  margin:0 0 20px;
-}
-.wid-h em { font-style:italic; color:rgba(240,237,230,.55); font-weight:200 }
-.wid-sub {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:14px; font-weight:500;
-  color:rgba(240,237,230,.42);
-  line-height:1.7;
-  margin:0;
-}
-
-/* No board — cards float on body background */
-.corkboard {
-  max-width:1200px;
-  margin:0 auto;
-  padding:40px 32px 60px;
-  position:relative;
-  display:grid;
-  grid-template-columns:repeat(3, 1fr);
-  gap:64px 48px;
-  background:none;
-  border:none;
-  box-shadow:none;
-}
-.board-grain { display:none }
-
-/* Papers — Sanzo Wada muted palette designed to harmonise with blue bg */
-.card {
-  position:relative;
-  padding:32px 26px 28px;
-  color:#2a2520;
-  border:1px solid rgba(0,0,0,.05);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,.5) inset,
-    0 16px 32px rgba(0,0,0,.32),
-    0 4px 10px rgba(0,0,0,.2);
-  transition:transform .4s cubic-bezier(.22,.61,.36,1),
-             box-shadow .4s cubic-bezier(.22,.61,.36,1);
-  z-index:2;
-}
-
-/* Sanzo Wada colours: Shironeri (raw silk), Kinari (unbleached), Usuzumi (light ink),
-   Kuchiba (decayed leaf), Karecha (withered tea). All muted, all neutral. */
-.card-1 {
-  /* Shironeri — raw silk off-white */
-  transform: rotate(-2deg) translateY(0);
-  background: linear-gradient(180deg, #e8e1cf 0%, #d9d1bc 100%);
-}
-.card-2 {
-  /* Usuzumi — light sumi ink grey */
-  transform: rotate(1.5deg) translateY(16px);
-  background: linear-gradient(180deg, #d4cdb8 0%, #c0b9a3 100%);
-}
-.card-3 {
-  /* Kinari — unbleached cotton, the warmest tone */
-  transform: rotate(-1deg) translateY(-6px);
-  background: linear-gradient(180deg, #e6d9b8 0%, #d4c5a0 100%);
-}
-.card-4 {
-  /* Karecha — withered tea, dusty mossy */
-  transform: rotate(2deg) translateY(8px);
-  background: linear-gradient(180deg, #ccc8a8 0%, #b8b290 100%);
-}
-.card-5 {
-  /* Kuchiba — decayed leaf, deepest warmth */
-  transform: rotate(-1.5deg) translateY(22px);
-  background: linear-gradient(180deg, #ddd0b0 0%, #c7b894 100%);
-}
-
-.card:hover {
-  transform: rotate(0deg) translateY(-12px) scale(1.03);
-  z-index:5;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,.7) inset,
-    0 30px 50px rgba(0,0,0,.4),
-    0 12px 20px rgba(0,0,0,.25);
-}
-
-/* TAPE strips — vintage cellophane on top corners */
-.tape {
-  position:absolute;
-  width:64px; height:18px;
-  background: rgba(238,228,200,.4);
-  border-top: 1px solid rgba(255,255,255,.25);
-  border-bottom: 1px solid rgba(255,255,255,.12);
-  box-shadow: 0 2px 4px rgba(0,0,0,.15);
-  z-index: 3;
-  pointer-events: none;
-}
-.tape-tl { top:-7px; left:18px; transform: rotate(-32deg); }
-.tape-tr { top:-7px; right:18px; transform: rotate(28deg); }
-
-
-/* All pins use the same muted brass tone — no colourful variation */
-.pin { display:none !important; }
-
-.card-2 .pin,
-.card-3 .pin,
-.card-4 .pin,
-
-
-
-
-
-
-
-.card-num {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:9px; font-weight:700;
-  letter-spacing:3px;
-  color:rgba(42,37,32,.55);
-  margin-bottom:14px;
-}
-.card-t {
-  font-family:'Fraunces',serif;
-  font-size:22px; font-weight:700; font-style:italic;
-  color:#1f1812;
-  line-height:1.15;
-  letter-spacing:-.5px;
-  margin:0;
-  font-variation-settings:'opsz' 22,'WONK' 1;
-}
-.card-rule {
-  width:34px; height:1.5px;
-  background:rgba(42,37,32,.4);
-  margin:12px 0 16px;
-}
-.card-li { list-style:none; padding:0; margin:0 }
-.card-li li {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:11.5px; font-weight:500;
-  color:rgba(42,37,32,.7);
-  line-height:1.85;
-  position:relative;
-  padding-left:14px;
-}
-.card-li li::before {
-  content:'·';
-  position:absolute;
-  left:2px; top:-1px;
-  font-weight:900;
-  color:rgba(42,37,32,.5);
-}
-
-@media (max-width:900px) {
-  .corkboard {
-    grid-template-columns:repeat(2, 1fr);
-    gap:54px 40px;
-    padding:30px 20px 60px;
-  }
-  .card-5 { grid-column:1 / -1; max-width:55%; margin:0 auto }
-}
-@media (max-width:560px) {
-  #what-i-do { padding:70px 16px 100px }
-  .corkboard {
-    grid-template-columns:1fr;
-    gap:48px;
-    padding:30px 20px 40px;
-  }
-  .card-1, .card-2, .card-3, .card-4, .card-5 { transform:rotate(-1deg) }
-  .card-2, .card-4 { transform:rotate(1deg) }
-  .card-5 { max-width:100% }
-  .wid-head { margin-bottom:50px }
-}
-
-.card:hover {
-  transform: rotate(0deg) translateY(-10px) scale(1.03);
-  z-index:5;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,.7) inset,
-    0 28px 50px rgba(0,0,0,.55),
-    0 10px 18px rgba(0,0,0,.38);
-}
-
-@media (max-width:760px) {
-  #contact { grid-template-columns:1fr; gap:40px; padding:80px 24px 60px }
-  #socials-strip { padding:30px 24px 80px }
-}
-
-
-
 /* ═══ SKETCHBOOK page-curl flip (Paper-app style) ═══ */
-
-
-.flip-label {
-  position: relative;
-  text-align: center;
-  margin-bottom: 36px;
-  z-index: 5;
-}
-.flip-eyebrow {
-  font-family: 'Cabinet Grotesk', sans-serif;
-  font-size: 9px; font-weight: 700;
-  letter-spacing: 5px; text-transform: uppercase;
-  color: rgba(240,237,230,.4); margin-bottom: 8px;
-}
-.flip-h {
-  font-family: 'Fraunces', serif;
-  font-size: clamp(36px, 5.5vw, 68px);
-  font-weight: 400; font-style: italic;
-  color: rgba(240,237,230,.92);
-  letter-spacing: -1px;
-}
-.flip-h em { font-style: italic; color: rgba(240,237,230,.6); font-weight: 300; }
-.flip-h em { font-style: italic; color: rgba(240,237,230,.78); }
-.flip-sub {
-  font-family: 'Cabinet Grotesk', sans-serif;
-  font-size: 14px; font-weight: 500;
-  color: rgba(240,237,230,.42);
-  line-height: 1.7;
-  max-width: 480px;
-  margin: 18px auto 0;
-}
-
-
-
 
 
 
@@ -1796,7 +1557,6 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
   gap: 30px;
   padding: 60px 20px 80px;
 }
-.flip-label { position: relative; text-align: center; }
 #book-wrap {
   width: 100%;
   max-width: 920px;
@@ -1819,7 +1579,7 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 /* cover pages */
 .sb-cover { background: linear-gradient(135deg,#1f3a5c,#16293f); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #ece0c6; padding: 50px; }
 .sb-cover h2 { font-family:'Fraunces',serif; font-style: italic; font-weight: 300; font-size: 32px; line-height: 1.1; }
-.sb-cover .sb-csub { font-family:'Cabinet Grotesk',sans-serif; font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: rgba(236,224,198,.5); margin-top: 18px; }
+.sb-cover .sb-csub { font-family:'Cabinet Grotesk',sans-serif; font-size: 12px; font-weight: 500; letter-spacing: .2px; text-transform: none; line-height: 1.6; color: rgba(236,224,198,.6); margin-top: 18px; max-width: 240px; }
 .sb-cover .sb-crule { width: 40px; height: 1px; background: rgba(236,224,198,.4); margin: 20px 0; }
 /* controls */
 .flip-controls { display: flex; gap: 16px; align-items: center; }
@@ -1844,17 +1604,18 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 <nav id="nav">
   <a href="#hero" class="n-logo">मुस्कान <span class="n-dot"></span></a>
   <ul class="n-links">
+    <li><a href="#wid-scroll">Services</a></li>
     <li><a href="#client-intro">Clients</a></li>
     <li><a href="#flip-track">Projects</a></li>
     <li><a href="#about">About</a></li>
-    <li><a href="#what-i-do">Services</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
 <div class="mob" id="mob">
   <button class="mob-x" id="mobX">✕</button>
+  <a href="#wid-scroll" onclick="cMob()">Services</a>
+  <a href="#client-intro" onclick="cMob()">Clients</a>
   <a href="#flip-track" onclick="cMob()">Projects</a>
-  <a href="#about" onclick="cMob()">Clients</a>
   <a href="#about" onclick="cMob()">About</a>
   <a href="#contact" onclick="cMob()">Contact</a>
 </div>
@@ -1885,9 +1646,146 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
     </div>
     <div class="h-sub">Muskan KC &nbsp;·&nbsp; Available for freelance</div>
   </div>
-  <a href="#flip-track" class="h-cta">View work →</a>
   <div class="h-scroll"><div class="hs-l"></div><div class="hs-t">Scroll</div></div>
 </section>
+
+<!-- ═══ WHAT I DO — horizontal scroll track, appears right after hero ═══ -->
+<section id="wid-scroll" class="hs-host" data-nav="services">
+  <div class="hs-viewport">
+    <div class="hs-section-label">Services</div>
+    <nav class="hs-jumpnav" id="widJumpNav"></nav>
+    <div class="hs-hud">
+      <div class="hs-hud-count"><b id="widCurNum">01</b>&nbsp;/&nbsp;05</div>
+      <div class="hs-hud-bar"><div class="hs-hud-fill" id="widHudFill"></div></div>
+    </div>
+
+    <div class="hs-track" id="widTrack">
+
+      <div class="hs-panel" data-title="UI / UX Design" style="background:#dfd6c3;">
+        <div class="hs-content">
+          <div class="hs-cat">01 &middot; Interface &amp; Product</div>
+          <h2 class="hs-title">UI / UX<br><em>Design</em></h2>
+          <ul class="hs-list">
+            <li>Wireframing &amp; prototyping</li>
+            <li>User interface design</li>
+            <li>Usability testing</li>
+            <li>User research &amp; flows</li>
+            <li>Micro-animations</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="hs-panel" data-title="Graphic Design" style="background:#c8c1ac;">
+        <div class="hs-content">
+          <div class="hs-cat">02 &middot; Visual Identity</div>
+          <h2 class="hs-title">Graphic<br><em>Design</em></h2>
+          <ul class="hs-list">
+            <li>Logo &amp; brand identity</li>
+            <li>Event posters &amp; flyers</li>
+            <li>Social media graphics</li>
+            <li>Infographics</li>
+            <li>Custom illustrations</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="hs-panel" data-title="Web Design" style="background:#dccca3;">
+        <div class="hs-content">
+          <div class="hs-cat">03 &middot; Sites &amp; Builds</div>
+          <h2 class="hs-title">Web<br><em>Design</em></h2>
+          <ul class="hs-list">
+            <li>Responsive site design</li>
+            <li>Landing page design</li>
+            <li>Framer &amp; Webflow</li>
+            <li>Portfolio websites</li>
+            <li>Client site builds</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="hs-panel" data-title="VR / XR" style="background:#c2be9e;">
+        <div class="hs-content">
+          <div class="hs-cat">04 &middot; Immersive</div>
+          <h2 class="hs-title">VR /<br><em>XR</em></h2>
+          <ul class="hs-list">
+            <li>VR interface design</li>
+            <li>Spatial UX &amp; navigation</li>
+            <li>User research for XR</li>
+            <li>3D interaction design</li>
+            <li>Immersive prototyping</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="hs-panel" data-title="Accounting" style="background:#d5c7a2;">
+        <div class="hs-content">
+          <div class="hs-cat">05 &middot; Numbers</div>
+          <h2 class="hs-title"><em>Accounting</em></h2>
+          <ul class="hs-list">
+            <li>Tax return prep &amp; filing</li>
+            <li>Financial statements</li>
+            <li>General ledger review</li>
+            <li>QuickBooks &amp; Excel</li>
+            <li>Grant &amp; loan support</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ABOUT — horizontal scroll track, same mechanic and colour
+     family as Services and Projects ═══ -->
+<section id="about" class="hs-host">
+  <div class="hs-viewport">
+    <div class="hs-section-label">About</div>
+    <nav class="hs-jumpnav" id="abtJumpNav"></nav>
+    <div class="hs-hud">
+      <div class="hs-hud-count"><b id="abtCurNum">01</b>&nbsp;/&nbsp;03</div>
+      <div class="hs-hud-bar"><div class="hs-hud-fill" id="abtHudFill"></div></div>
+    </div>
+
+    <div class="hs-track" id="abtTrack">
+
+      <div class="hs-panel" data-title="Who I Am" style="background:#eee6d8;">
+        <div class="hs-content">
+          <div class="hs-cat">Who I Am</div>
+          <h2 class="hs-title">UX/UI Designer<br>Graphic Artist<br><em>Web &amp; XR</em></h2>
+          <p class="hs-prose">New York&ndash;based designer. Master&rsquo;s in UX/UI Design from NYIT. My background in accounting gives an analytical lens to every creative decision.</p>
+        </div>
+      </div>
+
+      <div class="hs-panel" data-title="How I Work" style="background:#d9c9a3;">
+        <div class="hs-content">
+          <div class="hs-cat">How I Work</div>
+          <h2 class="hs-title">Observation first,<br><em>then design</em></h2>
+          <p class="hs-prose">I design interfaces that feel alive &mdash; systems with warmth, texture, and intention. Every project begins with observation and ends with something that surprises.</p>
+          <div class="hs-stats">
+            <div><span class="hs-stat-n">MA</span><span class="hs-stat-l">NYIT &middot; 2024</span></div>
+            <div><span class="hs-stat-n">7+</span><span class="hs-stat-l">Projects</span></div>
+            <div><span class="hs-stat-n">NYC</span><span class="hs-stat-l">New York</span></div>
+            <div><span class="hs-stat-n">3</span><span class="hs-stat-l">Languages</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hs-panel" data-title="Skills &amp; Tools" style="background:#c8c1ac;">
+        <div class="hs-content">
+          <div class="hs-cat">What I Know</div>
+          <h2 class="hs-title">Skills &amp;<br><em>Tools</em></h2>
+          <div class="hs-tags">
+            <span>Figma</span><span>Unity</span><span>Framer</span><span>Shapes XR</span>
+            <span>HTML/CSS/JS</span><span>UX Research</span><span>VR/AR/MR</span><span>QuickBooks</span>
+            <span>Nepali</span><span>Hindi</span><span>Spanish</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- ═══ CLIENT WORK — intro panel, unchanged wording ═══ -->
 <section id="client-intro" data-nav="clients">
   <div class="ci-eyebrow">Clients &middot; Branding &middot; Graphic &amp; Freelance Work</div>
@@ -1896,7 +1794,7 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 </section>
 
 <!-- ═══ CASE STUDIES — horizontal scroll track ═══ -->
-<section id="hscroll">
+<section id="hscroll" class="hs-host">
   <div class="hs-viewport">
     <nav class="hs-jumpnav" id="hsJumpNav"></nav>
     <div class="hs-hud">
@@ -1957,10 +1855,6 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 <!-- ═══ ACADEMIC PROJECTS — Compact slide deck ═══ -->
 <!-- ═══ ACADEMIC — Sketchbook page-curl flip ═══ -->
 <div id="flip-track">
-  <div class="flip-label">
-    <div class="flip-h">Research</div>
-    <p class="flip-sub">Research thesis projects conducted during my masters program.</p>
-  </div>
   <div id="book-wrap"><div id="sketchbook"></div></div>
   <div class="flip-controls">
     <button id="sbPrev" aria-label="Previous page">&#8249;</button>
@@ -1973,111 +1867,6 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 <svg class="brush" style="display:block;margin-top:-2px" viewBox="0 0 1440 16" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M0 9C120 5 240 13 360 8C480 3 600 12 720 7C840 2 960 11 1080 7C1200 3 1320 10 1440 8" stroke="rgba(240,237,230,.18)" stroke-width="2" fill="none" stroke-linecap="round"/>
 </svg>
-
-<!-- ═══ ABOUT — Simple, quiet ═══ -->
-<section id="about">
-  <div class="ab-inner">
-    <div class="ab-eyebrow">About</div>
-    <h2 class="ab-h">UX/UI Designer<br>Graphic Artist<br>Web &amp; <em>XR</em></h2>
-    <p class="ab-p">New York&ndash;based designer. Master&rsquo;s in UX/UI Design from NYIT. My background in accounting gives an analytical lens to every creative decision.</p>
-    <p class="ab-p">I design interfaces that feel alive &mdash; systems with warmth, texture, and intention. Every project begins with observation and ends with something that surprises.</p>
-    <div class="ab-meta">
-      <div><span class="ab-meta-n">MA</span><span class="ab-meta-l">NYIT &middot; 2024</span></div>
-      <div><span class="ab-meta-n">7+</span><span class="ab-meta-l">Projects</span></div>
-      <div><span class="ab-meta-n">NYC</span><span class="ab-meta-l">New York</span></div>
-      <div><span class="ab-meta-n">3</span><span class="ab-meta-l">Languages</span></div>
-    </div>
-    <div class="ab-skills">
-      <span>Figma</span><span>Unity</span><span>Framer</span><span>Shapes XR</span>
-      <span>HTML/CSS/JS</span><span>UX Research</span><span>VR/AR/MR</span><span>QuickBooks</span>
-      <span>Nepali</span><span>Hindi</span><span>Spanish</span>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ WHAT I DO — Cork board with pinned notecards ═══ -->
-<section id="what-i-do">
-  <div class="wid-head">
-    <div class="wid-eyebrow">Services</div>
-    <h2 class="wid-h">What I <em>do</em></h2>
-    <p class="wid-sub">A scrapbook of disciplines &mdash; the things I keep coming back to.</p>
-  </div>
-
-  <div class="corkboard">
-    <div class="board-grain"></div>
-
-    <article class="card card-1">
-      <span class="tape tape-tl"></span>
-      <div class="card-num">01</div>
-      <h3 class="card-t">UI / UX Design</h3>
-      <div class="card-rule"></div>
-      <ul class="card-li">
-        <li>Wireframing &amp; prototyping</li>
-        <li>User interface design</li>
-        <li>Usability testing</li>
-        <li>User research &amp; flows</li>
-        <li>Micro-animations</li>
-      </ul>
-    </article>
-
-    <article class="card card-2">
-      <span class="tape tape-tr"></span>
-      <div class="card-num">02</div>
-      <h3 class="card-t">Graphic Design</h3>
-      <div class="card-rule"></div>
-      <ul class="card-li">
-        <li>Logo &amp; brand identity</li>
-        <li>Event posters &amp; flyers</li>
-        <li>Social media graphics</li>
-        <li>Infographics</li>
-        <li>Custom illustrations</li>
-      </ul>
-    </article>
-
-    <article class="card card-3">
-      <span class="tape tape-tl"></span>
-      <div class="card-num">03</div>
-      <h3 class="card-t">Web Design</h3>
-      <div class="card-rule"></div>
-      <ul class="card-li">
-        <li>Responsive site design</li>
-        <li>Landing page design</li>
-        <li>Framer &amp; Webflow</li>
-        <li>Portfolio websites</li>
-        <li>Client site builds</li>
-      </ul>
-    </article>
-
-    <article class="card card-4">
-      <span class="tape tape-tr"></span>
-      <div class="card-num">04</div>
-      <h3 class="card-t">VR / XR</h3>
-      <div class="card-rule"></div>
-      <ul class="card-li">
-        <li>VR interface design</li>
-        <li>Spatial UX &amp; navigation</li>
-        <li>User research for XR</li>
-        <li>3D interaction design</li>
-        <li>Immersive prototyping</li>
-      </ul>
-    </article>
-
-    <article class="card card-5">
-      <span class="tape tape-tl"></span>
-      <div class="card-num">05</div>
-      <h3 class="card-t">Accounting</h3>
-      <div class="card-rule"></div>
-      <ul class="card-li">
-        <li>Tax return prep &amp; filing</li>
-        <li>Financial statements</li>
-        <li>General ledger review</li>
-        <li>QuickBooks &amp; Excel</li>
-        <li>Grant &amp; loan support</li>
-      </ul>
-    </article>
-  </div>
-</section>
-
 
 <svg class="brush" viewBox="0 0 1440 16" preserveAspectRatio="none" style="height:16px" xmlns="http://www.w3.org/2000/svg">
   <path d="M0 9C120 5 240 13 360 8C480 3 600 12 720 7C840 2 960 11 1080 7C1200 3 1320 10 1440 8" stroke="rgba(240,237,230,.18)" stroke-width="2" fill="none" stroke-linecap="round"/>
@@ -2473,7 +2262,7 @@ setTimeout(function(){
     var el = document.createElement('div');
     if(p.type==='cover'){
       el.className='sb-page sb-cover';
-      el.innerHTML='<h2>Research &amp;<br>experiments</h2><div class="sb-crule"></div><div class="sb-csub">Sketchbook \u00b7 Muskan KC</div>';
+      el.innerHTML='<h2>Research<br>projects</h2><div class="sb-crule"></div><div class="sb-csub">Research thesis projects conducted<br>during my masters program</div>';
     } else if(p.type==='back'){
       el.className='sb-page sb-cover';
       el.innerHTML='<div class="sb-csub">More work at</div><h2 style="font-size:24px;margin-top:10px">muskankc.com</h2>';
