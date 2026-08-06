@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Muskan KC — UX/UI · Graphic · Web · XR</title>
-<meta name="description" content="Muskan KC — New York UX/UI designer, graphic designer, web and XR designer. MA NYIT. Available for freelance.">
+<meta name="description" content="Muskan KC — New York UX/UI designer, graphic designer, web and XR designer. MA NYIT. Taking freelance projects.">
 <link rel="canonical" href="https://muskankc.com/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Muskan KC","url":"https://muskankc.com","jobTitle":"UX/UI Designer","address":{"@type":"PostalAddress","addressLocality":"New York","addressRegion":"NY"},"sameAs":["http://www.linkedin.com/in/muskan-kc-0a56781a1","https://medium.com/@mkc_51000"]}</script>
 <script>
@@ -77,9 +77,10 @@ function onBodyColourScroll() {
   setBodyWada(idx);
 }
 
-window.addEventListener('scroll', onBodyColourScroll, {passive:true});
-/* Initial colour after intro */
-setTimeout(function(){ setBodyWada(0); }, 2500);
+/* Colour cycling disabled — the site now keeps a single consistent blue
+   background throughout, matching the hero, instead of shifting through
+   the Sanzo Wada palette as the user scrolls. */
+setBodyWada(0);
 
 
 /* ═══ PROJECT 3D CAROUSEL — scroll driven ════════════════════
@@ -210,23 +211,29 @@ setTimeout(function(){ setBodyWada(0); }, 2500);
 
 
 /* ═══════════════════════════════════════════════════════════
-   HORIZONTAL SCROLL TRACK — shared behaviour for both the
-   "What I Do" (services) and "Clients & freelance" (case studies)
-   sections. Wheel/swipe/arrow input steps exactly one panel at a
-   time. Only captures input while the section is actually in
-   view — scroll past the top or bottom edge and the page just
-   continues scrolling normally to the next/previous section.
+   HORIZONTAL SCROLL TRACK — shared behaviour for both the merged
+   Services+About track and the Projects/case-studies track.
+
+   This uses the browser's OWN native horizontal scrolling and
+   CSS scroll-snap for the panel-to-panel locking, instead of a
+   hand-built position:sticky + getBoundingClientRect scheme. The
+   previous approach depended on correctly predicting real-world
+   viewport/layout timing to decide when the section was "active";
+   that class of bug is very hard to catch in testing and doesn't
+   reproduce reliably, so it's removed rather than patched again.
+   Native scroll-snap can't have that bug — it just reads the
+   track's own actual scroll position, which is always correct.
 ═══════════════════════════════════════════════════════════ */
 function initHScroll(cfg){
-  var section = document.getElementById(cfg.sectionId);
-  var track   = document.getElementById(cfg.trackId);
-  if(!section || !track) return;
+  var track = document.getElementById(cfg.trackId);
+  if(!track) return;
 
-  var panels = track.querySelectorAll('.hs-panel');
+  var panels = Array.prototype.slice.call(track.querySelectorAll('.hs-panel'));
   var total  = panels.length;
   var curNumEl = document.getElementById(cfg.curNumId);
   var fillEl   = document.getElementById(cfg.hudFillId);
   var jumpNav  = document.getElementById(cfg.jumpNavId);
+  var section  = document.getElementById(cfg.sectionId);
 
   panels.forEach(function(p, i){
     var btn = document.createElement('button');
@@ -236,94 +243,47 @@ function initHScroll(cfg){
   });
   var jumpBtns = jumpNav.querySelectorAll('button');
 
-  var maxScroll = 0, current = 0, target = 0;
-  var currentIndex = 0;
-  var isLocked = false;
-  var LOCK_MS = 750;
-
-  function computeMax(){ maxScroll = track.scrollWidth - window.innerWidth; }
-  computeMax();
-  window.addEventListener('resize', computeMax);
+  function currentIndex(){
+    // read the track's real scroll position — always correct, no guessing
+    var w = track.clientWidth || 1;
+    return Math.round(track.scrollLeft / w);
+  }
 
   function updateHud(){
-    var progress = maxScroll > 0 ? current / maxScroll : 0;
-    curNumEl.textContent = String(currentIndex + 1).padStart(2, '0');
-    fillEl.style.width = (progress * 100) + '%';
-    jumpBtns.forEach(function(b,i){ b.classList.toggle('on', i === currentIndex); });
+    var idx = Math.max(0, Math.min(total - 1, currentIndex()));
+    var maxScroll = track.scrollWidth - track.clientWidth;
+    var progress = maxScroll > 0 ? track.scrollLeft / maxScroll : 0;
+    curNumEl.textContent = String(idx + 1).padStart(2, '0');
+    fillEl.style.width = (Math.max(0, Math.min(1, progress)) * 100) + '%';
+    jumpBtns.forEach(function(b,i){ b.classList.toggle('on', i === idx); });
+    if(section) section.classList.toggle('hs-active', true);
   }
 
   function goTo(i){
-    currentIndex = Math.max(0, Math.min(total - 1, i));
-    target = total > 1 ? (maxScroll / (total - 1)) * currentIndex : 0;
+    i = Math.max(0, Math.min(total - 1, i));
+    track.scrollTo({ left: i * track.clientWidth, behavior:'smooth' });
   }
 
-  // whether the section currently owns scroll input — true once the
-  // section's top has reached the top of the viewport (it's sticky)
-  // and we haven't yet stepped past the first/last panel.
-  function isActive(){
-    var r = section.getBoundingClientRect();
-    return r.top <= 2 && r.bottom > window.innerHeight;
-  }
-
-  function step(dir){
-    // at the boundary already, moving further out of range → release
-    // control back to native scroll so the page can continue normally.
-    var atBoundary = (currentIndex === 0 && dir < 0) || (currentIndex === total - 1 && dir > 0);
-    if(atBoundary) return false;
-    // still inside the section: advance if we're not already mid-transition,
-    // but ALWAYS report "captured" so the caller keeps blocking native
-    // scroll even during the lock window — otherwise scroll leaks through
-    // mid-transition and the page skips past the section entirely.
-    if(!isLocked){
-      isLocked = true;
-      goTo(currentIndex + dir);
-      setTimeout(function(){ isLocked = false; }, LOCK_MS);
-    }
-    return true;
-  }
-
-  window.addEventListener('wheel', function(e){
-    if(!isActive()) return;
-    if(Math.abs(e.deltaY) < 4) return;
+  // Vertical wheel input over the track moves it horizontally, snapping
+  // to the nearest panel. Once scrolled all the way to either edge, the
+  // wheel event is left alone so the page continues scrolling normally
+  // to the next/previous section — no viewport-position math involved,
+  // just the track's own real scrollLeft.
+  track.addEventListener('wheel', function(e){
+    var atStart = track.scrollLeft <= 1;
+    var atEnd   = track.scrollLeft >= track.scrollWidth - track.clientWidth - 1;
     var dir = e.deltaY > 0 ? 1 : -1;
-    var captured = step(dir);
-    if(captured) e.preventDefault();
-    // else: at the edge already — let the event fall through so the
-    // page continues scrolling to the next/previous section normally
+    if((dir > 0 && atEnd) || (dir < 0 && atStart)) return; // let the page scroll on
+    e.preventDefault();
+    goTo(currentIndex() + dir);
   }, { passive:false });
 
-  // Touch: mirrors the wheel behaviour above. Registered non-passive so
-  // preventDefault actually stops native scrolling while the section is
-  // capturing input — without this, touch scroll always slides straight
-  // through regardless of any JS logic.
-  var touchStartX = 0, touchStartY = 0;
-  section.addEventListener('touchstart', function(e){
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-  }, {passive:true});
-  section.addEventListener('touchmove', function(e){
-    if(!isActive()) return;
-    var dx = touchStartX - e.touches[0].clientX;
-    var dy = touchStartY - e.touches[0].clientY;
-    if(Math.abs(dx) < 10 && Math.abs(dy) < 10) return; // let the gesture develop
-    var dir = Math.abs(dy) >= Math.abs(dx) ? (dy > 0 ? 1 : -1) : (dx > 0 ? 1 : -1);
-    var atBoundary = (currentIndex === 0 && dir < 0) || (currentIndex === total - 1 && dir > 0);
-    if(atBoundary) return; // let native scroll carry the page onward
-    e.preventDefault();
-    if(!isLocked && (Math.abs(dx) > 40 || Math.abs(dy) > 40)){
-      isLocked = true;
-      goTo(currentIndex + dir);
-      setTimeout(function(){ isLocked = false; }, LOCK_MS);
-      // rebase so one long swipe can step through several panels
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-    }
-  }, {passive:false});
-
-  window.addEventListener('keydown', function(e){
-    if(!isActive()) return;
-    if(e.key === 'ArrowRight') step(1);
-    if(e.key === 'ArrowLeft') step(-1);
+  // Native horizontal touch swipe already works via scroll-snap with no
+  // extra code needed. Arrow keys, for anyone tabbing to the track.
+  track.setAttribute('tabindex', '0');
+  track.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight'){ e.preventDefault(); goTo(currentIndex() + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); goTo(currentIndex() - 1); }
   });
 
   jumpBtns.forEach(function(b){ b.addEventListener('click', function(){ goTo(parseInt(b.dataset.i)); }); });
@@ -344,42 +304,13 @@ function initHScroll(cfg){
     });
   });
 
-  // Start the render loop FIRST and unconditionally — this is what
-  // actually moves the panels, so nothing below may ever block it.
-  var lastTs = null;
-  function loop(ts){
-    if(lastTs === null) lastTs = ts;
-    var dt = Math.min(48, ts - lastTs);
-    lastTs = ts;
-    var ease = 1 - Math.pow(1 - 0.09, dt / 16.67);
-    current += (target - current) * ease;
-    track.style.transform = 'translateX(' + (-current) + 'px)';
-    updateHud();
-    requestAnimationFrame(loop);
-  }
-  requestAnimationFrame(loop);
-
-  // toggle the "active" class (drives jump-nav / hud visibility) —
-  // wrapped defensively so an unsupported/blocked IntersectionObserver
-  // can never take the render loop above down with it.
-  try {
-    if('IntersectionObserver' in window){
-      var io = new IntersectionObserver(function(entries){
-        entries.forEach(function(e){
-          section.classList.toggle('hs-active', e.isIntersecting && isActive());
-        });
-      }, { threshold:[0, 0.5, 1] });
-      io.observe(section);
-    }
-  } catch(err) { /* jump-nav/hud just stay as-is; core scroll still works */ }
-  window.addEventListener('scroll', function(){
-    section.classList.toggle('hs-active', isActive());
-  }, { passive:true });
+  track.addEventListener('scroll', updateHud, { passive:true });
+  window.addEventListener('resize', updateHud);
+  updateHud();
 }
 
-initHScroll({ sectionId:'wid-scroll', trackId:'widTrack', curNumId:'widCurNum', hudFillId:'widHudFill', jumpNavId:'widJumpNav' });
-initHScroll({ sectionId:'about',      trackId:'abtTrack', curNumId:'abtCurNum', hudFillId:'abtHudFill', jumpNavId:'abtJumpNav' });
-initHScroll({ sectionId:'hscroll',    trackId:'hsTrack',  curNumId:'hsCurNum',  hudFillId:'hsHudFill',  jumpNavId:'hsJumpNav'  });
+initHScroll({ sectionId:'intro-track', trackId:'itTrack', curNumId:'itCurNum', hudFillId:'itHudFill', jumpNavId:'itJumpNav' });
+initHScroll({ sectionId:'hscroll',      trackId:'hsTrack', curNumId:'hsCurNum', hudFillId:'hsHudFill', jumpNavId:'hsJumpNav' });
 
 
 
@@ -607,8 +538,15 @@ nav.s {
   border-bottom:1px solid rgba(240,237,230,.08);
 }
 .n-logo {
-  display: none;   /* hide logo in the floating side nav — keep it clean */
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  font-size: 15px; font-weight: 700;
+  color: rgba(240,237,230,.55);
+  text-decoration: none;
+  margin-bottom: 4px;
+  transition: color .3s;
 }
+.n-logo:hover { color: #fff; }
 .n-dot {
   width:5px;height:5px;border-radius:50%;
   background:var(--teal);box-shadow:0 0 8px var(--tglow);
@@ -1166,40 +1104,38 @@ footer {
 
 /* ═══════════════════════════════════════════════════════════
    CASE STUDIES — horizontal scroll track
-   One wheel/swipe step = exactly one panel. Only captures scroll
-   while the track is actually in view; otherwise the page scrolls
-   normally past it, so it behaves like a section, not a takeover.
+   One wheel/swipe step = exactly one panel, using the browser's own
+   native scroll-snap — no sticky-pin buffer, no viewport-position
+   math, just the track's own real scroll state.
 ═══════════════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════════
-   HORIZONTAL SCROLL TRACK — shared pattern, reused by both
-   "What I Do" (services) and "Clients & freelance" (case studies).
-   Each host section just needs: position:relative + a height that
-   gives position:sticky its scroll "runway" (see .hs-host below).
+   HORIZONTAL SCROLL TRACK — shared pattern, reused by both the
+   merged Services+About track and the Projects/case-studies track.
 ═══════════════════════════════════════════════════════════ */
 .hs-host {
   position:relative;
-  /* extra height gives position:sticky a scroll "runway" to hold the
-     panel viewport in place while wheel input steps through panels.
-     Kept deliberately short — this buffer is only consumed by the
-     final release scroll once you're past the last/first panel, so
-     a large value here just feels like dead space before the next
-     section appears. */
-  height:140vh;
 }
 .hs-viewport {
-  position:sticky;
-  top:0;
+  position:relative;
   height:100vh;
-  overflow:hidden;
 }
 .hs-track {
   height:100%;
   display:flex;
-  will-change:transform;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  outline:none;
 }
+.hs-track::-webkit-scrollbar{ display:none; }
 .hs-panel {
   height:100%;
   flex:0 0 100%;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
   display:flex; align-items:center; justify-content:center;
   position:relative;
   cursor:pointer;
@@ -1312,14 +1248,12 @@ footer {
 .hs-host.hs-active .hs-section-label { opacity:1; }
 @media (max-width:760px){ .hs-section-label{ top:20px; left:20px; font-size:8px; letter-spacing:3px; } }
 
-/* named jump nav + hud — only visible while the track is in view */
+/* named jump nav + hud, positioned within their own section */
 .hs-jumpnav {
   position:absolute; bottom:64px; left:50%; transform:translateX(-50%);
   z-index:15; display:flex; gap:20px; flex-wrap:wrap; justify-content:center;
   max-width:70vw;
-  opacity:0; pointer-events:none; transition:opacity .4s ease;
 }
-.hs-host.hs-active .hs-jumpnav { opacity:1; pointer-events:auto; }
 .hs-jumpnav button {
   background:none; border:none; cursor:pointer;
   font-family:'Fraunces', serif; font-size:13px; font-weight:600;
@@ -1335,9 +1269,7 @@ footer {
   position:absolute; bottom:24px; left:0; right:0;
   display:flex; flex-direction:column; align-items:center; gap:8px; z-index:15;
   pointer-events:none;
-  opacity:0; transition:opacity .4s ease;
 }
-.hs-host.hs-active .hs-hud { opacity:1; }
 .hs-hud-count { font-family:'Fraunces', serif; font-size:12px; color:rgba(240,237,230,.7); text-shadow:0 1px 3px rgba(0,0,0,.6); }
 .hs-hud-count b { color:#fff; font-weight:700; }
 .hs-hud-bar { width:180px; height:2px; background:rgba(240,237,230,.25); position:relative; overflow:hidden; }
@@ -1347,9 +1279,32 @@ footer {
   .hs-panel { flex:0 0 88vw; }
 }
 
-/* Services panels aren't links to another page, so no pointer affordance */
-#wid-scroll .hs-panel { cursor:default; }
-#about .hs-panel { cursor:default; }
+/* Services/About panels aren't links to another page, so no pointer affordance */
+#intro-track .hs-panel { cursor:default; }
+
+/* Projects: match the reference file's type scale exactly (it runs
+   smaller/tighter than the default hs-title size used elsewhere) */
+#hscroll .hs-title { font-size:clamp(24px,3.4vw,42px); }
+
+/* ═══════════════════════════════════════════════════════════
+   DARK / BLUE-PALETTE VARIANT — used by the merged Services+About
+   track. Same fonts, same interaction, but the site's own indigo
+   background and light text instead of the light pastel cards
+   used elsewhere, so it reads as a continuation of the hero.
+═══════════════════════════════════════════════════════════ */
+.hs-host.hs-dark .hs-panel { background:var(--bg); }
+.hs-host.hs-dark .hs-panel::before { content:none; } /* no paper-foxing texture on a solid dark bg */
+.hs-host.hs-dark .hs-cat { color:rgba(240,237,230,.4); }
+.hs-host.hs-dark .hs-title { color:rgba(240,237,230,.94); }
+.hs-host.hs-dark .hs-title em { color:var(--teal); font-weight:200; }
+.hs-host.hs-dark .hs-list li { color:rgba(240,237,230,.55); }
+.hs-host.hs-dark .hs-list li::before { color:rgba(240,237,230,.35); }
+.hs-host.hs-dark .hs-prose { color:rgba(240,237,230,.5); }
+.hs-host.hs-dark .hs-stat-n { color:rgba(240,237,230,.9); }
+.hs-host.hs-dark .hs-stat-l { color:rgba(240,237,230,.4); }
+.hs-host.hs-dark .hs-tags span { color:rgba(240,237,230,.5); border-color:rgba(240,237,230,.18); }
+.hs-host.hs-dark .hs-cta { color:rgba(240,237,230,.65); border-color:rgba(240,237,230,.3); }
+.hs-host.hs-dark .hs-cta:hover { color:#fff; border-color:rgba(77,255,210,.5); }
 
 /* ═══════════════════════════════════════════════════════════
    ACADEMIC PROJECTS — Compact slide deck
@@ -1376,6 +1331,12 @@ footer {
   letter-spacing:5px; text-transform:uppercase;
   color:rgba(240,237,230,.32);
 }
+.ss-namaste {
+  font-family:'Noto Sans Devanagari',sans-serif;
+  font-size:28px; font-weight:700;
+  color:rgba(240,237,230,.55);
+  margin-top:4px;
+}
 #socials-strip .socials {
   display:flex; gap:12px; flex-wrap:wrap; justify-content:center;
 }
@@ -1400,7 +1361,15 @@ footer {
   #client-intro { padding:90px 24px 60px }
   .hs-title { font-size:clamp(28px,9vw,48px); letter-spacing:-1px }
   .hs-cat { font-size:8px; }
-  #socials-strip { padding:40px 24px 60px }
+  /* the site nav becomes a fixed bottom bar on mobile — everything
+     that would otherwise sit at the very bottom of the page needs
+     enough clearance so the fixed bar doesn't sit on top of it */
+  #socials-strip { padding:40px 24px 100px }
+  footer {
+    flex-direction:column; align-items:flex-start; gap:14px;
+    padding:20px 24px 100px;
+  }
+  .ft-r { flex-wrap:wrap; gap:10px; }
 }
 
 
@@ -1558,29 +1527,80 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
   padding: 60px 20px 80px;
 }
 #book-wrap {
-  width: 100%;
-  max-width: 920px;
+  /* explicit fixed width + block-level auto margins: the most
+     bulletproof centering technique there is, independent of
+     whatever positioning scheme the page-flip library uses
+     internally for its own generated wrapper element */
+  width: 480px;
+  max-width: 92vw;
+  margin: 0 auto;
+  min-height: 560px;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 560px;
 }
+#sketchbook { width: 100%; margin: 0 auto; display: flex; justify-content: center; }
+/* whatever StPageFlip injects as its own wrapper, keep it centered
+   regardless of the library's own internal positioning */
+#book-wrap > div, #sketchbook > div { margin-left: auto !important; margin-right: auto !important; }
 /* page faces */
 .sb-page { background: linear-gradient(125deg,#f6ecd8 0%,#ece0c6 100%); overflow: hidden; }
-.sb-inner { position: relative; width: 100%; height: 100%; padding: 46px 40px; display: flex; flex-direction: column; }
-.sb-edge { position: absolute; top: 0; bottom: 0; left: 0; width: 46px; background: linear-gradient(90deg,rgba(120,90,50,.20),transparent); pointer-events: none; }
-.sb-cat { font-family:'Cabinet Grotesk',sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(58,37,21,.5); margin-bottom: 18px; }
-.sb-accent { width: 30px; height: 2px; margin-bottom: 18px; }
-.sb-title { font-family:'Fraunces',serif; font-size: clamp(26px,3.4vw,40px); font-weight: 800; font-style: italic; color: #2a1a0e; line-height: 1; letter-spacing: -1px; }
-.sb-sub { display: block; font-style: normal; font-weight: 300; font-size: .5em; color: rgba(58,37,21,.55); margin-top: 8px; }
-.sb-desc { font-family:'Cabinet Grotesk',sans-serif; font-size: 13px; line-height: 1.7; color: rgba(58,37,21,.62); margin-top: 22px; }
-.sb-cta { display: inline-block; margin-top: auto; font-family:'Cabinet Grotesk',sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(58,37,21,.75); text-decoration: none; border-bottom: 1px solid rgba(58,37,21,.4); padding-bottom: 4px; align-self: flex-start; }
-.sb-num { position: absolute; bottom: 28px; right: 34px; font-family:'Fraunces',serif; font-size: 13px; font-style: italic; color: rgba(58,37,21,.4); }
+.sb-inner {
+  position: relative; width: 100%; height: 100%;
+  padding: 44px 34px 40px 56px; /* extra left room clears the .sb-edge decoration cleanly */
+  display: flex; flex-direction: column;
+}
+.sb-edge { position: absolute; top: 0; bottom: 0; left: 0; width: 40px; background: linear-gradient(90deg,rgba(120,90,50,.20),transparent); pointer-events: none; }
+.sb-cat {
+  font-family:'Cabinet Grotesk',sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: rgba(58,37,21,.5);
+  margin-bottom: 16px; line-height: 1.5;
+}
+.sb-accent { width: 28px; height: 3px; border-radius: 2px; margin-bottom: 18px; flex-shrink: 0; }
+.sb-title {
+  font-family:'Fraunces',serif; font-size: clamp(19px,2.4vw,26px); font-weight: 800;
+  font-style: italic; color: #211407; line-height: 1.18; letter-spacing: -.3px;
+  font-variation-settings:'opsz' 26,'WONK' 1;
+}
+.sb-sub {
+  display: block; font-style: normal; font-weight: 700; font-size: 10px;
+  letter-spacing: 1.5px; text-transform: uppercase; color: rgba(58,37,21,.5);
+  margin-top: 10px;
+}
+.sb-desc {
+  font-family:'Cabinet Grotesk',sans-serif; font-size: 12.5px; line-height: 1.75;
+  color: rgba(58,37,21,.65); margin-top: 18px;
+}
+.sb-cta {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: auto;
+  font-family:'Cabinet Grotesk',sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: #211407;
+  text-decoration: none; border-bottom: 1.5px solid rgba(58,37,21,.5);
+  padding-bottom: 5px; align-self: flex-start; transition: border-color .2s, gap .2s;
+}
+.sb-cta:hover { border-color: rgba(58,37,21,.9); gap: 12px; }
+.sb-num { position: absolute; bottom: 26px; right: 30px; font-family:'Fraunces',serif; font-size: 12px; font-style: italic; color: rgba(58,37,21,.35); }
+/* timeline preview on each project's right-hand page — numbered
+   steps in filled circles rather than plain dots, more presence */
+.sb-timeline { display:flex; flex-direction:column; margin-top:22px; }
+.sb-timeline-item { display:flex; align-items:center; gap:14px; position:relative; padding-bottom:26px; }
+.sb-timeline-item:last-child { padding-bottom:0; }
+.sb-timeline-item::before {
+  content:''; position:absolute; left:10px; top:24px; bottom:0; width:1px;
+  background:rgba(58,37,21,.2);
+}
+.sb-timeline-item:last-child::before { display:none; }
+.sb-timeline-dot {
+  width:21px; height:21px; border-radius:50%; flex-shrink:0; position:relative; z-index:1;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Fraunces',serif; font-size:10px; font-weight:700; font-style:italic; color:#fff;
+}
+.sb-timeline-label { font-family:'Cabinet Grotesk',sans-serif; font-size:12px; font-weight:700; color:#2a1a0e; letter-spacing:.2px; }
 /* cover pages */
-.sb-cover { background: linear-gradient(135deg,#1f3a5c,#16293f); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #ece0c6; padding: 50px; }
-.sb-cover h2 { font-family:'Fraunces',serif; font-style: italic; font-weight: 300; font-size: 32px; line-height: 1.1; }
-.sb-cover .sb-csub { font-family:'Cabinet Grotesk',sans-serif; font-size: 12px; font-weight: 500; letter-spacing: .2px; text-transform: none; line-height: 1.6; color: rgba(236,224,198,.6); margin-top: 18px; max-width: 240px; }
-.sb-cover .sb-crule { width: 40px; height: 1px; background: rgba(236,224,198,.4); margin: 20px 0; }
+.sb-cover { background: linear-gradient(150deg,#243f60 0%,#152030 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #ece0c6; padding: 50px; }
+.sb-cover h2 { font-family:'Fraunces',serif; font-style: italic; font-weight: 300; font-size: 34px; line-height: 1.12; letter-spacing: -.5px; }
+.sb-cover .sb-csub { font-family:'Cabinet Grotesk',sans-serif; font-size: 12.5px; font-weight: 500; letter-spacing: .2px; text-transform: none; line-height: 1.65; color: rgba(236,224,198,.62); margin-top: 20px; max-width: 240px; }
+.sb-cover .sb-crule { width: 40px; height: 1px; background: rgba(236,224,198,.4); margin: 22px 0; }
 /* controls */
 .flip-controls { display: flex; gap: 16px; align-items: center; }
 .flip-controls button { background: none; border: 1px solid rgba(240,237,230,.3); color: rgba(240,237,230,.8); width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 16px; transition: .2s; }
@@ -1604,19 +1624,17 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 <nav id="nav">
   <a href="#hero" class="n-logo">मुस्कान <span class="n-dot"></span></a>
   <ul class="n-links">
-    <li><a href="#wid-scroll">Services</a></li>
+    <li><a href="#intro-track">About &amp; Services</a></li>
     <li><a href="#client-intro">Clients</a></li>
-    <li><a href="#flip-track">Projects</a></li>
-    <li><a href="#about">About</a></li>
+    <li><a href="#flip-track">Academic Projects</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
 <div class="mob" id="mob">
   <button class="mob-x" id="mobX">✕</button>
-  <a href="#wid-scroll" onclick="cMob()">Services</a>
+  <a href="#intro-track" onclick="cMob()">About &amp; Services</a>
   <a href="#client-intro" onclick="cMob()">Clients</a>
-  <a href="#flip-track" onclick="cMob()">Projects</a>
-  <a href="#about" onclick="cMob()">About</a>
+  <a href="#flip-track" onclick="cMob()">Academic Projects</a>
   <a href="#contact" onclick="cMob()">Contact</a>
 </div>
 
@@ -1632,7 +1650,7 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 </div>
 <section id="hero">
   <div class="h-text">
-    <div class="h-eyebrow">New York &nbsp;·&nbsp; UX/UI &nbsp;·&nbsp; Graphic Art &nbsp;·&nbsp; Web &nbsp;·&nbsp; VR</div>
+    <div class="h-eyebrow">UX/UI &nbsp;·&nbsp; Graphic &nbsp;·&nbsp; Web &nbsp;·&nbsp; VR</div>
     <div class="h-rule">
       <svg width="80" height="12" viewBox="0 0 80 12" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M2 8C8 6 14 10 22 7C30 4 36 9 44 7C52 5 58 9 66 7C72 5.5 76 8 78 7" stroke="#6e8a66" stroke-width="2.5" stroke-linecap="round" fill="none"/>
@@ -1644,26 +1662,59 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
       designing,<br>
       <span class="w teal">still learning</span>
     </div>
-    <div class="h-sub">Muskan KC &nbsp;·&nbsp; Available for freelance</div>
+    <div class="h-sub">Muskan KC &nbsp;·&nbsp; Taking freelance projects</div>
   </div>
   <div class="h-scroll"><div class="hs-l"></div><div class="hs-t">Scroll</div></div>
 </section>
 
-<!-- ═══ WHAT I DO — horizontal scroll track, appears right after hero ═══ -->
-<section id="wid-scroll" class="hs-host" data-nav="services">
+<!-- ═══ SERVICES + ABOUT — one combined horizontal track, right after
+     hero, same blue palette and type system as the hero itself ═══ -->
+<section id="intro-track" class="hs-host hs-dark" data-nav="services">
   <div class="hs-viewport">
-    <div class="hs-section-label">Services</div>
-    <nav class="hs-jumpnav" id="widJumpNav"></nav>
+    <nav class="hs-jumpnav" id="itJumpNav"></nav>
     <div class="hs-hud">
-      <div class="hs-hud-count"><b id="widCurNum">01</b>&nbsp;/&nbsp;05</div>
-      <div class="hs-hud-bar"><div class="hs-hud-fill" id="widHudFill"></div></div>
+      <div class="hs-hud-count"><b id="itCurNum">01</b>&nbsp;/&nbsp;08</div>
+      <div class="hs-hud-bar"><div class="hs-hud-fill" id="itHudFill"></div></div>
     </div>
 
-    <div class="hs-track" id="widTrack">
+    <div class="hs-track" id="itTrack">
 
-      <div class="hs-panel" data-title="UI / UX Design" style="background:#dfd6c3;">
+      <div class="hs-panel" data-title="Who I Am">
         <div class="hs-content">
-          <div class="hs-cat">01 &middot; Interface &amp; Product</div>
+          <div class="hs-cat">01 &middot; Who I Am</div>
+          <h2 class="hs-title">UX/UI Designer<br>Graphic Artist<br><em>Web &amp; XR</em></h2>
+          <p class="hs-prose">A New York designer who thinks in systems and feels in colour &mdash; building interfaces that are warm, considered, and a little unexpected.</p>
+        </div>
+      </div>
+
+      <div class="hs-panel" data-title="How I Work">
+        <div class="hs-content">
+          <div class="hs-cat">02 &middot; How I Work</div>
+          <h2 class="hs-title">Observation first,<br><em>then design</em></h2>
+          <p class="hs-prose">Every project starts with a question, not a template. I sketch first, refine often, and I&rsquo;m happiest when the smallest detail ends up mattering most.</p>
+          <div class="hs-stats">
+            <div><span class="hs-stat-n">7+</span><span class="hs-stat-l">Projects</span></div>
+            <div><span class="hs-stat-n">NYC</span><span class="hs-stat-l">New York</span></div>
+            <div><span class="hs-stat-n">3</span><span class="hs-stat-l">Languages</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hs-panel" data-title="Skills &amp; Tools">
+        <div class="hs-content">
+          <div class="hs-cat">03 &middot; What I Know</div>
+          <h2 class="hs-title">Skills &amp;<br><em>Tools</em></h2>
+          <div class="hs-tags">
+            <span>Figma</span><span>Unity</span><span>Framer</span><span>Shapes XR</span>
+            <span>HTML/CSS/JS</span><span>UX Research</span><span>VR/AR/MR</span><span>QuickBooks</span>
+            <span>Nepali</span><span>Hindi</span><span>Spanish</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hs-panel" data-title="UI / UX Design">
+        <div class="hs-content">
+          <div class="hs-cat">04 &middot; Interface &amp; Product</div>
           <h2 class="hs-title">UI / UX<br><em>Design</em></h2>
           <ul class="hs-list">
             <li>Wireframing &amp; prototyping</li>
@@ -1675,9 +1726,9 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
         </div>
       </div>
 
-      <div class="hs-panel" data-title="Graphic Design" style="background:#c8c1ac;">
+      <div class="hs-panel" data-title="Graphic Design">
         <div class="hs-content">
-          <div class="hs-cat">02 &middot; Visual Identity</div>
+          <div class="hs-cat">05 &middot; Visual Identity</div>
           <h2 class="hs-title">Graphic<br><em>Design</em></h2>
           <ul class="hs-list">
             <li>Logo &amp; brand identity</li>
@@ -1689,9 +1740,9 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
         </div>
       </div>
 
-      <div class="hs-panel" data-title="Web Design" style="background:#dccca3;">
+      <div class="hs-panel" data-title="Web Design">
         <div class="hs-content">
-          <div class="hs-cat">03 &middot; Sites &amp; Builds</div>
+          <div class="hs-cat">06 &middot; Sites &amp; Builds</div>
           <h2 class="hs-title">Web<br><em>Design</em></h2>
           <ul class="hs-list">
             <li>Responsive site design</li>
@@ -1703,9 +1754,9 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
         </div>
       </div>
 
-      <div class="hs-panel" data-title="VR / XR" style="background:#c2be9e;">
+      <div class="hs-panel" data-title="VR / XR">
         <div class="hs-content">
-          <div class="hs-cat">04 &middot; Immersive</div>
+          <div class="hs-cat">07 &middot; Immersive</div>
           <h2 class="hs-title">VR /<br><em>XR</em></h2>
           <ul class="hs-list">
             <li>VR interface design</li>
@@ -1717,9 +1768,9 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
         </div>
       </div>
 
-      <div class="hs-panel" data-title="Accounting" style="background:#d5c7a2;">
+      <div class="hs-panel" data-title="Accounting">
         <div class="hs-content">
-          <div class="hs-cat">05 &middot; Numbers</div>
+          <div class="hs-cat">08 &middot; Numbers</div>
           <h2 class="hs-title"><em>Accounting</em></h2>
           <ul class="hs-list">
             <li>Tax return prep &amp; filing</li>
@@ -1728,57 +1779,6 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
             <li>QuickBooks &amp; Excel</li>
             <li>Grant &amp; loan support</li>
           </ul>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ═══ ABOUT — horizontal scroll track, same mechanic and colour
-     family as Services and Projects ═══ -->
-<section id="about" class="hs-host">
-  <div class="hs-viewport">
-    <div class="hs-section-label">About</div>
-    <nav class="hs-jumpnav" id="abtJumpNav"></nav>
-    <div class="hs-hud">
-      <div class="hs-hud-count"><b id="abtCurNum">01</b>&nbsp;/&nbsp;03</div>
-      <div class="hs-hud-bar"><div class="hs-hud-fill" id="abtHudFill"></div></div>
-    </div>
-
-    <div class="hs-track" id="abtTrack">
-
-      <div class="hs-panel" data-title="Who I Am" style="background:#eee6d8;">
-        <div class="hs-content">
-          <div class="hs-cat">Who I Am</div>
-          <h2 class="hs-title">UX/UI Designer<br>Graphic Artist<br><em>Web &amp; XR</em></h2>
-          <p class="hs-prose">New York&ndash;based designer. Master&rsquo;s in UX/UI Design from NYIT. My background in accounting gives an analytical lens to every creative decision.</p>
-        </div>
-      </div>
-
-      <div class="hs-panel" data-title="How I Work" style="background:#d9c9a3;">
-        <div class="hs-content">
-          <div class="hs-cat">How I Work</div>
-          <h2 class="hs-title">Observation first,<br><em>then design</em></h2>
-          <p class="hs-prose">I design interfaces that feel alive &mdash; systems with warmth, texture, and intention. Every project begins with observation and ends with something that surprises.</p>
-          <div class="hs-stats">
-            <div><span class="hs-stat-n">MA</span><span class="hs-stat-l">NYIT &middot; 2024</span></div>
-            <div><span class="hs-stat-n">7+</span><span class="hs-stat-l">Projects</span></div>
-            <div><span class="hs-stat-n">NYC</span><span class="hs-stat-l">New York</span></div>
-            <div><span class="hs-stat-n">3</span><span class="hs-stat-l">Languages</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="hs-panel" data-title="Skills &amp; Tools" style="background:#c8c1ac;">
-        <div class="hs-content">
-          <div class="hs-cat">What I Know</div>
-          <h2 class="hs-title">Skills &amp;<br><em>Tools</em></h2>
-          <div class="hs-tags">
-            <span>Figma</span><span>Unity</span><span>Framer</span><span>Shapes XR</span>
-            <span>HTML/CSS/JS</span><span>UX Research</span><span>VR/AR/MR</span><span>QuickBooks</span>
-            <span>Nepali</span><span>Hindi</span><span>Spanish</span>
-          </div>
         </div>
       </div>
 
@@ -1807,23 +1807,23 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
       <div class="hs-panel" data-href="sammys.html" data-title="Non-Profit" style="background:#eee6d8;">
         <div class="hs-content">
           <div class="hs-cat">Non-Profit &middot; UX/UI &middot; Web Redesign</div>
-          <h2 class="hs-title">Sammy&rsquo;s Senior<br><em>Sanctuary</em></h2>
-          <a class="hs-cta" href="sammys.html" onclick="event.stopPropagation()">View Case Study &#8594;</a>
+          <h2 class="hs-title">Sammy&rsquo;s Senior <em>Sanctuary</em></h2>
+          <a class="hs-cta" href="sammys.html" onclick="event.stopPropagation()">View Case Study</a>
         </div>
       </div>
 
       <div class="hs-panel" data-href="nyeeminc.html" data-title="Production Company" style="background:#e3ba82;">
         <div class="hs-content">
           <div class="hs-cat">Production Company &middot; Brand &middot; Web</div>
-          <h2 class="hs-title">Nyeem<br><em>Inc.</em></h2>
-          <a class="hs-cta" href="nyeeminc.html" onclick="event.stopPropagation()">View Case Study &#8594;</a>
+          <h2 class="hs-title">Nyeem <em>Inc.</em></h2>
+          <a class="hs-cta" href="nyeeminc.html" onclick="event.stopPropagation()">View Case Study</a>
         </div>
       </div>
 
-      <div class="hs-panel" data-href="studio57.html" data-title="Business Website" style="background:#8ba86a;">
+      <div class="hs-panel" data-href="studio57.html" data-title="Small Business" style="background:#8ba86a;">
         <div class="hs-content">
-          <div class="hs-cat">Nail Salon &amp; Spa &middot; Brand &middot; Web</div>
-          <h2 class="hs-title">Studio 57 Nail<br><em>Salon &amp; Spa</em></h2>
+          <div class="hs-cat">Small Business &middot; Beauty &amp; Personal Care &middot; Brand &amp; Web</div>
+          <h2 class="hs-title">Studio 57 Nail <em>Salon &amp; Spa</em></h2>
           <div class="hs-dual">
             <a class="hs-cta" href="studio57.html" onclick="event.stopPropagation()">View Website</a>
             <span class="hs-divider">/</span>
@@ -1835,16 +1835,16 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
       <div class="hs-panel" data-href="freelance.html" data-title="Freelance Event Graphics" style="background:#7c93a3;">
         <div class="hs-content">
           <div class="hs-cat">Freelance &middot; Graphic Design &middot; Print &amp; Social</div>
-          <h2 class="hs-title">Freelance Event<br><em>Graphics</em></h2>
-          <a class="hs-cta" href="freelance.html" onclick="event.stopPropagation()">View Case Study &#8594;</a>
+          <h2 class="hs-title">Freelance Event <em>Graphics</em></h2>
+          <a class="hs-cta" href="freelance.html" onclick="event.stopPropagation()">View Case Study</a>
         </div>
       </div>
 
       <div class="hs-panel" data-href="freelance-projects.html" data-title="Freelance Projects" style="background:#d9c9a3;">
         <div class="hs-content">
           <div class="hs-cat">Graphic Design &middot; Freelance &middot; Print &amp; Digital</div>
-          <h2 class="hs-title">Freelance<br><em>Projects</em></h2>
-          <a class="hs-cta" href="freelance-projects.html" onclick="event.stopPropagation()">View Projects &#8594;</a>
+          <h2 class="hs-title">Freelance <em>Projects</em></h2>
+          <a class="hs-cta" href="freelance-projects.html" onclick="event.stopPropagation()">View Projects</a>
         </div>
       </div>
 
@@ -1858,7 +1858,7 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
   <div id="book-wrap"><div id="sketchbook"></div></div>
   <div class="flip-controls">
     <button id="sbPrev" aria-label="Previous page">&#8249;</button>
-    <span class="flip-count"><span id="flipCnt">1</span> / 5</span>
+    <span class="flip-count"><span id="flipCnt">1</span> / <span id="flipTotal">8</span></span>
     <button id="sbNext" aria-label="Next page">&#8250;</button>
   </div>
   <div class="flip-hint">Drag a page corner to turn it &middot; like real paper</div>
@@ -1892,7 +1892,7 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
   <div class="rb-c r d2">
     <div class="rn-open" id="rnOpen">
       <div class="rp">
-        <h3>Muskan KC</h3><div class="rc">636-219-4677 · muskankc.com</div><hr>
+        <h3>Muskan KC</h3><div class="rc">muskankc.com</div><hr>
         <div class="rs">Education</div>
         <div class="re"><div class="rt">MA UX/UI Design — NYIT, Manhattan NY</div><div class="rd">May 2024</div></div>
         <div class="re"><div class="rt">BA Accounting · Minor Philosophy — Lindenwood University</div><div class="rd">May 2021</div></div>
@@ -1938,7 +1938,7 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
   <div class="con-l">
     <div class="sec-lbl r">Contact</div>
     <h2 class="con-h r d1">Let&rsquo;s make something<br><em>worth remembering</em></h2>
-    <p class="con-sub r d2">Available for freelance, full-time and collaborative projects. Based in New York, working globally.</p>
+    <p class="con-sub r d2">Taking on freelance, full-time and collaborative projects. Based in New York, working globally.</p>
     <div class="clinks r d2">
       <a href="http://www.linkedin.com/in/muskan-kc-0a56781a1" class="clink" target="_blank"><div class="clink-d"></div>LinkedIn &mdash; Connect</a>
       <a href="https://medium.com/@mkc_51000" class="clink" target="_blank"><div class="clink-d"></div>Medium &mdash; Writing</a>
@@ -1970,13 +1970,13 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
     <a href="https://opensea.io/0x34cbd384ce51cf7b43acb9b11e2b64f294d4bfe8" target="_blank" class="cs" title="OpenSea" style="font-size:15px">&#x1F30A;</a>
     <a href="https://www.bandlab.com/muskan444" target="_blank" class="cs" title="BandLab" style="font-size:15px">&#x1F3B5;</a>
   </div>
+  <div class="ss-namaste">नमस्ते</div>
 </section>
 
 <footer>
   <span class="ft-l">© 2025 Muskan KC — All Rights Reserved</span>
   <div class="ft-r">
-    <span class="ft-pill">Available for work</span>
-    <span class="ft-n">नमस्ते</span>
+    <span class="ft-pill">Taking freelance projects</span>
   </div>
 </footer>
 
@@ -2251,30 +2251,52 @@ setTimeout(function(){
 
 /* === SKETCHBOOK — StPageFlip realistic book === */
 (function(){
-  var pages = [
-    {type:'cover'},
-    {href:'spotify.html', cat:'UX Research \u00b7 Thesis \u00b7 2024', accent:'#2C4A6E', title:'Spotify Research', sub:'Feature Design', desc:'End-to-end UX \u2014 research, flows, wireframes and interactive prototype. A feature born from listening to real users.', num:'01'},
-    {href:'piano-vr.html', cat:'VR / XR Design \u00b7 2025', accent:'#3D5C2A', title:'Piano VR App', sub:'Menu Redesign', desc:'Spatial UX redesign \u2014 navigation architecture, information hierarchy and immersive user flows.', num:'02'},
-    {href:'vr-accessibility.html', cat:'VR \u00b7 AI \u00b7 Accessibility \u00b7 2024', accent:'#4A3070', title:'VR Accessibility', sub:'AI Object Descriptions', desc:'AI-powered real-time 3D object descriptions inside VR. Making immersive spaces inclusive for everyone.', num:'03'},
-    {type:'back'}
+  var projects = [
+    { href:'spotify.html', cat:'UX Research \u00b7 Thesis \u00b7 2024', accent:'#2C4A6E', title:'Spotify Research', sub:'Feature Design', desc:'End-to-end UX \u2014 research, flows, wireframes and interactive prototype. A feature born from listening to real users.', num:'01' },
+    { href:'piano-vr.html', cat:'VR / XR Design \u00b7 2025', accent:'#3D5C2A', title:'Piano VR App', sub:'Menu Redesign', desc:'Spatial UX redesign \u2014 navigation architecture, information hierarchy and immersive user flows.', num:'02' },
+    { href:'vr-accessibility.html', cat:'VR \u00b7 AI \u00b7 Accessibility \u00b7 2024', accent:'#4A3070', title:'VR Accessibility', sub:'AI Object Descriptions', desc:'AI-powered real-time 3D object descriptions inside VR. Making immersive spaces inclusive for everyone.', num:'03' }
   ];
+  var TIMELINE_STEPS = ['Research', 'Design', 'Prototype', 'Launch'];
+
+  // each project now spans a full spread — a left page for the topic,
+  // a right page for a timeline preview and the case-study link —
+  // so the book has real page count and reads with more volume.
+  var pages = [{type:'cover'}];
+  projects.forEach(function(p){
+    pages.push({type:'project-left', data:p});
+    pages.push({type:'project-right', data:p});
+  });
+  pages.push({type:'back'});
+
   function buildPage(p){
     var el = document.createElement('div');
     if(p.type==='cover'){
       el.className='sb-page sb-cover';
-      el.innerHTML='<h2>Research<br>projects</h2><div class="sb-crule"></div><div class="sb-csub">Research thesis projects conducted<br>during my masters program</div>';
+      el.innerHTML='<h2>Research /<br>Academic<br>Projects</h2><div class="sb-crule"></div><div class="sb-csub">Research thesis projects conducted<br>during my masters program</div>';
     } else if(p.type==='back'){
       el.className='sb-page sb-cover';
       el.innerHTML='<div class="sb-csub">More work at</div><h2 style="font-size:24px;margin-top:10px">muskankc.com</h2>';
-    } else {
+    } else if(p.type==='project-left'){
+      var d = p.data;
       el.className='sb-page';
       el.innerHTML='<div class="sb-edge"></div><div class="sb-inner">'+
-        '<div class="sb-cat">'+p.cat+'</div>'+
-        '<div class="sb-accent" style="background:'+p.accent+'"></div>'+
-        '<div class="sb-title">'+p.title+'<span class="sb-sub">'+p.sub+'</span></div>'+
-        '<div class="sb-desc">'+p.desc+'</div>'+
-        '<a class="sb-cta" href="'+p.href+'">View Case Study \u2192</a>'+
-        '<div class="sb-num">'+p.num+'</div></div>';
+        '<div class="sb-cat">'+d.cat+'</div>'+
+        '<div class="sb-accent" style="background:'+d.accent+'"></div>'+
+        '<div class="sb-title">'+d.title+'<span class="sb-sub">'+d.sub+'</span></div>'+
+        '<div class="sb-desc">'+d.desc+'</div>'+
+        '<div class="sb-num">'+d.num+'</div></div>';
+    } else if(p.type==='project-right'){
+      var d = p.data;
+      var steps = TIMELINE_STEPS.map(function(s, i){
+        return '<div class="sb-timeline-item"><span class="sb-timeline-dot" style="background:'+d.accent+'">'+(i+1)+'</span><span class="sb-timeline-label">'+s+'</span></div>';
+      }).join('');
+      el.className='sb-page';
+      el.innerHTML='<div class="sb-edge"></div><div class="sb-inner">'+
+        '<div class="sb-cat">Process Preview</div>'+
+        '<div class="sb-accent" style="background:'+d.accent+'"></div>'+
+        '<div class="sb-timeline">'+steps+'</div>'+
+        '<a class="sb-cta" href="'+d.href+'">View Case Study \u2192</a>'+
+        '<div class="sb-num">'+d.num+'</div></div>';
     }
     return el;
   }
@@ -2283,8 +2305,8 @@ setTimeout(function(){
     if(!el) return;
     if(typeof St === 'undefined' || !St.PageFlip){
       // fallback: show pages stacked as simple cards so it's never blank
-      el.style.display='flex'; el.style.flexDirection='column'; el.style.gap='16px';
-      pages.forEach(function(p){ if(p.type) return; var card=buildPage(p); card.style.height='auto'; card.style.minHeight='320px'; card.style.width='min(440px,86vw)'; card.style.borderRadius='6px'; el.appendChild(card); });
+      el.style.display='flex'; el.style.flexDirection='column'; el.style.alignItems='center'; el.style.gap='16px'; el.style.width='100%';
+      pages.forEach(function(p){ if(p.type==='cover'||p.type==='back') return; var card=buildPage(p); card.style.height='auto'; card.style.minHeight='320px'; card.style.width='min(440px,86vw)'; card.style.borderRadius='6px'; el.appendChild(card); });
       return;
     }
     var pf = new St.PageFlip(el, {
@@ -2295,10 +2317,25 @@ setTimeout(function(){
     });
     pf.loadFromHTML(pages.map(buildPage));
     var pg = document.getElementById('flipCnt');
+    if(pg) pg.textContent = '1';
+    var totalEl = document.getElementById('flipTotal');
+    if(totalEl) totalEl.textContent = String(pages.length);
     pf.on('flip', function(e){ if(pg) pg.textContent = (e.data+1); });
     var n=document.getElementById('sbNext'), pv=document.getElementById('sbPrev');
     if(n) n.onclick=function(){ pf.flipNext(); };
     if(pv) pv.onclick=function(){ pf.flipPrev(); };
+    // belt-and-suspenders: whatever wrapper the library generated for
+    // itself, force it centered directly rather than trusting CSS
+    // alone to reach into markup this script doesn't fully control
+    setTimeout(function(){
+      var wrap = el.querySelector('.stf__wrapper') || el.querySelector('.stf__parent') || el.firstElementChild;
+      if(wrap){
+        wrap.style.marginLeft = 'auto';
+        wrap.style.marginRight = 'auto';
+        wrap.style.left = '';
+        wrap.style.position = wrap.style.position === 'absolute' ? 'relative' : wrap.style.position;
+      }
+    }, 50);
   }
   if(document.readyState==='complete') initBook();
   else window.addEventListener('load', initBook);
