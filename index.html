@@ -215,37 +215,143 @@ setTimeout(function(){ setBodyWada(0); }, 2500);
 
 
 /* ═══════════════════════════════════════════════════════════
-   CLIENT PANELS — Sons & Daughters scroll reveal + click navigation
+   CASE STUDIES — horizontal scroll track
+   Wheel/swipe/arrow input steps exactly one panel at a time.
+   Only captures input while the section is actually in view —
+   scroll past the top or bottom edge and the page just continues
+   scrolling normally to the next/previous section, like any
+   other part of the page.
 ═══════════════════════════════════════════════════════════ */
 (function(){
-  var panels = document.querySelectorAll('.cs-panel');
-  if(!panels.length) return;
+  var section = document.getElementById('hscroll');
+  var track   = document.getElementById('hsTrack');
+  if(!section || !track) return;
 
-  // IntersectionObserver triggers content fade-in
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      e.target.classList.toggle('in-view', e.isIntersecting);
-    });
-  }, { threshold: 0.35 });
+  var panels = track.querySelectorAll('.hs-panel');
+  var total  = panels.length;
+  var curNumEl = document.getElementById('hsCurNum');
+  var fillEl   = document.getElementById('hsHudFill');
+  var jumpNav  = document.getElementById('hsJumpNav');
 
+  panels.forEach(function(p, i){
+    var btn = document.createElement('button');
+    btn.textContent = p.dataset.title;
+    btn.dataset.i = i;
+    jumpNav.appendChild(btn);
+  });
+  var jumpBtns = jumpNav.querySelectorAll('button');
+
+  var maxScroll = 0, current = 0, target = 0;
+  var currentIndex = 0;
+  var isLocked = false;
+  var LOCK_MS = 750;
+
+  function computeMax(){ maxScroll = track.scrollWidth - window.innerWidth; }
+  computeMax();
+  window.addEventListener('resize', computeMax);
+
+  function updateHud(){
+    var progress = maxScroll > 0 ? current / maxScroll : 0;
+    curNumEl.textContent = String(currentIndex + 1).padStart(2, '0');
+    fillEl.style.width = (progress * 100) + '%';
+    jumpBtns.forEach(function(b,i){ b.classList.toggle('on', i === currentIndex); });
+  }
+
+  function goTo(i){
+    currentIndex = Math.max(0, Math.min(total - 1, i));
+    target = total > 1 ? (maxScroll / (total - 1)) * currentIndex : 0;
+  }
+
+  // whether the section currently owns scroll input — true once the
+  // section's top has reached the top of the viewport (it's sticky)
+  // and we haven't yet stepped past the first/last panel.
+  function isActive(){
+    var r = section.getBoundingClientRect();
+    return r.top <= 2 && r.bottom > window.innerHeight;
+  }
+
+  function step(dir){
+    if(isLocked) return;
+    // at the boundary already, moving further out of range → release scroll
+    if((currentIndex === 0 && dir < 0) || (currentIndex === total - 1 && dir > 0)) return false;
+    isLocked = true;
+    goTo(currentIndex + dir);
+    setTimeout(function(){ isLocked = false; }, LOCK_MS);
+    return true;
+  }
+
+  window.addEventListener('wheel', function(e){
+    if(!isActive()) return;
+    if(Math.abs(e.deltaY) < 4) return;
+    var dir = e.deltaY > 0 ? 1 : -1;
+    var moved = step(dir);
+    if(moved) e.preventDefault();
+    // else: at the edge already — let the event fall through so the
+    // page continues scrolling to the next/previous section normally
+  }, { passive:false });
+
+  var touchStartX = 0, touchStartY = 0, touchHandled = false;
+  section.addEventListener('touchstart', function(e){
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchHandled = false;
+  }, {passive:true});
+  section.addEventListener('touchmove', function(e){
+    if(touchHandled || !isActive()) return;
+    var dx = touchStartX - e.touches[0].clientX;
+    var dy = touchStartY - e.touches[0].clientY;
+    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40){
+      step(dx > 0 ? 1 : -1);
+      touchHandled = true;
+    }
+  }, {passive:true});
+
+  window.addEventListener('keydown', function(e){
+    if(!isActive()) return;
+    if(e.key === 'ArrowRight') step(1);
+    if(e.key === 'ArrowLeft') step(-1);
+  });
+
+  jumpBtns.forEach(function(b){ b.addEventListener('click', function(){ goTo(parseInt(b.dataset.i)); }); });
+
+  // click a panel (not its links) → colour-flood navigate, matching
+  // the flood transition used elsewhere on the site
   panels.forEach(function(p){
-    io.observe(p);
-    // Click anywhere on panel = navigate (with colour flood)
     p.addEventListener('click', function(e){
-      // ignore clicks on inner links/buttons
       if(e.target.closest('a, button')) return;
       var href = p.dataset.href;
       if(!href) return;
       var ov = document.createElement('div');
-      ov.style.cssText = 'position:fixed;inset:0;z-index:700;background:' + document.body.style.backgroundColor + ';opacity:0;transition:opacity .5s';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:700;background:' + getComputedStyle(p).backgroundColor + ';opacity:0;transition:opacity .5s';
       document.body.appendChild(ov);
-      requestAnimationFrame(function(){ ov.style.opacity = '1' });
-      setTimeout(function(){
-        if(p.dataset.target === '_blank') window.open(href, '_blank');
-        else window.location.href = href;
-      }, 520);
+      requestAnimationFrame(function(){ ov.style.opacity = '1'; });
+      setTimeout(function(){ window.location.href = href; }, 520);
     });
   });
+
+  // toggle the "active" class (drives jump-nav / hud visibility)
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      section.classList.toggle('hs-active', e.isIntersecting && isActive());
+    });
+  }, { threshold:[0, 0.5, 1] });
+  io.observe(section);
+  window.addEventListener('scroll', function(){
+    section.classList.toggle('hs-active', isActive());
+  }, { passive:true });
+
+  var lastTs = null;
+  function loop(ts){
+    if(lastTs === null) lastTs = ts;
+    var dt = Math.min(48, ts - lastTs);
+    lastTs = ts;
+    var ease = 1 - Math.pow(1 - 0.09, dt / 16.67);
+    current += (target - current) * ease;
+    track.style.transform = 'translateX(' + (-current) + 'px)';
+    updateHud();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
 })();
 
 
@@ -996,7 +1102,7 @@ footer {
    CLIENT WORK — Sons & Daughters scroll showcase
 ═══════════════════════════════════════════════════════════ */
 
-/* Intro panel — sets the tone */
+/* Intro panel — sets the tone, sits above the horizontal case-study track */
 #client-intro {
   min-height:80vh;
   display:flex; flex-direction:column;
@@ -1041,119 +1147,131 @@ footer {
   50%     { opacity:.85; transform:translateY(6px) }
 }
 
-/* Each client panel — full viewport */
-.cs-panel {
-  min-height:100vh;
+/* ═══════════════════════════════════════════════════════════
+   CASE STUDIES — horizontal scroll track
+   One wheel/swipe step = exactly one panel. Only captures scroll
+   while the track is actually in view; otherwise the page scrolls
+   normally past it, so it behaves like a section, not a takeover.
+═══════════════════════════════════════════════════════════ */
+#hscroll {
+  position:relative;
+  /* extra height gives position:sticky a scroll "runway" to hold the
+     panel viewport in place while wheel input steps through panels;
+     without this buffer there's nothing for sticky to hold onto. */
+  height:300vh;
+}
+#hscroll .hs-viewport {
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow:hidden;
+}
+#hscroll .hs-track {
+  height:100%;
+  display:flex;
+  will-change:transform;
+}
+#hscroll .hs-panel {
+  height:100%;
+  flex:0 0 100%;
   display:flex; align-items:center; justify-content:center;
-  padding:80px 60px;
   position:relative;
   cursor:pointer;
   overflow:hidden;
 }
-.cs-content {
-  position:relative;
-  z-index:2;
-  max-width:780px;
-  width:100%;
+/* soft irregular age stains, like foxing on old paper — a few large
+   blurred blotches per panel, not a uniform grain */
+#hscroll .hs-panel::before {
+  content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
+  mix-blend-mode:multiply;
 }
-.cs-meta {
-  display:flex; align-items:baseline; gap:18px;
-  margin-bottom:32px;
+#hscroll .hs-panel:nth-child(1)::before {
+  background:
+    radial-gradient(ellipse 260px 180px at 12% 88%, rgba(30,30,20,.14), transparent 70%),
+    radial-gradient(ellipse 140px 320px at 78% 55%, rgba(20,25,20,.08), transparent 65%);
 }
-.cs-num {
-  font-family:'Fraunces',serif;
-  font-size:14px; font-weight:300; font-style:italic;
-  color:rgba(240,237,230,.4);
-  font-variation-settings:'opsz' 14;
+#hscroll .hs-panel:nth-child(2)::before {
+  background:
+    radial-gradient(ellipse 220px 300px at 85% 60%, rgba(60,35,10,.12), transparent 68%),
+    radial-gradient(ellipse 180px 140px at 8% 20%, rgba(60,35,10,.07), transparent 70%);
 }
-.cs-cat {
+#hscroll .hs-panel:nth-child(3)::before {
+  background:
+    radial-gradient(ellipse 200px 260px at 15% 30%, rgba(20,20,10,.1), transparent 68%),
+    radial-gradient(ellipse 160px 220px at 90% 80%, rgba(20,20,10,.07), transparent 65%);
+}
+#hscroll .hs-panel:nth-child(4)::before {
+  background:
+    radial-gradient(ellipse 240px 180px at 70% 10%, rgba(20,25,30,.09), transparent 70%),
+    radial-gradient(ellipse 180px 260px at 20% 75%, rgba(20,25,30,.06), transparent 65%);
+}
+#hscroll .hs-panel:nth-child(5)::before {
+  background:
+    radial-gradient(ellipse 200px 220px at 90% 40%, rgba(30,20,10,.1), transparent 68%),
+    radial-gradient(ellipse 160px 180px at 10% 85%, rgba(30,20,10,.07), transparent 70%);
+}
+#hscroll .hs-content {
+  position:relative; z-index:2;
+  display:flex; flex-direction:column; align-items:center; text-align:center;
+  padding:0 8%;
+}
+#hscroll .hs-cat {
   font-family:'Cabinet Grotesk',sans-serif;
-  font-size:9px; font-weight:700;
-  letter-spacing:4px; text-transform:uppercase;
-  color:rgba(240,237,230,.35);
+  font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase;
+  color:rgba(0,0,0,.5); margin-bottom:18px;
 }
-.cs-title {
-  font-family:'Fraunces',serif;
-  font-size:clamp(56px,9vw,128px);
-  font-weight:800; font-style:italic;
-  color:rgba(240,237,230,.94); line-height:.94;
-  letter-spacing:-3px;
-  font-variation-settings:'opsz' 128,'WONK' 1;
-  margin:0 0 24px;
+#hscroll .hs-title {
+  font-family:'Fraunces',serif; font-weight:800;
+  font-size:clamp(30px,4.6vw,64px); line-height:1.0; letter-spacing:-1.5px;
+  color:#161311; margin:0 0 26px;
+  font-variation-settings:'opsz' 64,'WONK' 1;
 }
-.cs-title em { font-style:italic; color:rgba(240,237,230,.6); font-weight:200 }
-.cs-tag {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:11px; font-weight:700;
-  letter-spacing:3px; text-transform:uppercase;
-  color:rgba(240,237,230,.55);
-  margin:0 0 18px;
-  display:inline-block;
-  border-bottom:1px solid rgba(240,237,230,.25);
-  padding-bottom:4px;
+#hscroll .hs-title em { font-style:italic; color:#5c3a2a; font-weight:200; }
+#hscroll .hs-cta {
+  font-family:'Cabinet Grotesk',sans-serif; font-weight:700;
+  font-size:10.5px; letter-spacing:2px; text-transform:uppercase;
+  color:rgba(22,19,17,.65); text-decoration:none;
+  border-bottom:1.5px solid rgba(22,19,17,.3);
+  padding-bottom:3px;
+  transition:color .25s, border-color .25s;
 }
-.cs-desc {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:15px; font-weight:500;
-  line-height:1.72; color:rgba(240,237,230,.45);
-  max-width:560px; margin:0 0 26px;
-}
-.cs-tags {
-  display:flex; flex-wrap:wrap; gap:8px;
-  margin-bottom:32px;
-}
-.cs-tags span {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:9px; font-weight:700;
-  letter-spacing:2px; text-transform:uppercase;
-  color:rgba(240,237,230,.5);
-  border:1px solid rgba(240,237,230,.15);
-  padding:5px 12px;
-}
-.cs-cta {
-  display:inline-flex; align-items:center; gap:10px;
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:11px; font-weight:700;
-  letter-spacing:2.5px; text-transform:uppercase;
-  color:rgba(240,237,230,.85); text-decoration:none;
-  border:1.5px solid rgba(240,237,230,.3);
-  padding:14px 28px;
-  transition:all .25s;
-}
-.cs-cta:hover {
-  border-color:rgba(240,237,230,.7);
-  background:rgba(240,237,230,.06);
-}
-/* Decorative number watermark */
-.cs-deco {
-  position:absolute; top:0; right:0; bottom:0;
-  width:50%;
-  pointer-events:none;
-  z-index:1;
-  opacity:.04;
-}
-.cs-panel[data-cs="1"] .cs-deco::before { content:"01" }
-.cs-panel[data-cs="2"] .cs-deco::before { content:"02" }
-.cs-panel[data-cs="3"] .cs-deco::before { content:"03" }
-.cs-panel[data-cs="4"] .cs-deco::before { content:"04" }
-.cs-deco::before {
-  position:absolute;
-  bottom:-12vw; right:-2vw;
-  font-family:'Fraunces',serif;
-  font-size:38vw; font-weight:900;
-  line-height:.85;
-  color:rgba(240,237,230,1);
-  font-variation-settings:'opsz' 144;
-}
+#hscroll .hs-cta:hover { color:#161311; border-color:rgba(22,19,17,.7); }
+#hscroll .hs-dual { display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center; }
+#hscroll .hs-divider { color:rgba(22,19,17,.3); font-size:12px; }
 
-/* Scroll-driven reveal — content visible by default, slightly faded.
-   When panel enters viewport (35%+) the .in-view class fades it to full opacity.
-   Critical: opacity:1 by default so content NEVER disappears, even if JS fails. */
-.cs-panel .cs-content {
-  opacity:1;
-  transform:translateY(0);
-  transition:opacity .9s cubic-bezier(.22,.61,.36,1),
-             transform .9s cubic-bezier(.22,.61,.36,1);
+/* named jump nav + hud — only visible while the track is in view */
+#hscroll .hs-jumpnav {
+  position:absolute; bottom:64px; left:50%; transform:translateX(-50%);
+  z-index:15; display:flex; gap:20px; flex-wrap:wrap; justify-content:center;
+  max-width:70vw;
+  opacity:0; pointer-events:none; transition:opacity .4s ease;
+}
+#hscroll.hs-active .hs-jumpnav { opacity:1; pointer-events:auto; }
+#hscroll .hs-jumpnav button {
+  background:none; border:none; cursor:pointer;
+  font-family:'Fraunces', serif; font-size:13px; font-weight:600;
+  color:rgba(240,237,230,.55);
+  padding:4px 0; border-bottom:1px solid transparent; transition:color .25s, border-color .25s;
+  text-shadow:0 1px 3px rgba(0,0,0,.5);
+}
+#hscroll .hs-jumpnav button.on { color:var(--teal); border-color:var(--teal); }
+#hscroll .hs-jumpnav button:hover { color:#fff; }
+@media (max-width:900px){ #hscroll .hs-jumpnav { display:none; } }
+
+#hscroll .hs-hud {
+  position:absolute; bottom:24px; left:0; right:0;
+  display:flex; flex-direction:column; align-items:center; gap:8px; z-index:15;
+  pointer-events:none;
+  opacity:0; transition:opacity .4s ease;
+}
+#hscroll.hs-active .hs-hud { opacity:1; }
+#hscroll .hs-hud-count { font-family:'Fraunces', serif; font-size:12px; color:rgba(240,237,230,.7); text-shadow:0 1px 3px rgba(0,0,0,.6); }
+#hscroll .hs-hud-count b { color:#fff; font-weight:700; }
+#hscroll .hs-hud-bar { width:180px; height:2px; background:rgba(240,237,230,.25); position:relative; overflow:hidden; }
+#hscroll .hs-hud-fill { position:absolute; top:0; left:0; bottom:0; width:20%; background:var(--teal); box-shadow:0 0 8px var(--tglow); transition:width .12s linear; }
+
+@media (max-width:760px){
+  #hscroll .hs-panel { flex:0 0 88vw; }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1270,10 +1388,8 @@ footer {
 /* Responsive */
 @media (max-width:760px) {
   #client-intro { padding:90px 24px 60px }
-  .cs-panel { padding:60px 24px }
-  .cs-title { font-size:clamp(40px,12vw,72px); letter-spacing:-2px }
-  .cs-meta { flex-direction:column; gap:8px; align-items:flex-start }
-  .cs-deco::before { font-size:50vw }
+  #hscroll .hs-title { font-size:clamp(28px,9vw,48px); letter-spacing:-1px }
+  #hscroll .hs-cat { font-size:8px; }
         #about { padding:80px 24px }
   .ab-meta { gap:20px }
   #socials-strip { padding:40px 24px 60px }
@@ -1756,7 +1872,7 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
   <a href="#flip-track" class="h-cta">View work →</a>
   <div class="h-scroll"><div class="hs-l"></div><div class="hs-t">Scroll</div></div>
 </section>
-<!-- ═══ CLIENT WORK — Sons & Daughters scroll showcase ═══ -->
+<!-- ═══ CLIENT WORK — intro panel, unchanged wording ═══ -->
 <section id="client-intro" data-nav="clients">
   <div class="ci-eyebrow">Clients &middot; Branding &middot; Graphic &amp; Freelance Work</div>
   <h2 class="ci-h">Clients &amp; <em>freelance</em>.</h2>
@@ -1764,94 +1880,63 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
   <div class="ci-scroll-hint">&darr; Scroll to explore</div>
 </section>
 
-<!-- CLIENT 1 — Non-Profit (Sammy's Senior Sanctuary) -->
-<section class="cs-panel" data-cs="1" data-href="sammys.html">
-  <div class="cs-content">
-    <div class="cs-meta">
-      <span class="cs-num">01</span>
-      <span class="cs-cat">Non-Profit &middot; UX/UI &middot; Web Redesign</span>
+<!-- ═══ CASE STUDIES — horizontal scroll track ═══ -->
+<section id="hscroll">
+  <div class="hs-viewport">
+    <nav class="hs-jumpnav" id="hsJumpNav"></nav>
+    <div class="hs-hud">
+      <div class="hs-hud-count"><b id="hsCurNum">01</b>&nbsp;/&nbsp;05</div>
+      <div class="hs-hud-bar"><div class="hs-hud-fill" id="hsHudFill"></div></div>
     </div>
-    <h2 class="cs-title">Non-Profit<br><em>Website Redesign</em></h2>
-    <p class="cs-tag">UX-first redesign for a senior dog sanctuary</p>
-    <p class="cs-desc">Full website redesign focused on accessibility, donation flow, and warm brand voice. Tap the panel for the full case study.</p>
-    <div class="cs-tags">
-      <span>UX Research</span><span>Accessibility</span><span>Web Design</span>
-    </div>
-    <a href="sammys.html" class="cs-cta" onclick="event.stopPropagation()">View Case Study &#8594;</a>
-  </div>
-  <div class="cs-deco"></div>
-</section>
 
-<!-- CLIENT 2 — Production Company (NyeemInc) -->
-<section class="cs-panel" data-cs="2" data-href="nyeeminc.html">
-  <div class="cs-content">
-    <div class="cs-meta">
-      <span class="cs-num">02</span>
-      <span class="cs-cat">Production Company &middot; Brand &middot; Web</span>
-    </div>
-    <h2 class="cs-title">Production Company<br><em>Website</em></h2>
-    <p class="cs-tag">Full redesign for an indie film &amp; podcast studio</p>
-    <p class="cs-desc">Editorial typography, festival showcase and a hand-coded build. Tap the panel for the full case study.</p>
-    <div class="cs-tags">
-      <span>Brand Identity</span><span>Web Design</span><span>Editorial</span>
-    </div>
-    <a href="nyeeminc.html" class="cs-cta" onclick="event.stopPropagation()">View Case Study &#8594;</a>
-  </div>
-  <div class="cs-deco"></div>
-</section>
+    <div class="hs-track" id="hsTrack">
 
-<!-- CLIENT 3 — Nail Salon (Studio 57) -->
-<section class="cs-panel" data-cs="3" data-href="studio57.html">
-  <div class="cs-content">
-    <div class="cs-meta">
-      <span class="cs-num">03</span>
-      <span class="cs-cat">Nail Salon &amp; Spa &middot; Brand &middot; Web</span>
-    </div>
-    <h2 class="cs-title">Nail Salon &amp; Spa<br><em>Website</em></h2>
-    <p class="cs-tag">Built from scratch &mdash; brand, UX, code</p>
-    <p class="cs-desc">A new digital home for a luxury nail bar &amp; spa. No template &mdash; every detail custom. Tap for the full case study.</p>
-    <div class="cs-tags">
-      <span>Brand Identity</span><span>Web Design</span><span>Development</span>
-    </div>
-    <a href="studio57.html" class="cs-cta" onclick="event.stopPropagation()">View Case Study &#8594;</a>
-  </div>
-  <div class="cs-deco"></div>
-</section>
+      <div class="hs-panel" data-href="sammys.html" data-title="Non-Profit" style="background:#eee6d8;">
+        <div class="hs-content">
+          <div class="hs-cat">Non-Profit &middot; UX/UI &middot; Web Redesign</div>
+          <h2 class="hs-title">Sammy&rsquo;s Senior<br><em>Sanctuary</em></h2>
+          <a class="hs-cta" href="sammys.html" onclick="event.stopPropagation()">View Case Study &#8594;</a>
+        </div>
+      </div>
 
-<!-- CLIENT 4 — Theater Artist -->
-<section class="cs-panel" data-cs="4" data-href="freelance.html">
-  <div class="cs-content">
-    <div class="cs-meta">
-      <span class="cs-num">04</span>
-      <span class="cs-cat">Theater Artist &middot; Portfolio &middot; Personal Brand</span>
-    </div>
-    <h2 class="cs-title">Theater Artist<br><em>Portfolio</em></h2>
-    <p class="cs-tag">Personal brand &amp; portfolio web design</p>
-    <p class="cs-desc">A custom portfolio site for an actor and theater artist &mdash; personal branding, content design and full build.</p>
-    <div class="cs-tags">
-      <span>Portfolio</span><span>Personal Brand</span><span>Theater</span>
-    </div>
-    <a href="freelance.html" class="cs-cta" onclick="event.stopPropagation()">View Project &#8594;</a>
-  </div>
-  <div class="cs-deco"></div>
-</section>
+      <div class="hs-panel" data-href="nyeeminc.html" data-title="Production Company" style="background:#e3ba82;">
+        <div class="hs-content">
+          <div class="hs-cat">Production Company &middot; Brand &middot; Web</div>
+          <h2 class="hs-title">Nyeem<br><em>Inc.</em></h2>
+          <a class="hs-cta" href="nyeeminc.html" onclick="event.stopPropagation()">View Case Study &#8594;</a>
+        </div>
+      </div>
 
-<!-- CLIENT 5 — Freelance Graphic Design -->
-<section class="cs-panel" data-cs="5" data-href="freelance-projects.html">
-  <div class="cs-content">
-    <div class="cs-meta">
-      <span class="cs-num">05</span>
-      <span class="cs-cat">Graphic Design &middot; Freelance &middot; Print &amp; Digital</span>
+      <div class="hs-panel" data-href="studio57.html" data-title="Business Website" style="background:#8ba86a;">
+        <div class="hs-content">
+          <div class="hs-cat">Nail Salon &amp; Spa &middot; Brand &middot; Web</div>
+          <h2 class="hs-title">Studio 57 Nail<br><em>Salon &amp; Spa</em></h2>
+          <div class="hs-dual">
+            <a class="hs-cta" href="studio57.html" onclick="event.stopPropagation()">View Website</a>
+            <span class="hs-divider">/</span>
+            <a class="hs-cta" href="studio57-app.html" onclick="event.stopPropagation()">View Booking App</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hs-panel" data-href="freelance.html" data-title="Theater Artist" style="background:#7c93a3;">
+        <div class="hs-content">
+          <div class="hs-cat">Theater Artist &middot; Portfolio &middot; Personal Brand</div>
+          <h2 class="hs-title">Theater Artist<br><em>Portfolio</em></h2>
+          <a class="hs-cta" href="freelance.html" onclick="event.stopPropagation()">View Project &#8594;</a>
+        </div>
+      </div>
+
+      <div class="hs-panel" data-href="freelance-projects.html" data-title="Freelance Projects" style="background:#d9c9a3;">
+        <div class="hs-content">
+          <div class="hs-cat">Graphic Design &middot; Freelance &middot; Print &amp; Digital</div>
+          <h2 class="hs-title">Freelance<br><em>Projects</em></h2>
+          <a class="hs-cta" href="freelance-projects.html" onclick="event.stopPropagation()">View Projects &#8594;</a>
+        </div>
+      </div>
+
     </div>
-    <h2 class="cs-title">Freelance<br><em>Projects</em></h2>
-    <p class="cs-tag">Flyers, posters, branding &amp; graphic design</p>
-    <p class="cs-desc">A collection of freelance graphic design work &mdash; event flyers, posters, social media graphics, and brand collateral for a range of clients.</p>
-    <div class="cs-tags">
-      <span>Graphic Design</span><span>Flyers</span><span>Branding</span>
-    </div>
-    <a href="freelance-projects.html" class="cs-cta" onclick="event.stopPropagation()">View Projects &#8594;</a>
   </div>
-  <div class="cs-deco"></div>
 </section>
 
 <!-- ═══ ACADEMIC PROJECTS — Compact slide deck ═══ -->
