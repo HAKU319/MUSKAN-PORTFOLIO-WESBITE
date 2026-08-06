@@ -97,53 +97,72 @@ nav{ position:fixed; top:100px; left:48px; z-index:500; display:flex; flex-direc
   max-width:1220px; margin:0 auto;
   display:grid;
   grid-template-columns:repeat(3, 1fr);
-  gap:64px 46px;
+  gap:76px 46px;
+}
+/* Each slot establishes its own perspective, so tilt always feels
+   like the poster is right under the cursor, wherever it sits in the grid. */
+.flyer-slot{
+  position:relative;
+  perspective:1000px;
+}
+/* The 3D actor: tilts on rotateX/rotateY toward the cursor, lifts on
+   translateZ, and holds the tape + poster together in one 3D space
+   so the tape visibly floats above the paper as it tilts. */
+.flyer-3d{
+  position:relative;
+  transform-style:preserve-3d;
+  --tiltX:0deg; --tiltY:0deg; --tz:0px; --sc:1;
+  transform:rotateZ(var(--rot,0deg)) rotateX(var(--tiltX)) rotateY(var(--tiltY)) translateZ(var(--tz)) scale(var(--sc));
+  transition:transform .55s cubic-bezier(.22,1,.36,1);
+  animation:pinDrop .9s cubic-bezier(.22,1,.36,1) both;
+  animation-delay:var(--delay, 0s);
+}
+.flyer-slot.tilting .flyer-3d{ transition:transform .12s ease-out; }
+@keyframes pinDrop{
+  0%{ opacity:0; transform:rotateZ(var(--rot,0deg)) rotateX(-14deg) translateY(-30px) scale(.94); }
+  100%{ opacity:1; transform:rotateZ(var(--rot,0deg)) rotateX(0deg) translateY(0) scale(1); }
 }
 .flyer{
   position:relative;
   cursor:pointer;
-  transform:rotate(var(--rot, 0deg)) translateY(0);
-  transition:transform .5s cubic-bezier(.22,1,.36,1), filter .35s;
-  filter:drop-shadow(0 16px 32px rgba(0,0,0,.5));
-  animation:pinDrop .9s cubic-bezier(.22,1,.36,1) both;
-  animation-delay:var(--delay, 0s);
   border-radius:2px;
   overflow:hidden;
   background:#152538;
+  filter:drop-shadow(0 16px 32px rgba(0,0,0,.5));
+  transition:filter .3s;
 }
-.flyer:hover{ animation:flyerSway 1.9s ease-in-out infinite; filter:drop-shadow(0 24px 46px rgba(0,0,0,.65)); z-index:10; }
-@keyframes flyerSway{
-  0%,100%{ transform:rotate(0deg) translateY(-8px) scale(1.035); }
-  25%{ transform:rotate(1.1deg) translateY(-10px) scale(1.035); }
-  50%{ transform:rotate(-.5deg) translateY(-8px) scale(1.04); }
-  75%{ transform:rotate(.7deg) translateY(-9px) scale(1.035); }
-}
+.flyer-slot:hover .flyer{ filter:drop-shadow(0 34px 58px rgba(0,0,0,.7)); }
 .flyer img{ width:100%; height:100%; object-fit:cover; display:block; }
 .flyer::before{
   content:''; position:absolute; inset:0;
   background:linear-gradient(180deg, rgba(255,255,255,.06) 0%, transparent 22%, transparent 78%, rgba(0,0,0,.22) 100%);
   pointer-events:none; mix-blend-mode:overlay;
 }
+/* cursor-tracked glare — a real light catching the paper's surface */
+.flyer-shine{
+  position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(circle at var(--shine-x,50%) var(--shine-y,50%), rgba(255,255,255,.4), transparent 55%);
+  opacity:0; transition:opacity .3s;
+  mix-blend-mode:overlay;
+}
+.flyer-slot:hover .flyer-shine{ opacity:1; }
+/* tape sits ABOVE the poster in actual 3D depth, not just z-index */
 .tape{
   position:absolute; top:-9px; left:50%;
-  transform:translateX(-50%) rotate(calc(var(--rot, 0deg) * -1));
+  transform:translateX(-50%) translateZ(20px) rotate(calc(var(--rot, 0deg) * -1));
   width:56px; height:18px;
   background:rgba(240,237,230,.3);
   border:1px solid rgba(240,237,230,.14);
-  box-shadow:0 2px 4px rgba(0,0,0,.3);
+  box-shadow:0 6px 10px rgba(0,0,0,.35);
   z-index:6; pointer-events:none;
 }
-.flyer:nth-child(3n+1){ --rot:-2deg; }
-.flyer:nth-child(3n+2){ --rot:1.5deg; }
-.flyer:nth-child(3n){ --rot:-1deg; }
-.flyer:nth-child(4n+1){ --rot:2.2deg; }
-.flyer:nth-child(1){ --delay:0s; } .flyer:nth-child(2){ --delay:.06s; } .flyer:nth-child(3){ --delay:.12s; }
-.flyer:nth-child(4){ --delay:.18s; } .flyer:nth-child(5){ --delay:.24s; } .flyer:nth-child(6){ --delay:.3s; }
-.flyer:nth-child(n+7){ --delay:.36s; }
-@keyframes pinDrop{
-  0%{ opacity:0; transform:rotate(var(--rot,0deg)) translateY(-26px) scale(.96); }
-  100%{ opacity:1; transform:rotate(var(--rot,0deg)) translateY(0) scale(1); }
-}
+.flyer-slot:nth-child(3n+1) .flyer-3d{ --rot:-2deg; }
+.flyer-slot:nth-child(3n+2) .flyer-3d{ --rot:1.5deg; }
+.flyer-slot:nth-child(3n) .flyer-3d{ --rot:-1deg; }
+.flyer-slot:nth-child(4n+1) .flyer-3d{ --rot:2.2deg; }
+.flyer-slot:nth-child(1) .flyer-3d{ --delay:0s; } .flyer-slot:nth-child(2) .flyer-3d{ --delay:.06s; } .flyer-slot:nth-child(3) .flyer-3d{ --delay:.12s; }
+.flyer-slot:nth-child(4) .flyer-3d{ --delay:.18s; } .flyer-slot:nth-child(5) .flyer-3d{ --delay:.24s; } .flyer-slot:nth-child(6) .flyer-3d{ --delay:.3s; }
+.flyer-slot:nth-child(n+7) .flyer-3d{ --delay:.36s; }
 .flyer-caption{
   position:absolute; left:0; right:0; bottom:0;
   padding:26px 16px 14px;
@@ -152,7 +171,7 @@ nav{ position:fixed; top:100px; left:48px; z-index:500; display:flex; flex-direc
   transition:opacity .3s, transform .3s;
   pointer-events:none;
 }
-.flyer:hover .flyer-caption{ opacity:1; transform:translateY(0); }
+.flyer-slot:hover .flyer-caption{ opacity:1; transform:translateY(0); }
 .fc-title{ font-family:'Fraunces',serif; font-style:italic; font-weight:700; font-size:16px; color:#fff; }
 .fc-cat{ font-family:'Cabinet Grotesk',sans-serif; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:rgba(240,237,230,.65); margin-top:4px; }
 .newspaper-badge{
@@ -162,11 +181,16 @@ nav{ position:fixed; top:100px; left:48px; z-index:500; display:flex; flex-direc
   box-shadow:0 4px 12px rgba(0,0,0,.35);
 }
 
-@media (max-width:980px){ .flyers{ grid-template-columns:repeat(2, 1fr); gap:54px 32px; } }
+@media (max-width:980px){ .flyers{ grid-template-columns:repeat(2, 1fr); gap:64px 32px; } }
 @media (max-width:600px){
-  .flyers{ grid-template-columns:1fr; gap:52px; }
+  .flyers{ grid-template-columns:1fr; gap:56px; }
   .wall-section{ padding:20px 8vw 100px; }
   .cs-hero{ padding:110px 8vw 20px; }
+}
+/* touch devices: no cursor to tilt toward, so skip 3D and rely on the entrance drop */
+@media (hover:none){
+  .flyer-slot{ perspective:none; }
+  .flyer-caption{ opacity:1; transform:none; background:linear-gradient(to top, rgba(10,18,30,.9), transparent); }
 }
 
 /* ═══ Lightbox ═══ */
@@ -179,15 +203,16 @@ nav{ position:fixed; top:100px; left:48px; z-index:500; display:flex; flex-direc
   transition:opacity .35s ease;
 }
 .lightbox.open{ opacity:1; pointer-events:auto; }
+.lightbox{ perspective:1400px; }
 .lightbox img{
   max-width:86vw; max-height:82vh;
   border-radius:4px;
   box-shadow:0 40px 100px rgba(0,0,0,.7);
-  transform:scale(.94);
-  transition:transform .45s cubic-bezier(.22,1,.36,1);
+  transform:scale(.92) rotateY(-8deg);
+  transition:transform .5s cubic-bezier(.22,1,.36,1);
   cursor:zoom-out;
 }
-.lightbox.open img{ transform:scale(1); }
+.lightbox.open img{ transform:scale(1) rotateY(0deg); }
 .lb-info{ position:absolute; bottom:32px; left:0; right:0; text-align:center; }
 .lb-info .lt{ font-family:'Fraunces',serif; font-style:italic; font-weight:700; font-size:22px; color:#fff; }
 .lb-info .lc{ font-family:'Cabinet Grotesk',sans-serif; font-size:10px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:rgba(240,237,230,.5); margin-top:5px; }
@@ -299,68 +324,116 @@ footer{ padding:24px 44px 24px 200px; background:#1a2e4a; display:flex; align-it
 <div class="wall-section">
   <div class="flyers" id="flyers">
 
-    <div class="flyer flyer-newspaper" onclick="openNewspaper()">
-      <img src="newspaper-page-1.jpg" alt="The Renakshya Times — Wedding Newspaper" loading="lazy">
-      <div class="newspaper-badge">4 Pages &middot; Read</div>
-      <div class="flyer-caption">
-        <div class="fc-title">The Renakshya Times</div>
-        <div class="fc-cat">Wedding Newspaper &middot; 4 Pages</div>
+    <div class="flyer-slot">
+      <div class="flyer-3d">
+        <span class="tape"></span>
+        <div class="flyer flyer-newspaper" onclick="openNewspaper()">
+          <img src="newspaper-page-1.jpg" alt="The Renakshya Times — Wedding Newspaper" loading="lazy">
+          <div class="flyer-shine"></div>
+          <div class="newspaper-badge">4 Pages &middot; Read</div>
+          <div class="flyer-caption">
+            <div class="fc-title">The Renakshya Times</div>
+            <div class="fc-cat">Wedding Newspaper &middot; 4 Pages</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="flyer" onclick="openLB('oonagh-joe-painting.jpg', 'Oonagh &amp; Joe', 'Save the Date · Wedding Anniversary')">
-      <img src="oonagh-joe-painting.jpg" alt="Oonagh & Joe — Save the Date" loading="lazy">
-      <div class="flyer-caption">
-        <div class="fc-title">Oonagh &amp; Joe</div>
-        <div class="fc-cat">Save the Date &middot; Wedding Anniversary</div>
+    <div class="flyer-slot">
+      <div class="flyer-3d">
+        <span class="tape"></span>
+        <div class="flyer" onclick="openLB('oonagh-joe-painting.jpg', 'Oonagh &amp; Joe', 'Save the Date · Wedding Anniversary')">
+          <img src="oonagh-joe-painting.jpg" alt="Oonagh & Joe — Save the Date" loading="lazy">
+          <div class="flyer-shine"></div>
+          <div class="flyer-caption">
+            <div class="fc-title">Oonagh &amp; Joe</div>
+            <div class="fc-cat">Save the Date &middot; Wedding Anniversary</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="flyer" onclick="openLB('oonagh-joe-rsvp.jpg', 'Oonagh &amp; Joe — RSVP', 'Wedding Invitation Card')">
-      <img src="oonagh-joe-rsvp.jpg" alt="Oonagh & Joe — RSVP card" loading="lazy">
-      <div class="flyer-caption">
-        <div class="fc-title">Oonagh &amp; Joe &mdash; RSVP</div>
-        <div class="fc-cat">Wedding Invitation Card</div>
+    <div class="flyer-slot">
+      <div class="flyer-3d">
+        <span class="tape"></span>
+        <div class="flyer" onclick="openLB('oonagh-joe-rsvp.jpg', 'Oonagh &amp; Joe — RSVP', 'Wedding Invitation Card')">
+          <img src="oonagh-joe-rsvp.jpg" alt="Oonagh & Joe — RSVP card" loading="lazy">
+          <div class="flyer-shine"></div>
+          <div class="flyer-caption">
+            <div class="fc-title">Oonagh &amp; Joe &mdash; RSVP</div>
+            <div class="fc-cat">Wedding Invitation Card</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="flyer" onclick="openLB('oonagh-joe-watercolor.jpg', 'Oonagh &amp; Joe', 'Watercolor Save the Date')">
-      <img src="oonagh-joe-watercolor.jpg" alt="Oonagh & Joe — watercolor version" loading="lazy">
-      <div class="flyer-caption">
-        <div class="fc-title">Oonagh &amp; Joe</div>
-        <div class="fc-cat">Watercolor Save the Date</div>
+    <div class="flyer-slot">
+      <div class="flyer-3d">
+        <span class="tape"></span>
+        <div class="flyer" onclick="openLB('oonagh-joe-watercolor.jpg', 'Oonagh &amp; Joe', 'Watercolor Save the Date')">
+          <img src="oonagh-joe-watercolor.jpg" alt="Oonagh & Joe — watercolor version" loading="lazy">
+          <div class="flyer-shine"></div>
+          <div class="flyer-caption">
+            <div class="fc-title">Oonagh &amp; Joe</div>
+            <div class="fc-cat">Watercolor Save the Date</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="flyer" onclick="openLB('lakeside-christmas-eve.jpg', 'Christmas Eve', 'Event Poster · Lakeside NYC')">
-      <img src="lakeside-christmas-eve.jpg" alt="Lakeside NYC — Christmas Eve poster" loading="lazy">
-      <div class="flyer-caption">
-        <div class="fc-title">Christmas Eve</div>
-        <div class="fc-cat">Event Poster &middot; Lakeside NYC</div>
+    <div class="flyer-slot">
+      <div class="flyer-3d">
+        <span class="tape"></span>
+        <div class="flyer" onclick="openLB('lakeside-christmas-eve.jpg', 'Christmas Eve', 'Event Poster · Lakeside NYC')">
+          <img src="lakeside-christmas-eve.jpg" alt="Lakeside NYC — Christmas Eve poster" loading="lazy">
+          <div class="flyer-shine"></div>
+          <div class="flyer-caption">
+            <div class="fc-title">Christmas Eve</div>
+            <div class="fc-cat">Event Poster &middot; Lakeside NYC</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="flyer" onclick="openLB('lakeside-live-music.jpg', 'Live Music', 'Furi Sherpa · Lakeside NYC')">
-      <img src="lakeside-live-music.jpg" alt="Lakeside NYC — Live Music poster" loading="lazy">
-      <div class="flyer-caption">
-        <div class="fc-title">Live Music</div>
-        <div class="fc-cat">Furi Sherpa &middot; Lakeside NYC</div>
+    <div class="flyer-slot">
+      <div class="flyer-3d">
+        <span class="tape"></span>
+        <div class="flyer" onclick="openLB('lakeside-live-music.jpg', 'Live Music', 'Furi Sherpa · Lakeside NYC')">
+          <img src="lakeside-live-music.jpg" alt="Lakeside NYC — Live Music poster" loading="lazy">
+          <div class="flyer-shine"></div>
+          <div class="flyer-caption">
+            <div class="fc-title">Live Music</div>
+            <div class="fc-cat">Furi Sherpa &middot; Lakeside NYC</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="flyer" onclick="openLB('lakeside-gift-card.jpg', 'Gift Card Draws', 'Promotional Flyer · Lakeside NYC')">
-      <img src="lakeside-gift-card.jpg" alt="Lakeside NYC — Gift card draw flyer" loading="lazy">
-      <div class="flyer-caption">
-        <div class="fc-title">Gift Card Draws</div>
-        <div class="fc-cat">Promotional Flyer &middot; Lakeside NYC</div>
+    <div class="flyer-slot">
+      <div class="flyer-3d">
+        <span class="tape"></span>
+        <div class="flyer" onclick="openLB('lakeside-gift-card.jpg', 'Gift Card Draws', 'Promotional Flyer · Lakeside NYC')">
+          <img src="lakeside-gift-card.jpg" alt="Lakeside NYC — Gift card draw flyer" loading="lazy">
+          <div class="flyer-shine"></div>
+          <div class="flyer-caption">
+            <div class="fc-title">Gift Card Draws</div>
+            <div class="fc-cat">Promotional Flyer &middot; Lakeside NYC</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="flyer" onclick="openLB('lakeside-hours.jpg', 'Restaurant Hours', 'Info Poster · Lakeside NYC')">
-      <img src="lakeside-hours.jpg" alt="Lakeside NYC — Hours poster" loading="lazy">
-      <div class="flyer-caption">
-        <div class="fc-title">Restaurant Hours</div>
-        <div class="fc-cat">Info Poster &middot; Lakeside NYC</div>
+    <div class="flyer-slot">
+      <div class="flyer-3d">
+        <span class="tape"></span>
+        <div class="flyer" onclick="openLB('lakeside-hours.jpg', 'Restaurant Hours', 'Info Poster · Lakeside NYC')">
+          <img src="lakeside-hours.jpg" alt="Lakeside NYC — Hours poster" loading="lazy">
+          <div class="flyer-shine"></div>
+          <div class="flyer-caption">
+            <div class="fc-title">Restaurant Hours</div>
+            <div class="fc-cat">Info Poster &middot; Lakeside NYC</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -430,10 +503,45 @@ document.querySelectorAll('a,button,.nv-dot').forEach(function(el){
   el.addEventListener('mouseenter',function(){document.body.classList.add('cl')});
   el.addEventListener('mouseleave',function(){document.body.classList.remove('cl')});
 });
-document.querySelectorAll('.flyer').forEach(function(el){
+document.querySelectorAll('.flyer-slot').forEach(function(el){
   el.addEventListener('mouseenter',function(){ B.classList.add('cp'); B.classList.remove('cl'); LBL.textContent='View →'; });
   el.addEventListener('mouseleave',function(){ B.classList.remove('cp'); });
 });
+</script>
+
+<script>
+/* ═══ 3D tilt — each flyer tips toward the cursor, like a real
+   pinned poster you're leaning down to look at ═══ */
+(function(){
+  var MAX_TILT = 16;      // degrees
+  var LIFT = 34;           // px translateZ on hover
+  document.querySelectorAll('.flyer-slot').forEach(function(slot){
+    var actor = slot.querySelector('.flyer-3d');
+    if(!actor) return;
+
+    slot.addEventListener('mousemove', function(e){
+      var r = slot.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width;   // 0 → 1
+      var py = (e.clientY - r.top) / r.height;   // 0 → 1
+      var tiltX = (0.5 - py) * MAX_TILT;
+      var tiltY = (px - 0.5) * (MAX_TILT + 4);
+      actor.style.setProperty('--tiltX', tiltX.toFixed(2) + 'deg');
+      actor.style.setProperty('--tiltY', tiltY.toFixed(2) + 'deg');
+      actor.style.setProperty('--tz', LIFT + 'px');
+      actor.style.setProperty('--sc', '1.045');
+      actor.style.setProperty('--shine-x', (px * 100).toFixed(1) + '%');
+      actor.style.setProperty('--shine-y', (py * 100).toFixed(1) + '%');
+      slot.classList.add('tilting');
+    });
+    slot.addEventListener('mouseleave', function(){
+      actor.style.setProperty('--tiltX', '0deg');
+      actor.style.setProperty('--tiltY', '0deg');
+      actor.style.setProperty('--tz', '0px');
+      actor.style.setProperty('--sc', '1');
+      slot.classList.remove('tilting');
+    });
+  });
+})();
 </script>
 
 <script>
