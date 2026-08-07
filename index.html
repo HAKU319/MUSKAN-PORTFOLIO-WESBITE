@@ -309,8 +309,24 @@ function initHScroll(cfg){
   updateHud();
 }
 
-initHScroll({ sectionId:'intro-track', trackId:'itTrack', curNumId:'itCurNum', hudFillId:'itHudFill', jumpNavId:'itJumpNav' });
-initHScroll({ sectionId:'hscroll',      trackId:'hsTrack', curNumId:'hsCurNum', hudFillId:'hsHudFill', jumpNavId:'hsJumpNav' });
+function startHScrollSections(){
+  initHScroll({ sectionId:'intro-track', trackId:'itTrack', curNumId:'itCurNum', hudFillId:'itHudFill', jumpNavId:'itJumpNav' });
+  initHScroll({ sectionId:'hscroll',      trackId:'hsTrack', curNumId:'hsCurNum', hudFillId:'hsHudFill', jumpNavId:'hsJumpNav' });
+}
+// CRITICAL: this whole <script> block runs while the browser is still
+// parsing <head>, long before #itTrack / #hsTrack exist anywhere in the
+// DOM (they're deep in <body>). Calling initHScroll() immediately here
+// makes document.getElementById() return null, which silently no-ops
+// via the "if(!track) return;" guard — no error, no listeners attached,
+// nothing works, and nothing in the console ever hints why. This was
+// confirmed with a real browser (not just jsdom): the wheel listener
+// was never even being registered. Waiting for the DOM to finish
+// parsing fixes it at the actual root cause.
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', startHScrollSections);
+} else {
+  startHScrollSections();
+}
 
 
 
