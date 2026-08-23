@@ -57,30 +57,10 @@ var WADA_PANEL = [
 ];
 
 /* Scroll-linked background lightness — darker at the top of the page,
-   gradually lighter the further down the user scrolls, and reversible:
-   scrolling back up darkens it again, since it's driven directly by
-   scroll position rather than a one-shot animation. Two colour stops
-   in the same maroon family, interpolated by scroll progress — not a
-   hue-cycling rainbow, just paper catching more or less light. */
-var BG_DARK  = [156, 74, 66];   /* #9c4a42 — top of page */
-var BG_LIGHT = [212, 162, 150]; /* #d4a296 — bottom of page */
-function updateBodyLightness(){
-  if(!document.body) return;
-  var docH = document.documentElement.scrollHeight - window.innerHeight;
-  var prog = docH > 0 ? Math.max(0, Math.min(1, window.scrollY / docH)) : 0;
-  var r = Math.round(BG_DARK[0] + (BG_LIGHT[0] - BG_DARK[0]) * prog);
-  var g = Math.round(BG_DARK[1] + (BG_LIGHT[1] - BG_DARK[1]) * prog);
-  var b = Math.round(BG_DARK[2] + (BG_LIGHT[2] - BG_DARK[2]) * prog);
-  document.body.style.backgroundColor = 'rgb(' + r + ',' + g + ',' + b + ')';
-}
-var bgTicking = false;
-window.addEventListener('scroll', function(){
-  if(!bgTicking){
-    requestAnimationFrame(function(){ updateBodyLightness(); bgTicking = false; });
-    bgTicking = true;
-  }
-}, { passive:true });
-updateBodyLightness();
+/* Background stays one fixed, consistent colour throughout the whole
+   site now — no scroll-linked lightening. Set once via CSS
+   (body { background-color: #9c4a42 }) rather than JS, since this
+   script runs in <head> before <body> exists in the DOM. */
 
 
 /* ═══ PROJECT 3D CAROUSEL — scroll driven ════════════════════
@@ -993,30 +973,35 @@ body.wada-1 body.wada-2 body.wada-3 body.wada-4 .cl-h em { font-style:normal;col
 /* ═══ RESUME + FIND ME — combined into one shared row ═══ */
 #bottom-row {
   display:flex;
-  align-items:flex-start;
-  gap:44px;
-  max-width:1600px;
+  align-items:stretch;
+  gap:28px;
+  max-width:1400px;
   padding:70px 52px 90px 380px;
   border-top:1px solid rgba(196,164,150,.2);
   position:relative;
   z-index:3;
   background:#9c4a42;
 }
-.br-resume { flex:1.2; min-width:0; }
-.br-game { flex:1.1; min-width:0; padding-top:6px; }
-.br-find { flex:1; display:flex; flex-direction:column; align-items:center; gap:22px; padding-top:6px; }
+.br-resume, .br-game, .br-find {
+  flex:1; min-width:0;
+  padding:36px 32px;
+  border:1px solid rgba(240,237,230,.15);
+  background:rgba(20,8,7,.16);
+  border-radius:4px;
+}
+.br-find { display:flex; flex-direction:column; align-items:center; gap:20px; text-align:center; }
 .rb-ln { background:rgba(240,237,230,.08) }
 .rb-a,.rb-b,.rb-c { display:flex;flex-direction:column;justify-content:center; margin-bottom:32px; }
 .rb-c { margin-bottom:0; }
 .rb-c { background:rgba(196,164,150,.05) }
-.rb-h { font-family:'Bungee',cursive;font-size:clamp(20px,2.8vw,32px);font-weight:400;color:rgba(240,237,230,.88);line-height:1.25;margin-bottom:8px;letter-spacing:0px }
+.rb-h { font-family:'Bungee',cursive;font-size:clamp(22px,2.6vw,30px);font-weight:400;color:rgba(240,237,230,.92);line-height:1.35;margin-bottom:10px;letter-spacing:0px }
 .rb-h em { font-style:normal;color:var(--cel-dk) }
-.rb-sub { font-family:'Cabinet Grotesk',sans-serif;font-size:var(--fs-label);font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(240,237,230,.32) }
+.rb-sub { font-family:'Cabinet Grotesk',sans-serif;font-size:var(--fs-label);font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(240,237,230,.4) }
 .rn-spine { height:3px;background:linear-gradient(90deg,var(--cel),var(--teal),var(--cel));margin-bottom:18px }
-.rn-tg { font-family:'Special Elite',monospace;font-size:var(--fs-label);font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(240,237,230,.3);margin-bottom:6px }
-.rn-ti { font-family:'Fraunces',serif;font-size:var(--fs-lead);font-weight:700;color:rgba(240,237,230,.85);margin-bottom:4px;font-variation-settings:'opsz' 19 }
-.rn-si { font-family:'Special Elite',monospace;font-size:var(--fs-label);color:rgba(240,237,230,.32);margin-bottom:16px }
-.rn-btn { font-family:'Special Elite',monospace;font-size:var(--fs-label);font-weight:700;letter-spacing:2px;text-transform:uppercase;background:none;border:1px solid rgba(240,237,230,.1);padding:10px 20px;cursor:none;color:var(--ink);transition:all .2s }
+.rn-tg { font-family:'Special Elite',monospace;font-size:var(--fs-label);font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(240,237,230,.35);margin-bottom:6px }
+.rn-ti { font-family:'Fraunces',serif;font-size:clamp(19px,2vw,24px);font-weight:700;color:rgba(240,237,230,.9);margin-bottom:4px;font-variation-settings:'opsz' 19 }
+.rn-si { font-family:'Special Elite',monospace;font-size:var(--fs-label);color:rgba(240,237,230,.4);margin-bottom:16px }
+.rn-btn { font-family:'Special Elite',monospace;font-size:var(--fs-body);font-weight:700;letter-spacing:2px;text-transform:uppercase;background:none;border:1.5px solid rgba(240,237,230,.3);padding:12px 24px;cursor:none;color:var(--ink);transition:all .2s }
 .rn-btn:hover { background:rgba(90,22,18,.85); color:#ffd23f; }
 .rn-lock,.rn-open { display:none }
 .rn-lock.on,.rn-open.on { display:block }
@@ -1346,7 +1331,7 @@ footer {
 .ft-n { font-family:'AMS Aaditya',sans-serif;font-size:var(--fs-body);font-weight:700;color:rgba(224,206,196,.28) }
 
 /* ── GAME COLUMN — sits between Resume and Find Me in bottom-row ── */
-.ft-game-eye { font-family:'Cabinet Grotesk',sans-serif;font-size:var(--fs-label);font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(240,237,230,.4);margin-bottom:var(--sp-3) }
+.ft-game-eye { font-family:'Bungee',cursive;font-size:clamp(22px,3vw,32px);font-weight:400;letter-spacing:0px;color:rgba(240,237,230,.92);margin-bottom:var(--sp-3);line-height:1.3 }
 
 /* Scroll reveal */
 .r { opacity:1;transform:none;transition:opacity .72s ease,transform .72s ease }
@@ -2392,7 +2377,7 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
   <div class="br-resume">
     <div class="rb-a r">
       <div class="sec-lbl">Resume</div>
-      <div class="rb-h">Credentials &<br><em>experience</em></div>
+      <div class="rb-h">Credentials &amp;<br><em>experience</em></div>
       <div class="rb-sub">Unlocked by a memory game</div>
     </div>
     <div class="rb-b r d1">
