@@ -3,471 +3,278 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spotify Podcast Bookmark — UX Thesis | Muskan KC</title>
-<meta name="description" content="UX thesis project — adding a podcast bookmark feature to Spotify. Reddit research, surveys, competitive analysis, user personas, usability testing and high-fidelity prototype.">
-
+<title>Case Study — Spotify Podcast Bookmarking</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Special+Elite&family=Fraunces:opsz,wght@9..144,100..900&display=swap" rel="stylesheet">
 <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
-
 <style>
-*,*::before,*::after { margin:0; padding:0; box-sizing:border-box }
-html { scroll-behavior:smooth }
-body {
-  background-color: #2C4A6E;
-  color: #f0ede6;
-  font-family: 'Cabinet Grotesk', sans-serif;
-  font-size: 16px; line-height:1.7;
-  overflow-x: hidden;
-  min-height: 100vh;
-}
-a { color:inherit; text-decoration:none }
-em { font-style:italic; color:rgba(240,237,230,.65); font-weight:300 }
+  :root{ --bg:#121212; --ink:#f0ede6; --dim:rgba(240,237,230,.45); --dim2:rgba(240,237,230,.25); --teal:#1DB954; --tglow:rgba(29,185,84,.5); --olive:#1ed760; }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Special Elite', monospace; }
 
-.nav-back {
-  position:fixed; top:24px; left:32px; z-index:100;
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:10px; font-weight:700;
-  letter-spacing:3px; text-transform:uppercase;
-  color:rgba(240,237,230,.55);
-  border-bottom:1px solid rgba(240,237,230,.25);
-  padding-bottom:3px;
-  transition:color .2s, border-color .2s;
-}
-.nav-back:hover { color:rgba(240,237,230,.95); border-color:rgba(240,237,230,.7) }
+  .cs-hero{ min-height:70vh; display:flex; flex-direction:column; justify-content:center; padding:100px 8vw 60px; max-width:900px; }
+  .cs-eyebrow{ font-size:9px; font-weight:700; letter-spacing:5px; text-transform:uppercase; color:var(--dim); margin-bottom:20px; }
+  .cs-hero h1{ font-family:'Bungee', cursive; font-weight:400; font-style:normal; font-size:clamp(28px,4.6vw,58px); line-height:1.25; letter-spacing:0px; margin:0 0 24px; }
+  .cs-hero h1 em{ font-style:normal; color:var(--olive); font-weight:400; }
+  .cs-hero p{ font-size:16px; line-height:1.7; color:var(--dim); max-width:560px; }
+  .cs-meta{ display:flex; flex-wrap:wrap; gap:24px; margin-top:28px; }
+  .cs-meta div{ font-size:10px; }
+  .cs-meta b{ display:block; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--dim2); margin-bottom:4px; }
+  .cs-meta span{ color:rgba(240,237,230,.75); font-size:12px; }
+  .cs-scroll-hint{ font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--dim2); margin-top:40px; animation:pulse 2.2s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{opacity:.4} 50%{opacity:1} }
 
-.nav-visit {
-  position:fixed; top:24px; right:32px; z-index:100;
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:10px; font-weight:700;
-  letter-spacing:2.5px; text-transform:uppercase;
-  color:rgba(240,237,230,.85);
-  border:1.5px solid rgba(240,237,230,.3);
-  padding:10px 22px;
-  transition:all .2s;
-}
-.nav-visit:hover { border-color:rgba(240,237,230,.7); background:rgba(240,237,230,.06) }
+  .scrolly{ display:flex; max-width:1400px; margin:0 auto; position:relative; }
+  .scrolly-sticky{ flex:0 0 50%; position:sticky; top:0; height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .scrolly-steps{ flex:0 0 50%; padding:0 6vw 0 3vw; }
+  .step{ min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:60px 0; opacity:.25; transition:opacity .4s ease; }
+  .step.active{ opacity:1; }
+  .step-tag{ font-size:9px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:var(--olive); margin-bottom:16px; }
+  .step h2{ font-family:'Bungee', cursive; font-weight:400; font-style:normal; font-size:clamp(20px,2.4vw,30px); line-height:1.3; margin:0 0 18px; letter-spacing:0px; }
+  .step p{ font-size:14.5px; line-height:1.75; color:rgba(240,237,230,.6); max-width:440px; }
+  .step ul{ margin:14px 0 0; padding:0 0 0 18px; font-size:13.5px; line-height:1.9; color:rgba(240,237,230,.55); max-width:440px; }
 
-.hero {
-  min-height:90vh;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  padding:120px 40px 80px; text-align:center;
-}
-.hero-eyebrow {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:9px; font-weight:700;
-  letter-spacing:6px; text-transform:uppercase;
-  color:rgba(240,237,230,.42); margin-bottom:26px;
-}
-.hero-title {
-  font-family:'Fraunces',serif;
-  font-size:clamp(48px,7.5vw,108px);
-  font-weight:800; font-style:italic;
-  color:rgba(240,237,230,.96); line-height:.97;
-  letter-spacing:-3px;
-  font-variation-settings:'opsz' 108,'WONK' 1;
-  margin:0; max-width:900px;
-}
-.hero-sub {
-  font-family:'Fraunces',serif;
-  font-size:clamp(18px,2.2vw,28px);
-  font-weight:300; font-style:italic;
-  color:rgba(240,237,230,.55);
-  margin-top:20px; max-width:680px;
-  font-variation-settings:'opsz' 28;
-}
-.hero-meta {
-  margin-top:48px;
-  display:flex; gap:48px; flex-wrap:wrap; justify-content:center;
-}
-.hero-meta > div { display:flex; flex-direction:column; gap:6px }
-.hero-meta-l {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:8px; font-weight:700;
-  letter-spacing:3px; text-transform:uppercase;
-  color:rgba(240,237,230,.4);
-}
-.hero-meta-v {
-  font-family:'Fraunces',serif;
-  font-size:15px; font-weight:500;
-  color:rgba(240,237,230,.88);
-  font-variation-settings:'opsz' 15;
-}
+  .browser{ width:340px; height:520px; border-radius:28px; background:#000; border:6px solid #1a1a1a; box-shadow:0 30px 70px rgba(0,0,0,.5); overflow:hidden; position:relative; }
+  .browser-body{ position:relative; height:100%; padding:24px 18px; }
+  .viz{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .5s ease; padding:24px 18px; }
+  .viz.on{ opacity:1; }
 
-section.cs { padding:60px 40px; max-width:860px; margin:0 auto }
-.cs-eyebrow {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:9px; font-weight:700;
-  letter-spacing:5px; text-transform:uppercase;
-  color:rgba(240,237,230,.4); margin-bottom:14px;
-}
-.cs-h {
-  font-family:'Fraunces',serif;
-  font-size:clamp(28px,4vw,48px);
-  font-weight:800; font-style:italic;
-  color:rgba(240,237,230,.92);
-  line-height:1.05; letter-spacing:-1.5px;
-  margin:0 0 24px;
-  font-variation-settings:'opsz' 48,'WONK' 1;
-}
-.cs-p {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:16px; line-height:1.78;
-  color:rgba(240,237,230,.65);
-  margin:0 0 16px; max-width:680px;
-}
-.cs-pull {
-  font-family:'Fraunces',serif;
-  font-size:clamp(20px,2.4vw,28px);
-  font-weight:300; font-style:italic;
-  color:rgba(240,237,230,.78);
-  line-height:1.4; letter-spacing:-.5px;
-  margin:32px 0;
-  padding-left:24px;
-  border-left:2px solid rgba(240,237,230,.3);
-  font-variation-settings:'opsz' 28;
-}
-.cs-list {
-  list-style:none; padding-left:0;
-  margin:18px 0; max-width:680px;
-}
-.cs-list li {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:15px; line-height:1.78;
-  color:rgba(240,237,230,.6);
-  padding-left:28px; position:relative;
-  margin-bottom:10px;
-}
-.cs-list li::before {
-  content:'—'; position:absolute; left:0;
-  color:rgba(240,237,230,.35); font-weight:700;
-}
+  /* Step 0 — current player, no bookmark option */
+  .ply-cover{ width:100%; height:170px; border-radius:8px; background:linear-gradient(135deg,#2a2a2a,#181818); margin-bottom:18px; }
+  .ply-title{ height:12px; width:70%; background:rgba(240,237,230,.85); border-radius:3px; margin-bottom:8px; }
+  .ply-sub{ height:8px; width:45%; background:rgba(240,237,230,.3); border-radius:3px; margin-bottom:24px; }
+  .ply-bar{ height:3px; width:100%; background:rgba(240,237,230,.15); border-radius:2px; margin-bottom:24px; position:relative; }
+  .ply-bar::after{ content:''; position:absolute; left:0; top:0; height:100%; width:38%; background:var(--olive); border-radius:2px; }
+  .ply-controls{ display:flex; align-items:center; justify-content:center; gap:26px; }
+  .ply-controls div{ width:14px; height:14px; opacity:.7; }
+  .ply-controls div.play{ width:44px; height:44px; background:#fff; border-radius:50%; opacity:1; }
+  .ply-note{ margin-top:26px; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(240,120,120,.75); text-align:center; }
 
-.steps { display:flex; flex-direction:column; gap:32px; margin-top:32px }
-.step {
-  display:grid; grid-template-columns:60px 1fr; gap:24px;
-  padding-bottom:28px;
-  border-bottom:1px solid rgba(240,237,230,.08);
-}
-.step:last-child { border-bottom:none; padding-bottom:0 }
-.step-n {
-  font-family:'Fraunces',serif;
-  font-size:32px; font-weight:900;
-  color:rgba(240,237,230,.16);
-  line-height:1;
-  font-variation-settings:'opsz' 32;
-}
-.step-t {
-  font-family:'Fraunces',serif;
-  font-size:20px; font-weight:700; font-style:italic;
-  color:rgba(240,237,230,.9);
-  margin:0 0 10px;
-  font-variation-settings:'opsz' 20;
-}
-.step-d {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:14px; line-height:1.72;
-  color:rgba(240,237,230,.6);
-}
+  /* Step 1 — reddit pain-point quote cards */
+  .quote-stack{ width:100%; display:flex; flex-direction:column; gap:12px; }
+  .quote-card{ background:rgba(240,237,230,.05); border:1px solid rgba(240,237,230,.1); border-left:3px solid var(--olive); border-radius:4px; padding:14px 16px; font-size:11.5px; line-height:1.6; color:rgba(240,237,230,.7); }
+  .quote-card b{ display:block; font-size:9px; letter-spacing:1px; text-transform:uppercase; color:var(--olive); margin-bottom:6px; }
 
-.tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:24px }
-.tag {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:9px; font-weight:700;
-  letter-spacing:2px; text-transform:uppercase;
-  border:1px solid rgba(240,237,230,.18);
-  padding:6px 14px; color:rgba(240,237,230,.6);
-}
+  /* Step 2 — survey stat grid */
+  .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; }
+  .stat-block{ text-align:center; background:rgba(240,237,230,.04); border-radius:8px; padding:18px 8px; }
+  .stat-block .num{ font-family:'Fraunces', serif; font-weight:800; font-size:32px; color:var(--olive); font-style:normal; }
+  .stat-block .lbl{ font-size:8.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--dim); margin-top:6px; line-height:1.4; }
 
-.cta-section {
-  padding:100px 40px;
-  text-align:center;
-  border-top:1px solid rgba(240,237,230,.08);
-  margin-top:60px;
-}
-.cta-h {
-  font-family:'Fraunces',serif;
-  font-size:clamp(32px,4.5vw,56px);
-  font-weight:800; font-style:italic;
-  color:rgba(240,237,230,.94);
-  line-height:1.05; letter-spacing:-1.5px;
-  margin:0 0 30px;
-  font-variation-settings:'opsz' 56,'WONK' 1;
-}
-.cta-btn {
-  display:inline-flex; align-items:center; gap:12px;
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:11px; font-weight:700;
-  letter-spacing:3px; text-transform:uppercase;
-  color:rgba(240,237,230,.95);
-  border:1.5px solid rgba(240,237,230,.4);
-  padding:16px 34px;
-  transition:all .25s;
-}
-.cta-btn:hover { border-color:rgba(240,237,230,.85); background:rgba(240,237,230,.08) }
+  /* Step 3 — persona cards */
+  .persona-stack{ width:100%; display:flex; flex-direction:column; gap:10px; }
+  .persona-card{ background:rgba(240,237,230,.05); border:1px solid rgba(240,237,230,.1); border-radius:8px; padding:14px 16px; }
+  .persona-card .pname{ font-family:'Fraunces',serif; font-style:normal; font-weight:700; font-size:15px; color:var(--ink); margin-bottom:2px; }
+  .persona-card .ptag{ font-size:9px; color:var(--olive); letter-spacing:.5px; margin-bottom:6px; }
+  .persona-card .pneed{ font-size:11px; color:rgba(240,237,230,.55); line-height:1.5; }
 
-footer.cs-footer {
-  padding:30px 40px; text-align:center;
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:9px; font-weight:700;
-  letter-spacing:3px; text-transform:uppercase;
-  color:rgba(240,237,230,.3);
-  border-top:1px solid rgba(240,237,230,.06);
-}
+  /* Step 4 — before / after usability comparison */
+  .vs-wrap{ width:100%; display:flex; flex-direction:column; gap:14px; }
+  .vs-card{ border-radius:8px; padding:16px; }
+  .vs-card.bad{ background:rgba(224,90,90,.08); border:1px solid rgba(224,90,90,.25); }
+  .vs-card.good{ background:rgba(29,185,84,.08); border:1px solid rgba(29,185,84,.3); }
+  .vs-card b{ display:block; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; }
+  .vs-card.bad b{ color:#e05a5a; }
+  .vs-card.good b{ color:var(--olive); }
+  .vs-card ul{ margin:0; padding:0 0 0 16px; font-size:11px; line-height:1.7; color:rgba(240,237,230,.65); }
 
-@media (max-width:760px) {
-  .nav-back { top:18px; left:18px }
-  .nav-visit { top:18px; right:18px; padding:8px 16px; font-size:9px }
-  .hero { padding:100px 24px 60px }
-  section.cs { padding:50px 24px }
-  .hero-meta { gap:28px }
-  .step { grid-template-columns:50px 1fr; gap:16px }
-}
+  /* Step 5 — final bookmark UI mockup */
+  .bm-player{ width:100%; }
+  .bm-icon-row{ display:flex; justify-content:center; margin-bottom:14px; }
+  .bm-icon{ width:34px; height:34px; border-radius:50%; background:var(--olive); display:flex; align-items:center; justify-content:center; font-size:16px; color:#000; }
+  .bm-field{ height:34px; background:rgba(240,237,230,.08); border:1px solid rgba(240,237,230,.15); border-radius:6px; margin-bottom:10px; display:flex; align-items:center; padding:0 10px; font-size:10px; color:rgba(240,237,230,.4); }
+  .bm-list{ display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+  .bm-list div{ height:38px; background:rgba(240,237,230,.05); border-radius:6px; display:flex; align-items:center; padding:0 12px; font-size:10px; color:rgba(240,237,230,.55); border-left:2px solid var(--olive); }
 
-.project-nav {
-  display:grid;
-  grid-template-columns:1fr auto 1fr;
-  align-items:center;
-  gap:32px;
-  padding:48px 40px 80px;
-  max-width:1100px;
-  margin:0 auto;
-  border-top:1px solid rgba(240,237,230,.08);
-}
-.pn-link {
-  display:flex; align-items:center; gap:18px;
-  text-decoration:none;
-  transition:opacity .2s;
-}
-.pn-prev { justify-content:flex-start }
-.pn-next { justify-content:flex-end }
-.pn-link:hover { opacity:.7 }
-.pn-link:hover .pn-arrow { transform:translateX(0) }
-.pn-prev:hover .pn-arrow { transform:translateX(-6px) }
-.pn-next:hover .pn-arrow { transform:translateX(6px) }
-.pn-arrow {
-  font-family:'Fraunces',serif;
-  font-size:32px; font-weight:200;
-  color:rgba(240,237,230,.45);
-  transition:transform .25s cubic-bezier(.22,.61,.36,1);
-  font-variation-settings:'opsz' 32;
-}
-.pn-link > span:not(.pn-arrow) {
-  display:flex; flex-direction:column; gap:4px;
-}
-.pn-prev > span:not(.pn-arrow) { text-align:left }
-.pn-next > span:not(.pn-arrow) { text-align:right }
-.pn-l {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:8px; font-weight:700;
-  letter-spacing:3px; text-transform:uppercase;
-  color:rgba(240,237,230,.38);
-}
-.pn-n {
-  font-family:'Fraunces',serif;
-  font-size:16px; font-weight:500;
-  font-style:italic;
-  color:rgba(240,237,230,.88);
-  font-variation-settings:'opsz' 16;
-}
-.pn-home {
-  font-family:'Cabinet Grotesk',sans-serif;
-  font-size:9px; font-weight:700;
-  letter-spacing:3px; text-transform:uppercase;
-  color:rgba(240,237,230,.5);
-  text-decoration:none;
-  border:1px solid rgba(240,237,230,.2);
-  padding:10px 22px;
-  transition:all .2s;
-  white-space:nowrap;
-}
-.pn-home:hover {
-  color:rgba(240,237,230,.95);
-  border-color:rgba(240,237,230,.55);
-  background:rgba(240,237,230,.04);
-}
-.pn-empty { width:1px; height:1px }
-@media (max-width:760px) {
-  .project-nav {
-    grid-template-columns:1fr;
-    gap:18px; padding:40px 24px 60px;
-    text-align:center;
+  .progress-dots{ position:absolute; left:24px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:12px; }
+  .progress-dots div{ width:6px; height:6px; border-radius:50%; background:var(--dim2); transition:background .3s, transform .3s; }
+  .progress-dots div.on{ background:var(--olive); transform:scale(1.4); box-shadow:0 0 8px rgba(29,185,84,.5); }
+
+  .cs-outro{ min-height:60vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:80px 8vw; }
+  .cs-outro h3{ font-family:'Bungee', cursive; font-weight:400; font-style:normal; font-size:clamp(22px,3.2vw,36px); margin:0 0 18px; }
+  .cs-outro p{ color:var(--dim); max-width:520px; line-height:1.7; }
+  .cs-outro-links{ display:flex; gap:16px; margin-top:28px; flex-wrap:wrap; justify-content:center; }
+  .cs-back, .cs-demo{ display:inline-flex; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; text-decoration:none; padding:12px 24px; border-radius:24px; }
+  .cs-back{ color:var(--ink); border:1.5px solid rgba(240,237,230,.3); }
+  .cs-demo{ color:#000; background:var(--olive); border:1.5px solid var(--olive); }
+
+  .cs-proto{ max-width:1100px; margin:0 auto; padding:100px 8vw 60px; }
+  .cs-proto-head{ max-width:600px; margin-bottom:36px; }
+  .cs-proto-head h3{ font-family:'Bungee',cursive; font-weight:400; font-style:normal; font-size:clamp(24px,3.6vw,42px); margin:8px 0 16px; letter-spacing:0px; }
+  .cs-proto-head p{ font-size:14.5px; line-height:1.7; color:var(--dim); }
+  .cs-proto-frame{ border-radius:12px; overflow:hidden; border:1px solid rgba(240,237,230,.15); box-shadow:0 30px 80px rgba(0,0,0,.4); background:#000; }
+  .cs-proto-bar{ display:flex; align-items:center; gap:7px; padding:12px 16px; background:rgba(240,237,230,.05); border-bottom:1px solid rgba(240,237,230,.08); }
+  .cs-proto-bar .dot{ width:9px; height:9px; border-radius:50%; background:rgba(240,237,230,.18); }
+  .cs-proto-url{ margin-left:10px; font-size:11px; color:rgba(240,237,230,.35); }
+  .cs-proto-iframe{ width:100%; height:640px; border:none; display:block; background:#fff; }
+  .cs-proto-fallback{ display:block; text-align:center; margin-top:18px; font-size:11px; color:var(--dim); text-decoration:none; border-bottom:1px solid rgba(240,237,230,.2); padding-bottom:2px; }
+  .cs-proto-fallback:hover{ color:var(--olive); border-color:var(--olive); }
+  @media (max-width:760px){ .cs-proto-iframe{ height:480px; } }
+
+  @media (max-width:900px){
+    .scrolly{ flex-direction:column; }
+    .scrolly-sticky{ position:sticky; top:0; flex:none; width:100%; height:55vh; }
+    .scrolly-steps{ flex:none; width:100%; padding:0 6vw; }
+    .progress-dots{ display:none; }
+    .browser{ width:78vw; height:48vh; }
   }
-  .pn-link { justify-content:center }
-  .pn-home { order:3 }
-}
-
 </style>
 </head>
-<body>
+<body data-step="0">
 
-<a href="/" class="nav-back">&larr; Back to portfolio</a>
-
-
-<section class="hero">
-  <div class="hero-eyebrow">Academic &middot; UX Research &middot; Thesis &middot; 2024</div>
-  <h1 class="hero-title">Spotify Podcast<br><em>Bookmark Feature</em></h1>
-  <div class="hero-sub">Enhancing the Spotify podcast experience with a bookmark feature</div>
-  <div class="hero-meta">
-    <div><div class="hero-meta-l">Type</div><div class="hero-meta-v">Thesis Project</div></div>
-    <div><div class="hero-meta-l">Role</div><div class="hero-meta-v">UX Researcher &amp; Designer</div></div>
-    <div><div class="hero-meta-l">Tools</div><div class="hero-meta-v">Figma &middot; Canva &middot; Reddit</div></div>
-    <div><div class="hero-meta-l">Year</div><div class="hero-meta-v">2024</div></div>
+<section class="cs-hero">
+  <div class="cs-eyebrow">Thesis Project &middot; UX Research &middot; Spotify</div>
+  <h1>Enhancing the Podcast<br><em>Bookmark Experience</em></h1>
+  <p>Podcast listening was booming, but Spotify gave users no way to save a specific moment worth returning to. A full UX research thesis — from Reddit deep-dives and surveys to personas, prototypes, and usability testing — aimed at solving that one overlooked gap.</p>
+  <div class="cs-meta">
+    <div><b>Role</b><span>UX Researcher &amp; Designer</span></div>
+    <div><b>Tools</b><span>Figma &middot; Canva &middot; Reddit</span></div>
+    <div><b>Focus</b><span>Research &middot; Prototyping &middot; Testing</span></div>
   </div>
+  <div class="cs-scroll-hint">&darr; Scroll to begin</div>
 </section>
 
-<section class="cs">
-  <div class="cs-eyebrow">Background</div>
-  <h2 class="cs-h">Why podcasts, why now.</h2>
-  <p class="cs-p">Podcast consumption is booming, especially among tech-savvy users aged 12&ndash;34 who seek entertainment, education, and companionship. With smart speakers and smartphones making access easier, users expect platforms like Spotify to offer personalised, user-friendly features.</p>
-  <p class="cs-p">Research from the <em>Infinite Dial 2023</em> and other reports revealed key industry trends &mdash; the importance of multitasking convenience, the desire for quick access to saved segments, and better discovery features &mdash; which shaped this project&rsquo;s focus.</p>
-  <div class="cs-pull">Podcasts have grown up. Spotify&rsquo;s podcast UX hadn&rsquo;t caught up.</div>
-</section>
-
-<section class="cs">
-  <div class="cs-eyebrow">Focus Areas</div>
-  <h2 class="cs-h">What this project covered.</h2>
-  <ul class="cs-list">
-    <li>UX Research &middot; Reddit &amp; survey-led discovery</li>
-    <li>Competitive Analysis &middot; Apple Podcasts, Overcast, others</li>
-    <li>Survey Design &middot; quantifying user pain points</li>
-    <li>UI/UX Prototyping &middot; mid- and high-fidelity flows</li>
-    <li>Usability Testing &middot; current Spotify vs new prototype</li>
-  </ul>
-</section>
-
-<section class="cs">
-  <div class="cs-eyebrow">Research</div>
-  <h2 class="cs-h">Listening before designing.</h2>
-  <p class="cs-p">Reddit was used to gather real user feedback from podcast communities. Common complaints &mdash; poor playlist management and lack of bookmarking &mdash; helped identify pain points and directly informed the survey questions, ensuring the research was grounded in authentic user experiences.</p>
-  <p class="cs-p">Users demanded improved navigation, better integration of features like episode transcripts and variable playback speeds, enhanced podcast discovery and playback, and more personalisation in managing podcast libraries.</p>
-</section>
-
-<section class="cs">
-  <div class="cs-eyebrow">Key Survey Insights</div>
-  <h2 class="cs-h">What the numbers said.</h2>
-  <div class="cs-pull">Users are switching to Apple and YouTube for features Spotify lacks.</div>
-  <ul class="cs-list">
-    <li><strong>40%</strong> &mdash; daily Spotify podcast listeners (high engagement)</li>
-    <li><strong>60%</strong> &mdash; love personalised recommendations</li>
-    <li><strong>50%</strong> &mdash; value search functionality</li>
-    <li><strong>45%</strong> &mdash; find playlist management frustrating</li>
-    <li><strong>40%</strong> &mdash; want bookmarking</li>
-    <li><strong>45%</strong> &mdash; want smarter recommendations</li>
-    <li><strong>45%</strong> &mdash; rated Spotify&rsquo;s podcast UX a solid 4 out of 5</li>
-  </ul>
-</section>
-
-<section class="cs">
-  <div class="cs-eyebrow">User Personas</div>
-  <h2 class="cs-h">Three voices that guided the design.</h2>
-  <p class="cs-p">Personas were developed from survey data, Reddit insights, and secondary research. Patterns in listening habits, frustrations, and tech use led to three key personas:</p>
-  <div class="steps">
-    <div class="step">
-      <div class="step-n">01</div>
-      <div>
-        <h3 class="step-t">The Daily Commuter</h3>
-        <p class="step-d">High tech level. Listens for news and professional growth. Needs fast access to saved episodes and smarter content discovery. Wants to maximise commute time with seamless, purposeful listening.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-n">02</div>
-      <div>
-        <h3 class="step-t">The Multitasking Enthusiast</h3>
-        <p class="step-d">Moderate tech level. Enjoys storytelling and educational podcasts while working from home. Needs bookmarking and social sharing to deepen engagement. Seeks a more interactive podcast experience.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-n">03</div>
-      <div>
-        <h3 class="step-t">The Casual Student Listener</h3>
-        <p class="step-d">Age 35, moderate&ndash;high tech level. Listens sporadically to lifestyle and pop culture content. Finds Spotify&rsquo;s UI overwhelming &mdash; needs easy recommendations and minimal effort to discover content.</p>
+<div class="scrolly">
+  <div class="progress-dots" id="dots"></div>
+  <div class="scrolly-sticky">
+    <div class="browser">
+      <div class="browser-body">
+        <div class="viz on" data-viz="0">
+          <div class="bm-player">
+            <div class="ply-cover"></div>
+            <div class="ply-title"></div>
+            <div class="ply-sub"></div>
+            <div class="ply-bar"></div>
+            <div class="ply-controls"><div></div><div></div><div class="play"></div><div></div><div></div></div>
+            <div class="ply-note">No way to bookmark this moment</div>
+          </div>
+        </div>
+        <div class="viz" data-viz="1">
+          <div class="quote-stack">
+            <div class="quote-card"><b>r/spotify</b>"I can never find that one episode part I liked again."</div>
+            <div class="quote-card"><b>r/podcasts</b>"Playlist management is a mess, no way to organize saved parts."</div>
+            <div class="quote-card"><b>r/spotify</b>"Wish I could just drop a pin on a moment while listening."</div>
+          </div>
+        </div>
+        <div class="viz" data-viz="2">
+          <div class="stat-grid">
+            <div class="stat-block"><div class="num">40%</div><div class="lbl">Listen to podcasts daily</div></div>
+            <div class="stat-block"><div class="num">45%</div><div class="lbl">Frustrated by playlist mgmt</div></div>
+            <div class="stat-block"><div class="num">40%</div><div class="lbl">Want a bookmark feature</div></div>
+            <div class="stat-block"><div class="num">4/5</div><div class="lbl">Current UX satisfaction</div></div>
+          </div>
+        </div>
+        <div class="viz" data-viz="3">
+          <div class="persona-stack">
+            <div class="persona-card"><div class="pname">The Commuter</div><div class="ptag">Daily &middot; High-tech</div><div class="pneed">Needs fast access to saved episodes during a fixed commute window.</div></div>
+            <div class="persona-card"><div class="pname">The Multitasker</div><div class="ptag">Works from home</div><div class="pneed">Wants to bookmark and revisit segments while half-focused elsewhere.</div></div>
+            <div class="persona-card"><div class="pname">The Casual Listener</div><div class="ptag">Sporadic &middot; Low effort</div><div class="pneed">Finds the app overwhelming — wants simplicity above all.</div></div>
+          </div>
+        </div>
+        <div class="viz" data-viz="4">
+          <div class="vs-wrap">
+            <div class="vs-card bad"><b>Current Spotify</b><ul><li>Time-consuming</li><li>Multiple taps required</li><li>Can't mark a segment to revisit</li></ul></div>
+            <div class="vs-card good"><b>New Prototype</b><ul><li>One-tap bookmarking</li><li>Higher satisfaction</li><li>Users loved naming &amp; organizing</li></ul></div>
+          </div>
+        </div>
+        <div class="viz" data-viz="5">
+          <div class="bm-player">
+            <div class="bm-icon-row"><div class="bm-icon">&#9733;</div></div>
+            <div class="bm-field">Bookmark title...</div>
+            <div class="bm-field">Add a note (optional)</div>
+            <div class="bm-list">
+              <div>"Great advice on burnout" — 14:32</div>
+              <div>"Guest's book recommendation" — 28:07</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
+  <div class="scrolly-steps">
+    <div class="step active" data-step="0">
+      <div class="step-tag">01 &mdash; The Problem</div>
+      <h2>Podcasts were booming,<br>but nothing stuck</h2>
+      <p>Podcast consumption was surging, especially among tech-savvy 12&ndash;34 year olds looking for entertainment, education and companionship. The Infinite Dial 2023 report pointed to a clear gap: users wanted quick access to saved segments and better discovery &mdash; and Spotify offered no way to bookmark a specific moment at all.</p>
+    </div>
+    <div class="step" data-step="1">
+      <div class="step-tag">02 &mdash; Reddit Research</div>
+      <h2>Real complaints,<br>straight from users</h2>
+      <p>Rather than guess, I went looking for genuine frustration on Reddit's podcast communities. Poor playlist management and the total absence of bookmarking came up again and again &mdash; and directly shaped every survey question that followed.</p>
+    </div>
+    <div class="step" data-step="2">
+      <div class="step-tag">03 &mdash; Survey Insights</div>
+      <h2>The numbers<br>backed it up</h2>
+      <p>A structured survey confirmed what Reddit hinted at: heavy daily engagement, real frustration with managing saved content, and a clear, specific request &mdash; bookmarking &mdash; named by 40% of respondents as a top ask.</p>
+    </div>
+    <div class="step" data-step="3">
+      <div class="step-tag">04 &mdash; Personas</div>
+      <h2>Three listeners,<br>one shared need</h2>
+      <p>Patterns across the survey and Reddit research converged on three personas &mdash; a daily commuter, a multitasking home-listener, and a casual browser &mdash; each hitting the same wall in a different way: nothing to mark a moment worth returning to.</p>
+    </div>
+    <div class="step" data-step="4">
+      <div class="step-tag">05 &mdash; Usability Testing</div>
+      <h2>Old way vs.<br>new way</h2>
+      <p>Testers were asked to revisit a specific podcast segment first on current Spotify, then on the prototype. The current app took multiple taps and real effort; the prototype's one-tap bookmark, with optional titles and notes, was faster and clearly preferred.</p>
+    </div>
+    <div class="step" data-step="5">
+      <div class="step-tag">06 &mdash; The Solution</div>
+      <h2>A bookmark feature,<br>built from real need</h2>
+      <p>The final design: a minimal bookmark icon right on the playback screen, a simple screen to name and annotate the moment, and a dedicated space to browse everything saved &mdash; all reachable straight from the main player, no detour required.</p>
+    </div>
+  </div>
+</div>
+
+<section class="cs-proto">
+  <div class="cs-proto-head">
+    <div class="cs-eyebrow">Try It Yourself</div>
+    <h3>Prototype</h3>
+    <p>The final interactive prototype, built in Figma and deployed live. Try the actual bookmark flow right here.</p>
+  </div>
+  <div class="cs-proto-frame">
+    <div class="cs-proto-bar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="cs-proto-url">spotifbookmarkredesign.netlify.app</span>
+    </div>
+    <iframe class="cs-proto-iframe" src="https://spotifbookmarkredesign.netlify.app/" title="Spotify podcast bookmark prototype" loading="lazy"></iframe>
+  </div>
+  <a href="https://spotifbookmarkredesign.netlify.app/" target="_blank" class="cs-proto-fallback">Not loading? Open the prototype directly &#8599;</a>
 </section>
 
-<section class="cs">
-  <div class="cs-eyebrow">Usability Testing</div>
-  <h2 class="cs-h">Old vs new &mdash; head to head.</h2>
-  <p class="cs-p">Conducted usability testing comparing the current Spotify app against a new prototype with a podcast bookmarking tool, assessing effectiveness, usability, and user satisfaction.</p>
-  <div class="steps">
-    <div class="step">
-      <div class="step-n">T1</div>
-      <div>
-        <h3 class="step-t">Current Spotify &mdash; revisiting a podcast segment</h3>
-        <p class="step-d">Time-consuming. Multiple taps required. Users couldn&rsquo;t easily mark or revisit meaningful segments.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-n">T2</div>
-      <div>
-        <h3 class="step-t">New prototype &mdash; bookmark feature</h3>
-        <p class="step-d">Easy bookmarking using minimal UI. Higher satisfaction. Users appreciated being able to name and organise bookmarks.</p>
-      </div>
-    </div>
+<section class="cs-outro">
+  <h3>Conclusion &amp; takeaway</h3>
+  <p>A well-defined problem, backed by real user insight, makes the design process smoother and far more impactful. Simplicity, when grounded in genuine need, is what creates real value.</p>
+  <div class="cs-outro-links">
+    <a href="index.html" class="cs-back">&larr; Back to all work</a>
   </div>
 </section>
 
-<section class="cs">
-  <div class="cs-eyebrow">The Solution</div>
-  <h2 class="cs-h">Four screens, one solution.</h2>
-  <div class="steps">
-    <div class="step">
-      <div class="step-n">01</div>
-      <div>
-        <h3 class="step-t">Bookmark icon on playback</h3>
-        <p class="step-d">A minimalistic bookmark icon on the podcast playback screen for easy segment marking without interrupting listening.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-n">02</div>
-      <div>
-        <h3 class="step-t">Bookmark creation</h3>
-        <p class="step-d">A detailed creation screen where users can add titles and optional notes, making each bookmark more informative and searchable.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-n">03</div>
-      <div>
-        <h3 class="step-t">Navigate to saved bookmarks</h3>
-        <p class="step-d">A new bookmark management interface that navigates to the podcast&rsquo;s saved bookmarks directly from the player.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-n">04</div>
-      <div>
-        <h3 class="step-t">Bookmark library</h3>
-        <p class="step-d">A straightforward layout, accessible from the main player, enhancing navigation and interaction with saved content.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="cs">
-  <div class="cs-eyebrow">Conclusion</div>
-  <h2 class="cs-h">What this taught me.</h2>
-  <p class="cs-p">This project showcased a full UX process &mdash; from real user research to mid- and high-fidelity designs &mdash; focused on solving a simple but overlooked user need: saving and revisiting podcast moments. The result is a solution that is intuitive, research-backed, and meaningful for everyday listeners.</p>
-  <div class="cs-pull">A well-defined problem, backed by user insight, makes the design process smoother and more impactful. Simplicity, when grounded in real needs, creates real value.</div>
-</section>
-
-
-<!-- Project navigation -->
-<section class="project-nav">
-  <a href="sammys.html" class="pn-link pn-prev"><span class="pn-arrow">&larr;</span><span><span class="pn-l">Previous Project</span><span class="pn-n">Sammy’s</span></span></a>
-  <a href="/" class="pn-home">All Work</a>
-  <a href="piano-vr.html" class="pn-link pn-next"><span><span class="pn-l">Next Project</span><span class="pn-n">Piano VR</span></span><span class="pn-arrow">&rarr;</span></a>
-</section>
-
-<section class="cta-section">
-  <h2 class="cta-h">Want to see more <em>work</em>?</h2>
-  <a href="/" class="cta-btn">Back to portfolio &#8594;</a>
-</section>
-
-<footer class="cs-footer">
-  &copy; 2026 Muskan KC &middot; Designed &amp; built in New York
-</footer>
-
+<script>
+(function(){
+  var steps = document.querySelectorAll('.step');
+  var vizzes = document.querySelectorAll('.viz');
+  var dotsWrap = document.getElementById('dots');
+  var body = document.body;
+  for (var i = 0; i < steps.length; i++) {
+    var d = document.createElement('div');
+    d.dataset.i = i;
+    if (i === 0) d.classList.add('on');
+    dotsWrap.appendChild(d);
+  }
+  var dots = dotsWrap.querySelectorAll('div');
+  function setStep(idx){
+    body.dataset.step = idx;
+    vizzes.forEach(function(v){ v.classList.toggle('on', v.dataset.viz == idx); });
+    dots.forEach(function(dd,i){ dd.classList.toggle('on', i == idx); });
+    steps.forEach(function(s,i){ s.classList.toggle('active', i == idx); });
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if (e.isIntersecting) setStep(parseInt(e.target.dataset.step)); });
+  }, { threshold: 0.55 });
+  steps.forEach(function(s){ io.observe(s); });
+})();
+</script>
 </body>
 </html>
