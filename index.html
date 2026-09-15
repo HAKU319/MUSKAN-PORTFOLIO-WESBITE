@@ -1318,12 +1318,16 @@ body.overlay-open { overflow:hidden; }
 }
 
 footer {
-  padding:20px 52px 20px 380px;
   background:#522019;
-  display:flex; align-items:center; justify-content:space-between;
   border-top:1px solid rgba(196,164,150,.12);
   position:relative;
   z-index:3;
+}
+.ft-bar {
+  padding:20px 52px 20px 380px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:relative;
+  z-index:1;
 }
 .ft-l { font-family:'Special Elite',monospace;font-size:var(--fs-label);font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(224,206,196,.28) }
 .ft-r { display:flex;align-items:center;gap:16px }
@@ -1456,6 +1460,12 @@ footer {
   z-index:0;
   pointer-events:none;
   opacity:0;
+}
+@media (min-width:761px) {
+  /* Keeps the lotus clear of the persistent left nav, which only
+     exists as a sidebar above this breakpoint (below it, nav becomes
+     a bottom bar and doesn't compete for the same horizontal space). */
+  #cat-figure { max-width:calc(100vw - 760px); }
 }
 #catf-svg { width:auto; height:100%; display:block; overflow:visible; }
 #catf-path {
@@ -2309,6 +2319,7 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
           <h2 class="cat-title">Research</h2>
           <p class="cat-teaser">A masters thesis on Spotify &mdash; research, flows, wireframes and an interactive prototype, laid out as a research notebook you can flip through.</p>
           <a href="spotify.html" class="cat-anchor">View Spotify Case Study &#8594;</a>
+          <a href="https://spotifbookmarkredesign.netlify.app/" target="_blank" class="cat-anchor" style="margin-top:14px">View Live App Demo &#8599;</a>
         </div>
       </div>
 
@@ -2432,14 +2443,15 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 </div>
 
 <footer>
-  <span class="ft-l">© 2025 Muskan KC — All Rights Reserved</span>
-  <div class="ft-r">
-    <span class="ft-pill">Taking freelance projects</span>
+  <div class="ft-bar">
+    <span class="ft-l">© 2025 Muskan KC — All Rights Reserved</span>
+    <div class="ft-r">
+      <span class="ft-pill">Taking freelance projects</span>
+    </div>
   </div>
 </footer>
 
 <script>
-
 
 /* =========================================================
    CROSSHAIR CURSOR
