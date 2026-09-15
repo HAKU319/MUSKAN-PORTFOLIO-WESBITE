@@ -2681,20 +2681,22 @@ function doForm(e){
   var introDone = false;
   var introCancelled = false;
 
-  // INTRO: sketch it in over 6s, runs to full completion — UNLESS the
-  // user starts scrolling first. Previously, scrolling away during
-  // this window left the figure frozen wherever the intro happened to
-  // be (since the scroll-based disappear logic was gated on the intro
-  // having finished) — and because this layer is position:fixed, that
-  // frozen state then bled through every section for the rest of the
-  // session, since nothing ever corrected it afterward. Now, any
-  // scroll during the intro cancels it immediately and hands off to
-  // the real scroll-position-based fade right away.
+  // INTRO: sketch it in quickly (~900ms) so the site feels
+  // responsive the moment someone lands on it, runs to full
+  // completion — UNLESS the user starts scrolling first. Previously,
+  // scrolling away during this window left the figure frozen wherever
+  // the intro happened to be (since the scroll-based disappear logic
+  // was gated on the intro having finished) — and because this layer
+  // is position:fixed, that frozen state then bled through every
+  // section for the rest of the session, since nothing ever corrected
+  // it afterward. Now, any scroll during the intro cancels it
+  // immediately and hands off to the real scroll-position-based fade
+  // right away.
   var t0 = null;
   function intro(ts){
     if(introCancelled) return;
     if(t0===null) t0 = ts;
-    var p = clamp((ts - t0)/6000, 0, 1);
+    var p = clamp((ts - t0)/900, 0, 1);
     layer.style.opacity = String(Math.min(p*1.6, 1));
     reveal(p);
     // reveal the title text once the figure is well underway (70%)
@@ -2708,7 +2710,7 @@ function doForm(e){
     if(p < 1){ requestAnimationFrame(intro); }
     else { fig.style.strokeDashoffset = '0'; introDone = true; }
   }
-  setTimeout(function(){ requestAnimationFrame(intro); }, 500);
+  setTimeout(function(){ requestAnimationFrame(intro); }, 80);
 
   // SCROLL-SYNCED disappear: over the first viewport of scrolling,
   // the figure un-draws (1→0) and fades, locked to scroll position.
