@@ -2212,6 +2212,12 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
   transition:background-color .3s, color .25s, letter-spacing .25s;
   filter:url(#inkSoft);
 }
+/* Developer panel: title swaps on hover */
+.cat-list a.swap-link{ display:grid; }
+.cat-list a.swap-link .sw-a,.cat-list a.swap-link .sw-b{ grid-area:1/1; transition:opacity .3s ease, transform .3s ease; }
+.cat-list a.swap-link .sw-b{ opacity:0; transform:translateY(8px); }
+.cat-list a.swap-link:hover .sw-a{ opacity:0; transform:translateY(-8px); }
+.cat-list a.swap-link:hover .sw-b{ opacity:1; transform:none; }
 .cat-reveal:hover, .cat-list a:hover { background-color:rgba(66,60,43,.07); color:var(--teal); padding-left:6px; letter-spacing:.6px; }
 .cr-label, .cr-name { left:6px; right:6px; text-align:center; }
 .cr-label { color:rgba(66,60,43,.85); }
@@ -2767,7 +2773,7 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
           <div class="cat-eyebrow">Category 02 &middot; Build</div>
           <h2 class="cat-title">Developer</h2>
           <div class="cat-list">
-            <a href="studio57-app.html">Studio 57 Booking App</a>
+            <a href="studio57-developer.html" class="swap-link"><span class="sw-a">Salon Booking App</span><span class="sw-b">Studio 57 Nail Bar &amp; Spa</span></a>
           </div>
         </div>
       </div>
@@ -2924,7 +2930,7 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
 /* embedded case-study pages — previews and the full overlay work from this one file */
 window.CASE_PAGES = (function(){ try{ return JSON.parse(document.getElementById('case-pages-data').textContent); }catch(e){ return {}; } })();
 /* Netlify's "pretty URLs" may rewrite sammys.html to /sammys — accept either spelling and map it to the real page key */
-window.CASE_KEYS = ['sammys.html','nyeeminc.html','studio57.html','studio57-app.html','freelance.html','freelance-projects.html','piano-vr.html','vr-accessibility.html','spotify.html'];
+window.CASE_KEYS = ['sammys.html','nyeeminc.html','studio57.html','studio57-app.html','studio57-developer.html','freelance.html','freelance-projects.html','piano-vr.html','vr-accessibility.html','spotify.html'];
 window.caseKey = function(href){
   if(!href || href.charAt(0) === '#') return '';
   var u; try{ u = new URL(href, location.href); }catch(e){ return ''; }
@@ -3577,13 +3583,13 @@ setTimeout(function(){
 ========================================================= */
 (function(){
   var CASE_STUDY_FILES = [
-    'sammys.html','nyeeminc.html','studio57.html','studio57-app.html',
+    'sammys.html','nyeeminc.html','studio57.html','studio57-app.html','studio57-developer.html',
     'freelance.html','freelance-projects.html',
     'piano-vr.html','vr-accessibility.html','spotify.html'
   ];
   var LABELS = {
     'sammys.html':'Sammy\u2019s Senior Sanctuary','nyeeminc.html':'Nyeem Inc.',
-    'studio57.html':'Studio 57','studio57-app.html':'Studio 57 \u2014 Booking App',
+    'studio57.html':'Studio 57','studio57-app.html':'Studio 57 \u2014 Booking App','studio57-developer.html':'Studio 57 \u2014 Salon Booking App',
     'freelance.html':'Freelance Event Graphics','freelance-projects.html':'Freelance Projects',
     'piano-vr.html':'Piano VR App','vr-accessibility.html':'VR Accessibility',
     'spotify.html':'Spotify Research'
