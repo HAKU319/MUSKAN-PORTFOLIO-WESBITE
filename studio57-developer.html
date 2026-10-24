@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio 57 POS Case Study | Muskan KC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+:root{ --bg:#2C4A6E; --bg2:#1f3855; --ink:#f0ede6; --dim:rgba(240,237,230,.55); --dim2:rgba(240,237,230,.3); --line:rgba(240,237,230,.14); --teal:#4DFFD2; --pink:#e58aa8; }
+body{ background:var(--bg); color:var(--ink); font-family:'Cabinet Grotesk',sans-serif; cursor:none; }
+a,button{ cursor:none; }
+#cur{ position:fixed; z-index:9999; pointer-events:none; width:26px; height:26px; transform:translate(-50%,-50%); }
+#cur::before,#cur::after{ content:''; position:absolute; background:var(--ink); }
+#cur::before{ left:0;right:0;top:50%;height:1px; } #cur::after{ top:0;bottom:0;left:50%;width:1px; }
+#cur-dot{ position:fixed; z-index:10000; pointer-events:none; width:4px; height:4px; border-radius:50%; background:var(--ink); transform:translate(-50%,-50%); }
+body.cl #cur::before,body.cl #cur::after,body.cl #cur-dot{ background:var(--teal); }
+@media (hover:none){ body,a,button{ cursor:auto; } #cur,#cur-dot{ display:none; } }
+
+nav{ position:fixed; top:36px; left:44px; z-index:500; }
+.n-links{ list-style:none; display:flex; flex-direction:column; gap:20px; }
+.n-links a{ font-size:10px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:rgba(240,237,230,.5); text-decoration:none; }
+.n-links a:hover{ color:#fff; }
+.cs-topbar{ position:fixed; top:32px; right:40px; z-index:500; }
+.cs-back-pill{ font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(240,237,230,.8); text-decoration:none; border:1.5px solid rgba(240,237,230,.25); padding:8px 16px; border-radius:20px; background:rgba(44,74,110,.6); backdrop-filter:blur(6px); }
+.cs-back-pill:hover{ border-color:var(--teal); color:var(--teal); }
+@media (max-width:760px){ nav,.cs-topbar{ display:none; } }
+
+.wrap{ max-width:1000px; margin:0 auto; padding:0 6vw; }
+.cs-hero{ padding:130px 6vw 40px; text-align:center; }
+.cs-eyebrow{ font-size:9px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:var(--dim); margin-bottom:18px; }
+.cs-hero h1{ font-family:'Fraunces',serif; font-weight:800; font-style:italic; font-size:clamp(36px,6.4vw,76px); line-height:1; letter-spacing:-2px; margin:0 auto 20px; max-width:820px; }
+.cs-hero h1 em{ color:var(--teal); font-weight:200; }
+.cs-hero p{ font-size:15px; line-height:1.75; color:var(--dim); max-width:520px; margin:0 auto; }
+
+.meta{ display:grid; grid-template-columns:repeat(3,1fr); gap:0; max-width:1000px; margin:50px auto 0; border-top:1px solid var(--line); }
+.meta{ text-align:left; }
+.meta > div{ padding:20px 18px; border-bottom:1px solid var(--line); }
+.meta .k{ font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--teal); margin-bottom:8px; }
+.meta .v{ font-size:13.5px; line-height:1.55; color:rgba(240,237,230,.8); }
+@media (max-width:760px){ .meta{ grid-template-columns:1fr 1fr; } }
+
+section.cs{ padding:90px 0 20px; }
+.sec-tag{ font-size:9px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:var(--teal); margin-bottom:14px; }
+section.cs h2{ font-family:'Fraunces',serif; font-weight:800; font-style:italic; font-size:clamp(28px,4.2vw,50px); line-height:1.05; letter-spacing:-1px; margin-bottom:22px; max-width:760px; }
+section.cs > .wrap > p, .lede{ font-size:15.5px; line-height:1.8; color:rgba(240,237,230,.7); max-width:680px; margin-bottom:18px; }
+
+.parts{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin:26px 0 8px; }
+.part{ border-top:2px solid var(--teal); padding-top:14px; }
+.part b{ font-family:'Fraunces',serif; font-style:italic; font-size:20px; display:block; margin-bottom:6px; }
+.part span{ font-size:13.5px; line-height:1.65; color:var(--dim); }
+@media (max-width:760px){ .parts{ grid-template-columns:1fr; } }
+
+.shots{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; margin:30px 0 10px; align-items:start; }
+.shots.cols-1{ grid-template-columns:minmax(0,640px); }
+.shot{ position:relative; background:var(--bg2); border:1px solid var(--line); border-radius:6px; padding:10px; }
+.shot img{ width:100%; display:block; border-radius:3px; background:#fff; }
+.shot.portrait img{ max-width:300px; margin:0 auto; }
+.shot figcaption{ font-size:11.5px; line-height:1.5; color:var(--dim); margin-top:10px; padding:0 4px 4px; }
+.shot-tag{ position:absolute; top:-10px; left:14px; z-index:2; font-size:9px; font-weight:800; letter-spacing:2px; text-transform:uppercase; background:var(--ink); color:#1d3552; padding:4px 10px; border-radius:20px; }
+
+.tbl-wrap{ overflow-x:auto; margin:30px 0 10px; border:1px solid var(--line); border-radius:6px; }
+table{ width:100%; border-collapse:collapse; min-width:640px; }
+th{ text-align:left; font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--teal); padding:14px 16px; border-bottom:1px solid var(--line); background:rgba(0,0,0,.12); }
+td{ padding:14px 16px; font-size:13.5px; line-height:1.55; color:rgba(240,237,230,.78); border-bottom:1px solid var(--line); vertical-align:top; }
+td:first-child{ color:var(--ink); font-weight:700; }
+tr:last-child td{ border-bottom:0; }
+
+ol.steps{ list-style:none; counter-reset:s; margin:26px 0 14px; max-width:720px; }
+ol.steps li{ counter-increment:s; position:relative; padding:0 0 22px 56px; font-size:15px; line-height:1.75; color:rgba(240,237,230,.72); }
+ol.steps li::before{ content:counter(s); position:absolute; left:0; top:-2px; width:36px; height:36px; border-radius:50%; border:1.5px solid var(--teal); color:var(--teal); font-family:'Fraunces',serif; font-weight:800; display:flex; align-items:center; justify-content:center; }
+ul.dots{ list-style:none; margin:20px 0; max-width:720px; }
+ul.dots li{ position:relative; padding:0 0 16px 24px; font-size:15px; line-height:1.75; color:rgba(240,237,230,.72); }
+ul.dots li::before{ content:''; position:absolute; left:0; top:11px; width:8px; height:8px; border-radius:50%; background:var(--teal); }
+b{ color:var(--ink); }
+
+.feedback{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:30px 0 0; }
+.quote{ border-left:2px solid var(--teal); padding:6px 0 6px 20px; }
+.quote q{ font-family:'Fraunces',serif; font-style:italic; font-weight:700; font-size:22px; line-height:1.25; display:block; margin-bottom:10px; quotes:"“" "”"; }
+.quote span{ font-size:13.5px; line-height:1.7; color:var(--dim); }
+@media (max-width:760px){ .feedback{ grid-template-columns:1fr; } }
+
+.change{ margin-top:70px; padding-top:30px; border-top:1px solid var(--line); }
+.change-head{ display:flex; align-items:baseline; gap:18px; margin-bottom:22px; }
+.change-n{ font-family:'Fraunces',serif; font-weight:200; font-size:44px; color:var(--teal); line-height:1; }
+.change h3{ font-family:'Fraunces',serif; font-weight:800; font-style:italic; font-size:clamp(22px,2.8vw,32px); letter-spacing:-.5px; }
+.why-what{ display:grid; grid-template-columns:1fr 1fr; gap:34px; }
+.lab{ font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--dim2); margin-bottom:8px; }
+.lab.teal{ color:var(--teal); }
+.why-what p{ font-size:14.5px; line-height:1.78; color:rgba(240,237,230,.72); }
+@media (max-width:760px){ .why-what{ grid-template-columns:1fr; gap:18px; } }
+
+.stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin:30px 0; }
+.stat{ border-top:2px solid var(--teal); padding-top:14px; }
+.stat .n{ font-family:'Fraunces',serif; font-weight:800; font-style:italic; font-size:clamp(40px,6vw,70px); line-height:1; letter-spacing:-2px; }
+.stat .d{ font-size:13.5px; line-height:1.6; color:var(--dim); margin-top:8px; }
+@media (max-width:760px){ .stats{ grid-template-columns:1fr; } }
+.lessons{ display:grid; grid-template-columns:1fr 1fr; gap:26px 34px; margin-top:20px; }
+.lesson h4{ font-family:'Fraunces',serif; font-style:italic; font-weight:800; font-size:20px; margin-bottom:6px; }
+.lesson p{ font-size:14px; line-height:1.7; color:var(--dim); }
+@media (max-width:760px){ .lessons{ grid-template-columns:1fr; } }
+.note{ margin-top:36px; font-size:12.5px; color:var(--dim2); letter-spacing:.3px; }
+
+.cs-outro{ text-align:center; padding:110px 6vw 90px; }
+.cs-outro h3{ font-family:'Fraunces',serif; font-weight:800; font-style:italic; font-size:clamp(28px,4vw,48px); margin-bottom:16px; }
+.cs-outro p{ color:var(--dim); max-width:460px; margin:0 auto; line-height:1.7; }
+.cs-back{ display:inline-flex; margin-top:26px; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--ink); text-decoration:none; border:1.5px solid rgba(240,237,230,.3); padding:12px 22px; border-radius:30px; }
+.cs-back:hover{ border-color:var(--teal); color:var(--teal); }
+
+.reveal{ opacity:0; transform:translateY(24px); transition:opacity .7s ease, transform .7s ease; }
+.reveal.in{ opacity:1; transform:none; }
+
+footer{ padding:24px 44px; background:#16283e; display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(240,237,230,.06); }
+.ft-l{ font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(240,237,230,.3); }
+.ft-r{ display:flex; align-items:center; gap:14px; }
+.ft-n{ font-family:'Noto Sans Devanagari',sans-serif; font-size:13px; font-weight:700; color:rgba(240,237,230,.3); }
+.footer-socials{ display:flex; gap:8px; }
+.footer-socials a{ width:30px; height:30px; display:flex; align-items:center; justify-content:center; border:1.5px solid rgba(240,237,230,.12); border-radius:50%; text-decoration:none; }
+.footer-socials svg{ width:12px; height:12px; fill:rgba(240,237,230,.4); }
+@media (max-width:760px){ footer{ flex-direction:column; gap:12px; padding:24px; } }
+
+.scrolly{ display:flex; max-width:1400px; margin:0 auto; position:relative; }
+.scrolly-sticky{ flex:0 0 56%; position:sticky; top:0; height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; padding:0 2vw 0 150px; }
+.scrolly-steps{ flex:0 0 44%; padding:0 6vw 0 2vw; }
+.step{ min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:70px 0; opacity:.22; transition:opacity .45s ease; }
+.step.active{ opacity:1; }
+.step-tag{ font-size:9px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:var(--teal); margin-bottom:16px; }
+.step h2{ font-family:'Fraunces',serif; font-weight:800; font-style:italic; font-size:clamp(28px,3.2vw,44px); line-height:1.05; margin:0 0 18px; letter-spacing:-1px; }
+.step p{ font-size:14.5px; line-height:1.75; color:rgba(240,237,230,.68); max-width:460px; margin-bottom:12px; }
+.step .lab{ margin-top:6px; } .step .lab + p{ margin-bottom:14px; }
+.step ol.steps{ margin:14px 0 8px; } .step ol.steps li{ font-size:14px; padding-bottom:16px; }
+.step ul.dots{ margin:10px 0; } .step ul.dots li{ font-size:14px; padding-bottom:12px; line-height:1.65; }
+.step .quote{ margin:14px 0; max-width:460px; } .step .quote q{ font-size:19px; }
+.stage{ position:relative; width:100%; height:78vh; }
+.pane{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+.pane.on{ pointer-events:auto; }
+.cards{ position:relative; width:100%; height:100%; }
+.card{ position:absolute; margin:0; background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:8px; box-shadow:0 30px 70px rgba(0,0,0,.45); width:68%; opacity:0; transform:translateY(60px) scale(.9) rotate(var(--r,0deg)); transition:opacity .6s ease var(--d), transform .8s cubic-bezier(.2,.9,.3,1.2) var(--d); }
+.pane.on .card{ opacity:1; transform:translate(var(--x,0),var(--y,0)) scale(1) rotate(var(--r,0deg)); }
+.card img{ width:100%; display:block; border-radius:4px; background:#fff; max-height:56vh; object-fit:contain; }
+.card figcaption{ font-size:11px; line-height:1.4; color:var(--dim); margin-top:8px; padding:0 3px 2px; }
+.card .shot-tag{ position:absolute; top:-10px; left:12px; z-index:3; font-size:9px; font-weight:800; letter-spacing:2px; text-transform:uppercase; background:var(--ink); color:#1d3552; padding:4px 10px; border-radius:20px; }
+.cards.n1 .card{ width:84%; top:50%; left:50%; --x:-50%; --y:-50%; transform:translate(-50%,-38%) scale(.9); }
+.cards.n1 .card.portrait{ width:46%; }
+.pane.on .cards.n1 .card{ transform:translate(-50%,-50%); }
+.cards.n2 .c0{ top:2%; left:0; --r:-2.5deg; width:60%; z-index:1; } .cards.n2 .c1{ bottom:0; right:0; --r:2deg; width:62%; z-index:2; }
+.cards.n3 .c0{ top:0; left:0; --r:-3deg; width:56%; z-index:1; } .cards.n3 .c1{ top:20%; right:0; --r:2.5deg; width:56%; z-index:2; } .cards.n3 .c2{ bottom:0; left:12%; --r:-1deg; width:56%; z-index:3; }
+.cards.n4 .c0{ top:0; left:0; --r:-2deg; width:46%; } .cards.n4 .c1{ top:4%; right:0; --r:2deg; width:46%; z-index:2; } .cards.n4 .c2{ bottom:0; left:2%; --r:1.5deg; width:46%; z-index:3; } .cards.n4 .c3{ bottom:2%; right:2%; --r:-2deg; width:46%; z-index:4; }
+.cards.n3 .portrait, .cards.n4 .portrait{ width:34%; }
+.cards.n3 .card figcaption,.cards.n4 .card figcaption{ display:none; }
+.cards.n3 .card img, .cards.n4 .card img{ max-height:30vh; } .cards.n2 .card img{ max-height:36vh; }
+.cards .card.portrait img{ max-height:46vh; }
+.bigstat{ text-align:center; }
+.bs-n{ font-family:'Fraunces',serif; font-weight:800; font-style:italic; font-size:clamp(60px,9vw,130px); line-height:1; letter-spacing:-3px; color:var(--teal); transform:scale(.85); opacity:0; transition:all .8s cubic-bezier(.2,.9,.3,1.2); }
+.bs-n small{ font-size:.28em; letter-spacing:0; color:var(--ink); font-weight:300; }
+.bs-d{ max-width:360px; margin:16px auto 0; font-size:14px; line-height:1.7; color:var(--dim); opacity:0; transition:opacity .8s .25s; }
+.pane.on .bs-n{ transform:none; opacity:1; } .pane.on .bs-d{ opacity:1; }
+.progress-dots{ position:absolute; left:22px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:10px; z-index:5; }
+.progress-dots div{ width:6px; height:6px; border-radius:50%; background:var(--dim2); transition:background .3s, transform .3s; }
+.progress-dots div.on{ background:var(--teal); transform:scale(1.5); box-shadow:0 0 8px rgba(77,255,210,.5); }
+@media (max-width:900px){
+  .scrolly{ flex-direction:column; }
+  .scrolly-sticky{ position:sticky; top:0; flex:none; width:100%; height:46vh; padding:12px 6vw; z-index:2; background:var(--bg); }
+  .scrolly-steps{ flex:none; width:100%; padding:0 6vw; }
+  .step{ min-height:70vh; padding:40px 0; }
+  .stage{ height:100%; } .card img{ max-height:20vh !important; } .progress-dots{ display:none; }
+  .cards.n1 .card{ width:70%; } .cards .card{ padding:5px; } .card figcaption{ display:none; }
+}
+.tbl-sec{ padding:80px 0 60px; } .tbl-sec .wrap{ max-width:1100px; }
+.tbl-sec h2{ font-family:'Fraunces',serif; font-weight:800; font-style:italic; font-size:clamp(26px,3.6vw,42px); letter-spacing:-1px; margin-bottom:24px; }
+.lessons-sec{ padding:80px 0 20px; } .lessons-sec .wrap{ max-width:1000px; }
+</style>
+</head><body>
+<div id="cur"></div><div id="cur-dot"></div>
+<nav>
+  <ul class="n-links">
+    <li><a href="index.html#client-intro">Clients</a></li>
+    <li><a href="index.html#flip-track">Projects</a></li>
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#what-i-do">Services</a></li>
+    <li><a href="index.html#contact">Contact</a></li>
+  </ul>
+</nav>
+<div class="cs-topbar"><a href="index.html#client-intro" class="cs-back-pill">&larr; All Work</a></div>
+
+<header class="cs-hero">
+  <div class="cs-eyebrow">Case Study &middot; App Development &middot; UX/UI Design</div>
+  <h1>Studio 57 POS<br><em>Developer Case Study</em></h1>
+  <p>I designed, built and now maintain the point-of-sale app that runs Studio 57 Nail Bar &amp; Spa from an iPad at the front desk. This is the story from version 1, through what broke once the salon depended on it every day, to the redesign that fixes it.</p>
+  <div class="meta">
+    <div><div class="k">Client</div><div class="v">Studio 57 Nail Bar &amp; Spa (nail salon, 8 stylists)</div></div>
+    <div><div class="k">My role</div><div class="v">UX/UI designer and developer: research, design, front end, back end, release</div></div>
+    <div><div class="k">Platform</div><div class="v">iPad web app, opened from a home-screen icon</div></div>
+    <div><div class="k">Stack</div><div class="v">React, TypeScript, Vite, Tailwind CSS, Google Apps Script, Google Sheets, Netlify</div></div>
+    <div><div class="k">This round</div><div class="v">Oct 19 to Oct 23, 2026: data recovery, redesign, build and testing</div></div>
+    <div><div class="k">Users</div><div class="v">Front-desk staff aged 40 to 60, and the owner as admin</div></div>
+  </div>
+</header>
+<div class="scrolly" id="s1"><div class="progress-dots"></div><div class="scrolly-sticky"><div class="stage"><div class="pane" data-i="0"><div class="cards n3"><figure class="card c0 n3" style="--d:0.0s"><img src="assets/studio57-pos/v1-login.png" alt="Version 1 login: black lock screen with logo and keypad"><figcaption>Version 1 login: black lock screen with logo and keypad</figcaption></figure><figure class="card c1 n3" style="--d:0.16s"><img src="assets/studio57-pos/v1-pos.png" alt="Version 1 employee POS: one ticket, stylist chosen from dropdowns"><figcaption>Version 1 employee POS: one ticket, stylist chosen from dropdowns</figcaption></figure><figure class="card c2 n3" style="--d:0.32s"><img src="assets/studio57-pos/v1-admin.png" alt="Version 1 admin dashboard: calendar, six totals and the audit log"><figcaption>Version 1 admin dashboard: calendar, six totals and the audit log</figcaption></figure></div></div><div class="pane" data-i="1"><div class="cards n1"><figure class="card c0 n1 portrait" style="--d:0.0s"><span class="shot-tag">Version 1</span><img src="assets/studio57-pos/v1-upright.png" alt="Version 1 on an upright iPad: tabs run into each other and the table is cut off"><figcaption>Version 1 on an upright iPad: tabs run into each other and the table is cut off</figcaption></figure></div></div></div></div><div class="scrolly-steps"><div class="step" data-i="0"><div class="step-tag">01 — Version 1</div><h2>What I built<br>and launched</h2><p>The first version replaced paper tickets with an iPad app: staff log in with a PIN, ring up services, and every sale is sent to a Google Sheet. I designed it in Figma, built it in React, and connected it to a Google Apps Script that stores the data in Google Sheets.</p><ul class="dots"><li><b>PIN login.</b> A black lock screen with the salon’s logo and a large keypad. Staff and admin each have a 4-digit code.</li><li><b>Employee POS.</b> Service menu on the left, live receipt on the right: pick a main stylist, add services and polish colors, choose payment and tip, then log the ticket.</li><li><b>Admin dashboard.</b> A calendar, six daily totals and tabs for audit logs, analytics, inventory, staff, the menu and settings.</li></ul><p>Version 1 worked well for one stylist and one client at a time. The cracks showed once the whole team used it on busy days.</p></div><div class="step" data-i="1"><div class="step-tag">02 — Real use</div><h2>What happened once the salon used it every day</h2><p>About four months of real use showed that the app’s biggest problem was invisible: sales had stopped reaching the Google Sheet, so the business records were incomplete. Everything else came from watching how the team actually works, several stylists and clients at the same time.</p><p>The full list is below.</p></div></div></div>
+<section class="tbl-sec"><div class="wrap"><div class="sec-tag reveal">What we saw at the salon</div><h2 class="reveal">Eight problems, eight causes</h2><div class="tbl-wrap reveal"><table><thead><tr><th>What we saw at the salon</th><th>Why it happened</th><th>Impact</th></tr></thead><tbody><tr><td>The Google Sheet stopped showing new sales</td><td>Each day was saved in the script’s private settings, which have a size limit; it was about 80% full</td><td>The owner asked for every transaction to date and the Sheet couldn’t provide it</td></tr><tr><td>Two stylists working at once got in each other’s way</td><td>The app held only one open ticket</td><td>One stylist waited, or kept services in her head until the other checked out</td></tr><tr><td>Opening cash showed $200 every morning</td><td>The server sent $200 for any day not saved yet, overriding the carried-forward amount</td><td>The admin retyped it daily; when they forgot, cash totals were wrong</td></tr><tr><td>Monthly and quarterly reports didn’t match reality</td><td>They multiplied today’s figures instead of adding up real tickets</td><td>No trustworthy report for any date range</td></tr><tr><td>A forgotten ticket stayed forgotten</td><td>Past days could be viewed but not added to</td><td>Missed sales never reached the books</td></tr><tr><td>The admin screen broke on an upright iPad</td><td>The layout assumed a wide screen</td><td>Tabs and cards overlapped and the table was cut off</td></tr><tr><td>I got locked out</td><td>The salon changed the passcodes after launch</td><td>I couldn’t get in to support them</td></tr><tr><td>Staff struggled with small text and dropdowns</td><td>The team is in their 40s to 60s</td><td>Slower checkout and more mistakes</td></tr></tbody></table></div></div></section>
+<div class="scrolly" id="s2"><div class="progress-dots"></div><div class="scrolly-sticky"><div class="stage"><div class="pane" data-i="0"><div class="bigstat"><div class="bs-n">398,640<small> / 500,000</small></div><div class="bs-d">bytes of the script’s private settings store were used, about 80% full</div></div></div><div class="pane" data-i="1"><div class="cards n3"><figure class="card c0 n3" style="--d:0.0s"><span class="shot-tag">Option A · Ticket tabs</span><img src="assets/studio57-pos/opt-a.png" alt="Ticket tabs across the top, menu on the left, receipt on the right"><figcaption>Ticket tabs across the top, menu on the left, receipt on the right</figcaption></figure><figure class="card c1 n3" style="--d:0.16s"><span class="shot-tag">Option B · Staff lanes</span><img src="assets/studio57-pos/opt-b.png" alt="Staff sidebar with each stylist’s open clients"><figcaption>Staff sidebar with each stylist’s open clients</figcaption></figure><figure class="card c2 n3" style="--d:0.32s"><span class="shot-tag">Option C · Ticket board</span><img src="assets/studio57-pos/opt-c.png" alt="A board of open-ticket cards"><figcaption>A board of open-ticket cards</figcaption></figure></div></div><div class="pane" data-i="2"><div class="cards n1"><figure class="card c0 n1" style="--d:0.0s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-start.png" alt="“Who is this ticket for?” with stylist tiles and client type"><figcaption>“Who is this ticket for?” with stylist tiles and client type</figcaption></figure></div></div><div class="pane" data-i="3"><div class="cards n2"><figure class="card c0 n2" style="--d:0.0s"><span class="shot-tag">Before</span><img src="assets/studio57-pos/v1-pos.png" alt="One ticket, stylist dropdowns"><figcaption>One ticket, stylist dropdowns</figcaption></figure><figure class="card c1 n2" style="--d:0.16s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-tabs.png" alt="Open-ticket tabs, pink added services and the receipt"><figcaption>Open-ticket tabs, pink added services and the receipt</figcaption></figure></div></div><div class="pane" data-i="4"><div class="cards n1"><figure class="card c0 n1" style="--d:0.0s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-doneby.png" alt="“Who did this service?” picker"><figcaption>“Who did this service?” picker</figcaption></figure></div></div><div class="pane" data-i="5"><div class="cards n2"><figure class="card c0 n2" style="--d:0.0s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-checkout.png" alt="Checkout with payment, discount and tip"><figcaption>Checkout with payment, discount and tip</figcaption></figure><figure class="card c1 n2" style="--d:0.16s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-logged.png" alt="“Transaction Logged” with “Saved to Google Sheet ✓”"><figcaption>“Transaction Logged” with “Saved to Google Sheet ✓”</figcaption></figure></div></div><div class="pane" data-i="6"><div class="cards n2"><figure class="card c0 n2" style="--d:0.0s"><span class="shot-tag">Before</span><img src="assets/studio57-pos/v1-admin.png" alt="The audit log as one table"><figcaption>The audit log as one table</figcaption></figure><figure class="card c1 n2" style="--d:0.16s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-audit.png" alt="Audit logs by stylist, one ticket open for editing"><figcaption>Audit logs by stylist, one ticket open for editing</figcaption></figure></div></div><div class="pane" data-i="7"><div class="cards n1"><figure class="card c0 n1" style="--d:0.0s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-missed.png" alt="A past day with an added ticket marked “Added later by admin”"><figcaption>A past day with an added ticket marked “Added later by admin”</figcaption></figure></div></div><div class="pane" data-i="8"><div class="cards n3"><figure class="card c0 n3 portrait" style="--d:0.0s"><span class="shot-tag">Before</span><img src="assets/studio57-pos/old-close.png" alt="“Close Out Register Drawer?” with only Cancel and Proceed"><figcaption>“Close Out Register Drawer?” with only Cancel and Proceed</figcaption></figure><figure class="card c1 n3" style="--d:0.16s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-close.png" alt="Close register with a cash count and tomorrow’s opening cash"><figcaption>Close register with a cash count and tomorrow’s opening cash</figcaption></figure><figure class="card c2 n3" style="--d:0.32s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-opening.png" alt="Opening cash carried forward, with drawer history"><figcaption>Opening cash carried forward, with drawer history</figcaption></figure></div></div><div class="pane" data-i="9"><div class="cards n4"><figure class="card c0 n4" style="--d:0.0s"><span class="shot-tag">Before</span><img src="assets/studio57-pos/old-analytics.png" alt="Analytics with popular services only"><figcaption>Analytics with popular services only</figcaption></figure><figure class="card c1 n4" style="--d:0.16s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-reports.png" alt="Reports tab with date range, totals and breakdowns"><figcaption>Reports tab with date range, totals and breakdowns</figcaption></figure><figure class="card c2 n4" style="--d:0.32s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-analytics.png" alt="Analytics with client types"><figcaption>Analytics with client types</figcaption></figure><figure class="card c3 n4" style="--d:0.48s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-email.png" alt="Email a report for any date range"><figcaption>Email a report for any date range</figcaption></figure></div></div><div class="pane" data-i="10"><div class="cards n3"><figure class="card c0 n3 portrait" style="--d:0.0s"><span class="shot-tag">Before</span><img src="assets/studio57-pos/v1-upright.png" alt="Version 1 upright: tabs overlap"><figcaption>Version 1 upright: tabs overlap</figcaption></figure><figure class="card c1 n3 portrait" style="--d:0.16s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-upright.png" alt="Admin on an upright iPad"><figcaption>Admin on an upright iPad</figcaption></figure><figure class="card c2 n3" style="--d:0.32s"><span class="shot-tag">After</span><img src="assets/studio57-pos/new-dark.png" alt="The ticket screen in Dark mode"><figcaption>The ticket screen in Dark mode</figcaption></figure></div></div><div class="pane" data-i="11"><div class="bigstat"><div class="bs-n">43<small> checks</small></div><div class="bs-d">23 end-to-end checks and 20 server tests passed on a copy of the real records</div></div></div><div class="pane" data-i="12"><div class="bigstat"><div class="bs-n">823<small> tickets</small></div><div class="bs-d">recovered across 85 days, none lost or duplicated, and no storage limit left to hit</div></div></div></div></div><div class="scrolly-steps"><div class="step" data-i="0"><div class="step-tag">03 — The urgent fix</div><h2>Solving the missing<br>transactions</h2><p>I fixed the storage before touching the design, so no sale could be lost while the salon kept working.</p><ol class="steps"><li><b>Found the cause.</b> I read the whole app and the Google script, then compared the iPad’s records with the Sheet day by day. The private settings store was 398,640 of about 500,000 bytes full.</li><li><b>Saved a copy of everything.</b> A one-time script exported all 822 stored tickets from 84 days into the Sheet.</li><li><b>Moved storage into the spreadsheet.</b> I rewrote the script to keep each day in a Sheet tab, plus a readable Tickets tab with one row per ticket. Big days are split across cells, so there’s no size limit anymore. The app’s screens didn’t change, so staff never noticed.</li><li><b>Checked it in real use.</b> 85 days and 823 tickets moved, and that afternoon’s real checkouts landed straight in the Tickets tab.</li><li><b>Added a safety net.</b> A “Backup transactions” screen lets the admin compare the iPad with the Sheet and send only the missing tickets, never duplicates.</li></ol><p>That fixed the records. The rest of the list needed a redesign.</p></div><div class="step" data-i="1"><div class="step-tag">04 — Redesign</div><h2>First ideas,<br>and why one won</h2><p>The core question was how several stylists can each keep a ticket open without crowding the screen. I sketched three answers, in a new visual style at first, and showed them to the owner.</p><p>The owner picked A and asked for B’s sense of who is busy. Two pieces of feedback then shaped everything after:</p><div class="quote"><q>Keep the fonts and colors the same.</q><span>The staff already knew the app, so the final screens use version 1’s system font, grays, pink and green, and keep familiar pieces such as the receipt rows, the amber massage control and the discount box.</span></div><div class="quote"><q>Make it as big and simple as it can be.</q><span>Big tiles, one decision per screen, and strong color for whatever is selected.</span></div></div><div class="step" data-i="2"><div class="step-tag">05.1 — What changed</div><h2>Starting a ticket</h2><div class="lab">Why it changed</div><p>In version 1 the stylist was a dropdown inside the receipt, easy to skip or pick wrong, and there was no record of what kind of client it was. The owner also wanted to know how many clients are walk-ins, regulars or appointments.</p><div class="lab teal">What changed</div><p>A first screen asks “Who is this ticket for?” with big stylist tiles and a required client type. Nothing is pre-selected, so no one can tap straight through. The client’s name is optional, and “View Tickets” skips straight to the open tickets.</p></div><div class="step" data-i="3"><div class="step-tag">05.2 — What changed</div><h2>Several clients at once</h2><div class="lab">Why it changed</div><p>With one ticket at a time, a second stylist had to wait or remember her services.</p><div class="lab teal">What changed</div><p>Open tickets sit as tabs across the top, with a count badge. The active tab turns pink so it’s clear whose client you’re on. Services added turn pink with “✓ ADDED”, and each ticket saves itself on the iPad, so nothing is lost if the app closes. Tips and payment wait until checkout, because services get added while the client is still in the chair.</p></div><div class="step" data-i="4"><div class="step-tag">05.3 — What changed</div><h2>Two stylists, one client</h2><div class="lab">Why it changed</div><p>Clients often get a manicure from one stylist and a pedicure from another, and the stylist dropdowns were hard to use.</p><div class="lab teal">What changed</div><p>Each service has a “Done by ▾” button that opens the same big stylist tiles. The ticket becomes Multi-Staff, and tips and commission still split the way they always did.</p></div><div class="step" data-i="5"><div class="step-tag">05.4 — What changed</div><h2>Checking out and<br>knowing it saved</h2><div class="lab">Why it changed</div><p>Version 1 put everything on one long panel and never confirmed the sale reached the Sheet, which is how the missing records went unnoticed.</p><div class="lab teal">What changed</div><p>“Ready to check out” opens a short checkout (payment, discount, tip, LOG TICKET), then a confirm step. The receipt says “Saved to Google Sheet ✓” only once the Sheet has the ticket. Until then the ticket waits on the iPad and is sent again if needed.</p></div><div class="step" data-i="6"><div class="step-tag">05.5 — What changed</div><h2>Audit logs and<br>fixing mistakes</h2><div class="lab">Why it changed</div><p>The audit log was one long table of every ticket. To fix one stylist’s ticket, the owner had to scan everyone’s, and editing meant typing into small cells.</p><div class="lab teal">What changed</div><p>A tab per stylist with a ticket count, newest ticket first. Tapping a ticket opens it with the same receipt rows staff use, and saving changes only that one ticket, so an edit can never wipe tickets another device saved.</p></div><div class="step" data-i="7"><div class="step-tag">05.6 — What changed</div><h2>Adding a ticket someone forgot</h2><div class="lab">Why it changed</div><p>On busy days a sale sometimes wasn’t logged, and past days couldn’t be changed.</p><div class="lab teal">What changed</div><p>Pick any past day on the calendar and tap “Add a missed ticket”. It saves to that day and the Sheet, marked “Added later by admin” so it’s easy to audit.</p></div><div class="step" data-i="8"><div class="step-tag">05.7 — What changed</div><h2>Opening cash and<br>closing the register</h2><div class="lab">Why it changed</div><p>Opening cash reset to $200 every morning, and closing was a two-button popup that never asked how much cash was actually in the drawer.</p><div class="lab teal">What changed</div><p>Closing now asks for the counted cash, shows the difference from what’s expected, and says “$247.00 tomorrow’s opening cash”. The next morning starts with that amount automatically, with a drawer history to check against. A new Cash in Hand card shows the day’s own cash: cash sales minus card tips and commissions paid out of the drawer.</p></div><div class="step" data-i="9"><div class="step-tag">05.8 — What changed</div><h2>Real reports</h2><div class="lab">Why it changed</div><p>The owner asked for every transaction to date, and the old monthly figures were estimates.</p><div class="lab teal">What changed</div><p>A Reports tab with any date range, real totals, payment methods, stylists, services and every transaction, plus Download and Email Report. Analytics adds Walk-in, Regular and Appointment by day, month and year.</p></div><div class="step" data-i="10"><div class="step-tag">05.9 — What changed</div><h2>iPad upright, Dark mode and<br>access</h2><div class="lab">Why it changed</div><p>The iPad is sometimes stood upright, where version 1 overlapped. The client also asked for a dark mode. And after the salon changed its passcodes, I had no way to get in to support them.</p><div class="lab teal">What changed</div><p>On an upright iPad the calendar folds into a date bar and the tabs sit in two rows. A Light and Dark switch sits next to Font Size, and both are remembered. A developer PIN is kept only in the server’s private settings, never in the app or the Sheet.</p></div><div class="step" data-i="11"><div class="step-tag">06 — Testing</div><h2>Before it goes back<br>into the salon</h2><p>The new version had to pass one test above all: every past and present transaction stays exactly as it was.</p><ul class="dots"><li><b>Tested on the real records.</b> I ran the new app in a test browser against a simulated Google script loaded with the salon’s real 87 days and 836 tickets.</li><li><b>Walked through a full day.</b> Two tickets open at once, the app closed and reopened, a shared ticket checked out, an admin edit, a missed ticket on a past day, reports, email, closing the register, the developer PIN, an upright iPad and Dark mode.</li><li><b>Checked the money.</b> For example: Color Gel $35 + Lavender Spa $50 + 5 extra massage minutes ($5) = $90, tax on card $7.99, commission $5.</li><li><b>Checked nothing old moved.</b> Every past day was identical afterwards except the one where I added a ticket on purpose, and the iPad still held every ticket.</li><li><b>Results:</b> 23 end-to-end checks and 20 server tests passed.</li><li><b>Safe release plan.</b> The code sits on its own branch. The server update goes first because it also works with the current app. The new app goes live after closing, with a short note to staff.</li></ul></div><div class="step" data-i="12"><div class="step-tag">07 — Outcome</div><h2>Records complete,<br>redesign approved</h2><p>The salon’s records are complete again, and the redesign the owner approved fixes every problem found in real use.</p><ul class="dots"><li><b>One problem, one change.</b> Each issue from the salon floor has a matching fix: open tickets, Done by, a confirmed save, missed tickets, a counted drawer, real reports, an upright layout and a developer PIN.</li><li><b>43 checks passed</b> on a copy of the real records before anything goes live.</li></ul></div></div></div>
+<section class="lessons-sec"><div class="wrap"><div class="sec-tag reveal">What I learned</div><div class="lessons"><div class="lesson reveal"><h4>Launching is the start, not the end.</h4><p>The most important problems only showed up after weeks of real use with the whole team.</p></div><div class="lesson reveal"><h4>Fix the data before the pixels.</h4><p>The most valuable work was invisible: making sure no sale could be lost.</p></div><div class="lesson reveal"><h4>Design for the people at the counter.</h4><p>For staff in their 40s to 60s, bigger targets, fewer choices per screen and clear feedback like “Saved ✓” mattered more than new features.</p></div><div class="lesson reveal"><h4>Keep what people already know.</h4><p>Keeping version 1’s fonts, colors and familiar controls made a big change feel small to the staff.</p></div></div><div class="note">To add after launch: staff feedback and any time saved at checkout, after a few weeks of use.</div></div></section>
+<div class="cs-outro">
+  <h3>More work</h3>
+  <p>Looking for the design side of this project? See the full Studio 57 website and booking app case studies.</p>
+  <a href="index.html#flip-track" class="cs-back">&larr; Back to all work</a>
+</div>
+
+<footer>
+  <span class="ft-l">&copy; 2025 Muskan KC &middot; All Rights Reserved</span>
+  <div class="ft-r">
+    <div class="footer-socials">
+      <a href="http://www.linkedin.com/in/muskan-kc-0a56781a1" target="_blank" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+      <a href="https://medium.com/@mkc_51000" target="_blank" title="Medium"><svg viewBox="0 0 24 24"><path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"/></svg></a>
+    </div>
+    <span class="ft-n">नमस्ते</span>
+  </div>
+</footer>
+
+<script>
+var CUR=document.getElementById('cur'),CDOT=document.getElementById('cur-dot'),mx=innerWidth/2,my=innerHeight/2;
+document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY});
+(function loop(){CUR.style.left=mx+'px';CUR.style.top=my+'px';CDOT.style.left=mx+'px';CDOT.style.top=my+'px';requestAnimationFrame(loop)})();
+document.querySelectorAll('a,button').forEach(function(el){el.addEventListener('mouseenter',function(){document.body.classList.add('cl')});el.addEventListener('mouseleave',function(){document.body.classList.remove('cl')})});
+document.querySelectorAll('.scrolly').forEach(function(sc){
+  var steps=sc.querySelectorAll('.step'),panes=sc.querySelectorAll('.pane'),dots=sc.querySelector('.progress-dots');
+  steps.forEach(function(){dots.appendChild(document.createElement('div'))});
+  function set(i){steps.forEach(function(s,j){s.classList.toggle('active',i===j)});panes.forEach(function(p,j){p.classList.toggle('on',i===j)});[].forEach.call(dots.children,function(d,j){d.classList.toggle('on',i===j)})}
+  set(0);
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)set(+e.target.dataset.i)})},{rootMargin:'-45% 0px -45% 0px'});
+  steps.forEach(function(s){io.observe(s)});
+});
+var rv=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');rv.unobserve(e.target)}})},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(function(el){rv.observe(el)});
+</script>
+</body>
+</html>
