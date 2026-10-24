@@ -166,9 +166,10 @@ footer{ padding:24px 44px; background:#16283e; display:flex; align-items:center;
   .scrolly-sticky{ position:sticky; top:0; flex:none; width:100%; height:46vh; padding:12px 6vw; z-index:2; background:var(--bg); }
   .scrolly-steps{ flex:none; width:100%; padding:0 6vw; }
   .step{ min-height:70vh; padding:40px 0; }
-  .stage{ height:100%; } .card img{ max-height:20vh !important; } .progress-dots{ display:none; }
+  .stage{ height:100%; } .card img{ max-height:30vh !important; } .cards.n1 .card.portrait{ width:40%; } .progress-dots{ display:none; }
   .cards.n1 .card{ width:70%; } .cards .card{ padding:5px; } .card figcaption{ display:none; }
 }
+@media (max-width:760px){ .tbl-wrap{ border:0; overflow:visible; } table,thead,tbody,tr,td{ display:block; min-width:0; width:100%; } thead{ display:none; } tr{ border:1px solid var(--line); border-radius:8px; margin-bottom:14px; padding:6px 0; background:rgba(0,0,0,.1); } td{ border:0; padding:8px 16px; } td:nth-child(2)::before,td:nth-child(3)::before{ display:block; font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--teal); margin-bottom:3px; } td:nth-child(2)::before{ content:'Why it happened'; } td:nth-child(3)::before{ content:'Impact'; } }
 .tbl-sec{ padding:80px 0 60px; } .tbl-sec .wrap{ max-width:1100px; }
 .tbl-sec h2{ font-family:'Fraunces',serif; font-weight:800; font-style:italic; font-size:clamp(26px,3.6vw,42px); letter-spacing:-1px; margin-bottom:24px; }
 .lessons-sec{ padding:80px 0 20px; } .lessons-sec .wrap{ max-width:1000px; }
