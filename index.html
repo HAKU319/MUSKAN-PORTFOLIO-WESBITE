@@ -2490,11 +2490,13 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
 /* ── Work Compilation: slow mandala behind the lists — sage + gold ink on the paper, kept very quiet ── */
 #cat-mandala{position:absolute;left:50%;top:50%;width:min(88vh,860px);height:min(88vh,860px);transform:translate(-50%,-50%);z-index:0;pointer-events:none;object-fit:contain;mix-blend-mode:multiply;opacity:0;transition:opacity 1.6s ease;-webkit-mask-image:radial-gradient(circle at 50% 50%,#000 58%,transparent 71%);mask-image:radial-gradient(circle at 50% 50%,#000 58%,transparent 71%)}
 /* v112 — flames only: the lamp is cropped away and the fire is enlarged to fill the whole Work Compilation screen */
-#cat-flame{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;container-type:size}
-#cat-flame #cat-mandala{position:absolute !important;left:50% !important;top:47% !important;width:max(300cqh,150cqw) !important;height:auto !important;max-width:none !important;transform:translate(-51%,-29%) !important;-webkit-mask-image:radial-gradient(ellipse 21% 13.5% at 51% 29%,#000 48%,transparent 100%) !important;mask-image:radial-gradient(ellipse 21% 13.5% at 51% 29%,#000 48%,transparent 100%) !important;filter:brightness(1.1) contrast(1.15);mix-blend-mode:multiply}
-#cat-mandala.on{opacity:.55}
+#cat-flame{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;container-type:size;mix-blend-mode:multiply}
+#cat-flame #cat-mandala{position:absolute !important;left:50% !important;top:47% !important;width:max(185cqh,95cqw) !important;height:auto !important;max-width:none !important;transform:translate(-51%,-29%) !important;-webkit-mask-image:radial-gradient(ellipse 19% 10.5% at 51% 28.6%,#000 58%,transparent 100%) !important;mask-image:radial-gradient(ellipse 19% 10.5% at 51% 28.6%,#000 58%,transparent 100%) !important;filter:contrast(1.28) saturate(1.2)}
+/* v113 — the outline figure behind Work Compilation is removed; the flame stands alone, larger-than-life but crisp */
+#cat-figure{display:none !important}
+#cat-mandala.on{opacity:.85}
 #category-nav.peeking #cat-mandala.on{opacity:.17;transition:opacity 1s ease}
-@media (max-width:760px){#cat-mandala.on{opacity:.6}}
+@media (max-width:760px){#cat-mandala.on{opacity:.85}}
 
 /* the project list stays sharp and readable while a preview is open — only the headings behind it soften */
 #category-nav.peeking .hs-panel .hs-content{opacity:1 !important;filter:none !important}
