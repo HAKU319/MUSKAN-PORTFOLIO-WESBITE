@@ -309,6 +309,8 @@ function initHScroll(cfg){
     curNumEl.textContent = String(idx + 1).padStart(2, '0');
     fillEl.style.width = (Math.max(0, Math.min(1, progress)) * 100) + '%';
     jumpBtns.forEach(function(b,i){ b.classList.toggle('on', i === idx); });
+    // on the last slide normal up/down page scrolling is handed back (phones only lock it in between)
+    if(section) section.classList.toggle('at-end', maxScroll > 0 && track.scrollLeft >= maxScroll - 2);
   }
 
   function goTo(i){
@@ -351,7 +353,7 @@ function initHScroll(cfg){
   // slides instead of stopping on them. Whenever a scroll gesture is carrying the
   // page into this section, catch it: glide the section exactly into place, lock
   // the page, and from then on only the horizontal slides move.
-  var snapping = false;
+  var snapping = false, handing = false, handUntil = 0;
   function snapIn(){
     var r = section.getBoundingClientRect();
     var from = window.scrollY, to = from + r.top, t0 = null;
@@ -368,7 +370,8 @@ function initHScroll(cfg){
   }
   if(section && window.matchMedia('(hover:hover) and (pointer:fine)').matches){
     window.addEventListener('wheel', function(e){
-      if(snapping){ e.preventDefault(); return; }
+      if(snapping || handing){ e.preventDefault(); return; }
+      if(Date.now() < handUntil) return;
       if(__scrollLocked || Math.abs(e.deltaY) < Math.abs(e.deltaX) || !e.deltaY) return;
       var r = section.getBoundingClientRect(), H = window.innerHeight;
       if(r.top <= 4 && r.top >= -2) return;                 // already in place — normal handler owns it
@@ -387,7 +390,7 @@ function initHScroll(cfg){
   // continuing to scroll releases the lock and hands off to normal
   // page scroll for that same gesture.
   var wheelTarget = section || track;
-  wheelTarget.addEventListener('wheel', function(e){
+  function onTrackWheel(e){
     checkCentered();
     if(!isCentered) return; // outside the section entirely — ordinary scroll
 
@@ -416,8 +419,20 @@ function initHScroll(cfg){
       // default scroll action, so the handoff is done manually instead
       // of just hoping the browser picks it back up.
       e.preventDefault();
+      if(handing || Date.now() < handUntil) return;   // ignore the momentum tail
       unlockPageScroll();
-      window.scrollBy(0, e.deltaY);
+      var hr = (section || track).getBoundingClientRect();
+      var hFrom = window.scrollY;
+      var hTo = Math.max(0, hFrom + (dir > 0 ? hr.bottom : hr.top - window.innerHeight));
+      handing = true;
+      var ht0 = null;
+      (function hf(ts){
+        if(ht0 === null) ht0 = ts;
+        var p = Math.min((ts - ht0) / 650, 1), k = 1 - Math.pow(1 - p, 3);
+        window.scrollTo(0, hFrom + (hTo - hFrom) * k);
+        if(p < 1) requestAnimationFrame(hf);
+        else { handing = false; handUntil = Date.now() + 350; checkCentered(); }
+      })(performance.now());
       return;
     }
 
@@ -427,7 +442,10 @@ function initHScroll(cfg){
     if(nowT < (track.__busyUntil || 0)) return;
     track.__busyUntil = nowT + 520;
     goTo(currentIndex() + dir);
-  }, { passive:false });
+  }
+  wheelTarget.addEventListener('wheel', onTrackWheel, { passive:false });
+  var peekEl = document.getElementById('cat-peek');
+  if(peekEl && section && !section.contains(peekEl) && cfg.sectionId === 'category-nav') peekEl.addEventListener('wheel', onTrackWheel, { passive:false });
 
   // Native horizontal touch swipe already works via scroll-snap with no
   // extra code needed — verified directly (including diagonal gestures
@@ -2266,7 +2284,7 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 .pk-view { position:relative; flex:1; overflow:hidden; background:#efe9da; border:1px solid rgba(66,60,43,.18); }
 .pk-view::before { content:'sketching…'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
   font-family:'Special Elite',monospace; font-size:12px; letter-spacing:3px; text-transform:uppercase; color:rgba(66,60,43,.4); }
-.pk-frame { position:absolute; top:0; left:0; border:0; background:#121212; transform-origin:0 0; opacity:0; transition:opacity .4s ease; }
+.pk-frame { pointer-events:none; position:absolute; top:0; left:0; border:0; background:#121212; transform-origin:0 0; opacity:0; transition:opacity .4s ease; }
 .pk-frame.show { opacity:1; }
 .pk-missing { position:absolute; inset:0; display:none; align-items:center; justify-content:center; text-align:center; padding:24px;
   font-family:'Special Elite',monospace; font-size:13px; line-height:1.8; color:rgba(66,60,43,.7); background:#efe9da; z-index:2; }
@@ -2351,9 +2369,10 @@ html { scroll-behavior:auto !important; }                  /* native smooth-scro
   #hero,#flip-track{min-height:100dvh}
   .hs-viewport{height:100dvh}
 }
-.hs-track{overscroll-behavior:contain;touch-action:pan-x pan-y}
+.hs-track{overscroll-behavior-x:contain;touch-action:pan-x pan-y}
 /* v112 — phones: inside a slide section only sideways swipes work (vertical is locked); a swipe past the first/last slide hands on to the page */
-@media (hover:none) and (pointer:coarse){.hs-track,.hs-viewport,.hs-host .hs-panel{touch-action:pan-x !important}.hs-track{overscroll-behavior:contain}}
+@media (hover:none) and (pointer:coarse){.hs-track,.hs-viewport,.hs-host .hs-panel{touch-action:pan-x !important}.hs-track{overscroll-behavior-x:contain}
+.hs-host.at-end .hs-track,.hs-host.at-end .hs-viewport,.hs-host.at-end .hs-panel{touch-action:pan-x pan-y !important}}
 @media (max-width:760px){
   html{-webkit-tap-highlight-color:transparent}
   body{-webkit-text-size-adjust:100%}
@@ -2408,8 +2427,9 @@ html { scroll-behavior:auto !important; }                  /* native smooth-scro
 html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
 
 /* v97 — flame: lift the clip's own paper-toned backdrop to white so multiply leaves only the vase + flame (no ghost oval of double texture) */
-/* v111 — hero: nothing behind the headline for now (the flame lives in Work Compilation) */
-#bg-video{display:none !important}
+/* v114 — the flame rises behind the headline once it is written: lamp cropped away, fire enlarged to sit behind the whole screen, a touch smaller than before */
+#bg-video{position:fixed !important;left:50% !important;top:58% !important;width:max(158vh,82vw) !important;height:auto !important;max-width:none !important;max-height:none !important;transform:translate3d(-51%,-29%,0) !important;-webkit-mask-image:radial-gradient(ellipse 19% 10.5% at 51% 28.6%,#000 58%,transparent 100%) !important;mask-image:radial-gradient(ellipse 19% 10.5% at 51% 28.6%,#000 58%,transparent 100%) !important;filter:contrast(1.28) saturate(1.2) !important;mix-blend-mode:multiply}
+@media (min-width:761px){#bg-video{width:max(212vh,82vw) !important;top:56% !important}}
 
 /* ── hand control: instructions, help button, live hint, click pulse ── */
 @media all{
@@ -2487,16 +2507,8 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
 #category-nav .hs-content{transition:transform .9s cubic-bezier(.22,1,.36,1),opacity 1.3s ease,filter 1.3s ease !important}
 #category-nav.peeking .hs-panel .hs-content{transform:translateX(-24vw) !important;opacity:.22;filter:blur(1.2px)}
 #category-nav.peeking #cat-figure{opacity:.08 !important;transition:opacity 1.3s ease}
-/* ── Work Compilation: slow mandala behind the lists — sage + gold ink on the paper, kept very quiet ── */
-#cat-mandala{position:absolute;left:50%;top:50%;width:min(88vh,860px);height:min(88vh,860px);transform:translate(-50%,-50%);z-index:0;pointer-events:none;object-fit:contain;mix-blend-mode:multiply;opacity:0;transition:opacity 1.6s ease;-webkit-mask-image:radial-gradient(circle at 50% 50%,#000 58%,transparent 71%);mask-image:radial-gradient(circle at 50% 50%,#000 58%,transparent 71%)}
-/* v112 — flames only: the lamp is cropped away and the fire is enlarged to fill the whole Work Compilation screen */
-#cat-flame{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;container-type:size;mix-blend-mode:multiply}
-#cat-flame #cat-mandala{position:absolute !important;left:50% !important;top:47% !important;width:max(185cqh,95cqw) !important;height:auto !important;max-width:none !important;transform:translate(-51%,-29%) !important;-webkit-mask-image:radial-gradient(ellipse 19% 10.5% at 51% 28.6%,#000 58%,transparent 100%) !important;mask-image:radial-gradient(ellipse 19% 10.5% at 51% 28.6%,#000 58%,transparent 100%) !important;filter:contrast(1.28) saturate(1.2)}
 /* v113 — the outline figure behind Work Compilation is removed; the flame stands alone, larger-than-life but crisp */
 #cat-figure{display:none !important}
-#cat-mandala.on{opacity:.85}
-#category-nav.peeking #cat-mandala.on{opacity:.17;transition:opacity 1s ease}
-@media (max-width:760px){#cat-mandala.on{opacity:.85}}
 
 /* the project list stays sharp and readable while a preview is open — only the headings behind it soften */
 #category-nav.peeking .hs-panel .hs-content{opacity:1 !important;filter:none !important}
@@ -2755,8 +2767,7 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
       <div class="hs-hud-count"><b id="catCurNum">01</b>&nbsp;/&nbsp;06</div>
       <div class="hs-hud-bar"><div class="hs-hud-fill" id="catHudFill"></div></div>
     </div>
-    <div id="cat-flame" aria-hidden="true"><video id="cat-mandala" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" disablepictureinpicture></video></div>
-    <div id="cat-figure">
+        <div id="cat-figure">
       <svg id="catf-svg" viewBox="0 0 475.145446 537.000000" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
         <g transform="translate(-162.412820,648.000000) scale(0.100000,-0.100000)">
           <path id="catf-path" d="M3977 6460 c-14 -11 -29 -30 -33 -43 -4 -12 -16 -34 -27 -49 -12 -17 -18 -36 -15 -52 3 -16 -1 -31 -10 -38 -22 -19 -42 -72 -42 -113 0 -20 -7 -46 -16 -60 -12 -19 -13 -31 -5 -63 13 -47 2 -87 -41 -146 -17 -24 -28 -52 -28 -72 0 -25 -7 -38 -30 -54 -44 -32 -66 -82 -90 -211 -12 -63 -22 -117 -23 -122 -1 -4 25 -19 58 -32 78 -32 87 -23 79 79 -10 114 18 141 222 223 44 18 95 47 114 65 25 25 30 27 21 11 -17 -33 -72 -67 -181 -113 -121 -51 -161 -88 -167 -157 -4 -41 0 -55 25 -93 37 -54 57 -127 48 -174 -4 -20 -31 -67 -63 -107 -62 -81 -95 -147 -112 -227 -13 -61 -14 -141 -3 -159 5 -8 53 17 157 83 222 142 270 186 282 260 4 27 1 42 -17 66 l-22 30 23 -7 c49 -15 99 -58 124 -108 35 -71 33 -127 -11 -255 -19 -57 -34 -105 -32 -107 11 -9 89 -44 123 -54 22 -7 47 -15 55 -18 8 -3 29 -5 45 -4 24 1 18 -3 -28 -23 -32 -13 -67 -32 -78 -42 -10 -9 -19 -14 -19 -11 0 4 18 20 40 36 38 27 39 30 19 36 -13 4 -24 2 -29 -5 -5 -8 -9 -7 -13 4 -3 8 -33 29 -65 45 l-59 30 -12 -26 c-58 -126 -52 -319 13 -467 24 -55 85 -151 91 -144 2 2 -3 32 -11 67 -8 35 -13 71 -11 80 3 11 5 9 6 -6 2 -46 52 -181 81 -221 33 -46 45 -51 52 -24 3 11 27 23 71 36 37 10 67 19 67 20 0 0 -9 25 -20 55 -12 29 -20 54 -18 56 2 1 31 19 66 40 34 21 62 39 62 42 0 2 -14 22 -31 46 l-30 42 36 34 37 33 -24 24 -24 25 -55 -25 c-30 -14 -67 -28 -84 -31 -16 -4 4 9 46 28 123 55 219 133 239 193 32 96 -80 233 -325 399 -110 75 -114 79 -148 149 -19 39 -37 83 -41 98 -10 42 11 117 49 180 19 31 35 64 36 75 1 10 5 -2 10 -26 5 -25 12 -48 17 -53 12 -12 122 34 122 52 0 23 -37 195 -50 235 -6 19 -28 49 -49 67 -25 22 -40 45 -45 68 -3 19 -21 55 -39 80 -29 40 -32 53 -33 120 -2 91 -27 205 -54 242 -11 15 -20 41 -20 58 0 18 -8 37 -20 47 -11 10 -20 25 -20 34 0 19 -54 69 -74 69 -8 0 -25 -9 -39 -20z m-77 -523 c12 -24 12 -30 -2 -44 -18 -17 -45 -12 -54 11 -3 9 2 33 13 55 13 28 19 34 23 22 3 -9 12 -29 20 -44z m287 -21 c-3 -30 -33 -44 -52 -25 -15 14 -15 19 2 53 l17 37 18 -23 c10 -13 17 -32 15 -42z M3858 5938 c-7 -19 2 -38 18 -38 8 0 14 10 14 25 0 26 -24 35 -32 13z M4147 5944 c-15 -15 -7 -45 11 -42 9 2 17 12 17 22 0 20 -16 31 -28 20z M4750 6078 c-18 -24 -30 -35 -27 -26 4 10 -3 22 -17 32 -29 19 -36 13 -37 -33 0 -20 -3 -29 -6 -21 -6 17 -32 40 -46 40 -10 0 -5 -38 9 -74 7 -17 5 -17 -14 2 -12 12 -31 22 -43 22 -20 0 -20 0 2 -40 29 -52 50 -71 91 -80 29 -7 30 -8 7 -9 -17 -1 -30 -9 -37 -26 -11 -25 -11 -25 31 -25 23 0 53 7 66 16 l23 17 -7 -89 c-7 -77 -11 -93 -38 -126 -20 -25 -31 -52 -35 -85 -6 -57 -16 -67 -136 -129 -78 -41 -90 -44 -98 -30 -12 21 -19 20 -79 -5 -27 -12 -49 -28 -49 -36 0 -8 14 -44 30 -79 24 -49 37 -65 57 -70 44 -12 125 39 236 148 55 54 102 97 104 95 2 -2 -11 -32 -29 -66 -43 -84 -49 -166 -18 -238 12 -29 31 -60 41 -69 15 -14 13 -4 -10 40 -46 87 -44 156 9 266 23 45 52 96 65 112 29 34 32 81 10 134 -10 25 -20 34 -30 30 -12 -4 -15 6 -15 58 0 56 15 126 26 126 3 0 17 -9 32 -20 38 -28 92 -38 92 -17 0 9 -7 22 -15 30 -12 13 -10 15 15 21 30 5 110 70 110 88 0 6 -17 8 -39 6 -37 -3 -38 -2 -25 17 21 29 17 45 -10 45 -18 0 -26 -7 -29 -22 -2 -13 -5 -2 -6 24 l-1 47 -30 -10 c-17 -6 -30 -18 -30 -27 0 -9 -10 4 -22 28 -13 24 -28 46 -34 47 -7 2 -26 -15 -44 -39z m-83 -110 c-3 -8 -6 -5 -6 6 -1 11 2 17 5 13 3 -3 4 -12 1 -19z m-17 -18 c6 -11 8 -20 6 -20 -3 0 -10 9 -16 20 -6 11 -8 20 -6 20 3 0 10 -9 16 -20z m191 -13 c-10 -9 -11 -8 -5 6 3 10 9 15 12 12 3 -3 0 -11 -7 -18z m-115 -34 c4 4 2 13 -4 19 -7 7 -12 16 -12 21 0 5 10 -3 21 -18 17 -21 28 -26 50 -23 16 3 29 1 29 -4 0 -14 27 -9 52 11 19 15 25 17 25 6 0 -8 -9 -18 -20 -21 -16 -5 -17 -8 -6 -16 10 -7 7 -8 -11 -3 -14 4 -50 9 -80 12 -59 6 -100 26 -100 50 0 8 9 3 24 -14 13 -15 28 -25 32 -20z m204 33 c0 -2 -8 -10 -17 -17 -16 -13 -17 -12 -4 4 13 16 21 21 21 13z M4722 6096 c1 -10 8 -17 13 -17 15 1 12 24 -3 29 -9 3 -13 -2 -10 -12z M4841 6101 c-10 -6 -11 -13 -3 -27 10 -18 11 -18 17 -2 10 25 3 39 -14 29z M3285 5738 c-12 -14 -19 -38 -19 -60 -1 -31 -5 -39 -33 -52 -19 -9 -38 -27 -43 -41 -8 -22 -16 -25 -55 -25 -31 0 -45 -4 -45 -13 0 -18 51 -88 100 -137 38 -38 43 -40 103 -40 l63 0 76 -79 c74 -77 155 -131 197 -131 29 0 56 41 85 127 29 87 30 84 -48 108 -54 16 -66 11 -66 -32 0 -31 -14 -36 -57 -18 -41 17 -133 76 -133 86 0 3 11 11 25 17 23 11 85 86 85 103 0 5 -22 11 -49 15 -36 5 -51 11 -54 25 -3 10 -20 26 -39 35 -29 13 -34 21 -30 41 4 22 -25 93 -38 93 -3 0 -14 -10 -25 -22z M4106 5131 c30 -88 -31 -168 -240 -310 -168 -115 -271 -204 -360 -313 -172 -209 -253 -422 -263 -693 -6 -165 10 -275 62 -432 64 -192 189 -403 238 -403 2 0 17 19 32 41 15 23 45 61 66 84 l40 43 -24 28 c-41 50 -103 147 -136 212 -34 67 -91 232 -91 260 0 10 14 -22 30 -71 16 -48 39 -106 51 -130 28 -56 119 -193 156 -237 l30 -34 79 72 c43 40 111 95 151 123 l74 51 81 -59 c101 -71 256 -223 327 -320 l53 -73 52 46 c58 53 134 106 218 153 l58 33 -26 51 c-31 61 -91 152 -146 222 -37 47 -36 46 21 -12 33 -34 88 -105 121 -156 l62 -94 61 22 c34 12 68 24 75 26 22 7 -92 152 -204 259 -54 53 -160 145 -234 205 -184 150 -254 217 -321 307 -113 152 -154 278 -146 443 5 110 17 152 90 310 83 180 84 268 6 346 -22 22 -43 39 -48 39 -5 0 -3 -17 5 -39z m31 -133 c-3 -8 -6 -5 -6 6 -1 11 2 17 5 13 3 -3 4 -12 1 -19z m-97 -113 c-7 -9 -27 -25 -44 -36 -25 -17 -24 -14 8 15 41 38 58 47 36 21z m38 -27 c-18 -24 -65 -78 -105 -120 -39 -43 -86 -98 -103 -123 -42 -62 -94 -177 -111 -245 -14 -61 -18 -198 -7 -275 l7 -50 -14 50 c-19 66 -19 235 0 310 20 80 65 170 118 238 36 46 233 252 245 256 2 1 -11 -18 -30 -41z m-268 -141 c0 -2 -24 -23 -52 -46 l-53 -43 50 46 c48 44 55 50 55 43z m142 -101 c-44 -70 -68 -95 -41 -44 14 27 79 118 84 118 2 0 -17 -33 -43 -74z m-323 -201 c-136 -271 -128 -587 21 -872 27 -51 47 -93 45 -93 -9 0 -89 145 -119 217 -94 221 -92 476 5 683 27 57 87 160 94 160 1 0 -19 -43 -46 -95z m308 13 c-3 -7 -5 -2 -5 12 0 14 2 19 5 13 2 -7 2 -19 0 -25z m17 -238 c44 -173 148 -341 330 -538 l61 -66 -60 52 c-111 96 -231 244 -285 352 -54 107 -72 180 -76 305 l-3 120 10 -85 c5 -47 16 -110 23 -140z m-488 97 c-43 -99 -61 -117 -26 -26 20 50 57 119 65 119 1 0 -16 -42 -39 -93z m181 -234 c-3 -10 -5 -4 -5 12 0 17 2 24 5 18 2 -7 2 -21 0 -30z m98 -263 c20 -41 66 -118 101 -170 63 -93 63 -94 18 -45 -94 101 -164 230 -198 361 -26 99 -18 107 13 14 15 -47 45 -119 66 -160z m229 81 c14 -24 19 -38 11 -31 -17 14 -85 131 -85 146 0 9 14 -12 74 -115z m269 -16 l31 -40 -33 30 c-18 17 -46 50 -63 75 l-29 45 31 -35 c17 -19 45 -53 63 -75z m-816 -177 c-3 -8 -6 -5 -6 6 -1 11 2 17 5 13 3 -3 4 -12 1 -19z m796 -187 c44 -42 107 -112 141 -156 121 -156 141 -195 34 -67 -36 42 -143 158 -239 257 -130 135 -154 163 -94 111 44 -38 115 -104 158 -145z m314 -131 c16 -19 42 -55 57 -80 24 -39 24 -42 4 -19 -13 14 -47 56 -76 93 -53 68 -42 72 15 6z m-1057 -50 c6 -11 8 -20 6 -20 -3 0 -10 9 -16 20 -6 11 -8 20 -6 20 3 0 10 -9 16 -20z M3101 3655 c-17 -20 -43 -59 -57 -88 -15 -29 -28 -54 -30 -56 -1 -1 -18 9 -38 24 -34 26 -160 84 -183 85 -15 0 -66 -105 -88 -182 l-16 -57 -37 22 c-93 58 -268 105 -293 80 -7 -7 -14 -54 -17 -107 l-5 -95 44 -11 c134 -34 253 -85 360 -155 39 -25 72 -45 74 -43 1 2 9 41 19 88 9 47 19 96 22 109 5 22 8 23 62 16 119 -15 322 -88 402 -145 17 -12 30 -19 30 -15 0 3 -13 31 -29 63 -68 135 -131 345 -131 436 0 25 -6 39 -22 50 -30 21 -31 21 -67 -19z M4794 3659 c-27 -17 -51 -33 -53 -35 -2 -2 38 -48 90 -102 52 -54 117 -131 144 -170 l50 -72 57 6 c67 7 59 17 84 -118 9 -54 20 -98 24 -98 4 0 37 20 74 45 105 70 220 120 355 155 l44 11 -6 87 c-3 48 -8 95 -12 105 -15 36 -145 10 -262 -53 l-72 -38 -21 71 c-25 81 -66 167 -80 167 -24 0 -125 -45 -172 -76 -28 -19 -52 -33 -52 -32 -1 2 -21 35 -44 73 -73 122 -72 122 -148 74z M3913 3301 c-170 -127 -318 -305 -413 -496 -205 -415 -160 -825 117 -1056 57 -48 167 -102 243 -120 76 -18 221 -15 300 5 316 84 508 413 460 787 -34 264 -157 511 -359 722 -86 89 -239 217 -261 217 -4 0 -44 -26 -87 -59z M2215 3240 c-9 -15 3 -228 22 -380 61 -503 289 -864 662 -1050 66 -33 204 -80 236 -80 5 0 -3 9 -19 20 -53 34 -156 143 -202 212 -86 129 -135 276 -154 458 -13 129 -8 218 21 433 12 81 18 155 15 163 -8 22 -141 104 -237 146 -130 58 -329 102 -344 78z M5650 3231 c-142 -30 -268 -86 -396 -177 l-62 -43 13 -63 c63 -302 48 -624 -37 -828 -61 -146 -175 -296 -271 -357 -21 -13 -37 -27 -34 -30 3 -2 38 4 79 15 414 114 720 501 807 1022 22 129 39 356 33 435 -5 53 -4 53 -132 26z M2876 3143 c-56 -300 -67 -375 -72 -538 -7 -196 6 -300 56 -436 80 -220 244 -393 442 -467 92 -34 249 -47 316 -26 9 2 -6 19 -36 43 -115 91 -202 240 -237 406 -19 92 -19 272 1 375 20 106 65 233 121 343 l46 88 -34 36 c-45 46 -209 155 -290 192 -80 36 -178 67 -244 75 l-50 7 -19 -98z M5040 3233 c-161 -28 -361 -130 -509 -260 l-43 -38 45 -90 c57 -115 100 -236 122 -349 21 -108 17 -317 -9 -411 -38 -140 -144 -307 -235 -372 -22 -15 -41 -31 -41 -34 0 -12 116 -17 193 -8 243 29 454 202 563 460 93 223 96 496 11 939 -35 178 -33 175 -97 163z M1813 3132 c-13 -8 -7 -27 104 -337 51 -143 143 -325 219 -431 59 -83 199 -229 284 -297 26 -21 23 -20 -15 5 -84 56 -256 235 -324 337 -67 101 -135 234 -185 363 -25 65 -37 84 -57 89 -31 9 -189 10 -210 1 -13 -6 -3 -29 55 -137 147 -270 226 -385 355 -514 119 -119 275 -222 396 -261 22 -7 35 -15 29 -17 -32 -11 -248 88 -326 149 -35 27 -39 28 -85 17 -59 -15 -136 -52 -184 -90 -39 -30 -119 -129 -119 -146 0 -13 91 -54 193 -87 126 -41 241 -60 372 -60 l121 0 43 42 c48 47 128 88 190 98 26 4 41 12 41 21 0 8 -4 12 -9 9 -12 -8 -167 139 -219 206 -175 228 -270 507 -307 910 l-6 66 -72 26 c-114 41 -251 59 -284 38z m694 -1208 c-3 -3 -12 -4 -19 -1 -8 3 -5 6 6 6 11 1 17 -2 13 -5z m40 -10 c-3 -3 -12 -4 -19 -1 -8 3 -5 6 6 6 11 1 17 -2 13 -5z M6023 3130 c-64 -12 -185 -57 -195 -73 -4 -7 -8 -37 -8 -67 0 -72 -25 -241 -49 -344 -73 -305 -232 -574 -435 -736 l-56 -44 53 -11 c68 -14 138 -50 189 -97 39 -36 46 -39 122 -44 138 -10 326 25 513 98 l102 39 -22 37 c-55 94 -183 188 -291 212 -44 10 -47 9 -108 -34 -84 -58 -166 -98 -266 -130 -101 -32 -132 -33 -42 -2 245 86 453 258 625 516 77 116 230 399 220 408 -11 11 -167 15 -205 5 -32 -9 -37 -16 -76 -109 -65 -159 -143 -302 -221 -405 -76 -102 -198 -222 -279 -277 -30 -21 -36 -23 -14 -6 78 61 239 234 297 319 67 99 155 269 196 380 55 148 126 360 121 364 -9 9 -120 10 -171 1z M2623 1800 c-66 -23 -103 -49 -147 -103 -42 -51 -109 -189 -104 -213 4 -21 22 -26 198 -60 165 -32 391 -37 505 -11 141 32 271 87 380 160 l60 41 -75 12 c-41 6 -109 21 -150 32 -41 11 -102 23 -134 26 -74 8 -212 54 -305 101 -83 41 -145 45 -228 15z M5145 1784 c-79 -43 -221 -90 -317 -103 -42 -6 -110 -20 -150 -31 -41 -11 -101 -24 -134 -28 l-59 -7 72 -48 c209 -139 448 -195 708 -168 120 13 345 57 359 71 5 5 -1 36 -13 70 -59 175 -190 282 -344 279 -50 -1 -73 -8 -122 -35z M3625 1631 c-36 -9 -45 -14 -108 -61 -25 -19 -46 -42 -47 -51 0 -28 50 -112 93 -157 60 -62 157 -124 302 -192 69 -33 130 -60 136 -60 5 0 65 27 134 59 210 100 331 196 380 304 l25 52 -32 25 c-113 91 -169 105 -264 66 -139 -57 -317 -61 -454 -11 -86 31 -122 37 -165 26z"/>
@@ -3177,7 +3188,7 @@ function doForm(e){
   // The flame clip travels INSIDE this one file (no separate flame.webm / flame.mp4 to forget to
   // upload, and no giant data: URL for iOS to choke on): decode it to a Blob and hand the
   // <video> a blob: URL. MP4/H.264 where the device plays it (iPhone, Safari, Chrome), WebM otherwise.
-  if(false && video && !video.getAttribute('src')){
+  if(video && !video.getAttribute('src')){
     try{
       var useMp4 = !!video.canPlayType('video/mp4; codecs="avc1.42E01E"');
       var src64 = document.getElementById(useMp4 ? 'flame-mp4-b64' : 'flame-webm-b64').textContent.trim();
@@ -3280,7 +3291,7 @@ function doForm(e){
   function revealVideo(){
     if(video){
       video.style.transition = 'opacity 1.6s ease, clip-path 2s cubic-bezier(.22,1,.36,1)';
-      video.style.opacity = '0.5';   // kept subtle — full strength competed with the headline
+      video.style.opacity = '0.62';   // kept subtle — full strength competed with the headline
       video.classList.add('reveal'); // drives the clip-path wipe below
       var pl = video.play();
       if(pl && pl.catch) pl.catch(function(){
@@ -3368,13 +3379,13 @@ function doForm(e){
       layer.style.opacity = '0';
       if(video){
         video.style.transition = 'opacity .5s ease';
-        video.style.opacity = '0.5';
+        video.style.opacity = '0.62';
         var plE = video.play(); if(plE && plE.catch) plE.catch(function(){});
       }
     }
     // progress through first screen: 0 at top, 1 by one full viewport
     var sp = clamp(y / H, 0, 1);
-    if(video){ video.style.opacity = String(0.5 * (1 - sp)); }  // fade synced to scroll, capped at the subtler ceiling
+    if(video){ video.style.opacity = String(0.62 * (1 - sp)); }  // fade synced to scroll, capped at the subtler ceiling
   }
   window.addEventListener('scroll', function(){
     if(!ticking){ requestAnimationFrame(onScroll); ticking=true; }
@@ -3564,7 +3575,7 @@ setTimeout(function(){
   var v = document.getElementById('bg-video');
   if(v && getComputedStyle(v).opacity === '0'){
     v.style.transition = 'opacity 1s ease';
-    v.style.opacity = '0.5';
+    v.style.opacity = '0.62';
     v.classList.add('reveal');
     var pl = v.play(); if(pl && pl.catch) pl.catch(function(){});
   }
