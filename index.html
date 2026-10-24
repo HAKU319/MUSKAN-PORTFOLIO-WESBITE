@@ -2586,7 +2586,7 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
 <div id="cat-peek" aria-hidden="true">
   <div class="pk-top"><span class="pk-cat"></span><span class="pk-title"></span></div>
   <div class="pk-view" id="pkView"></div>
-  <div class="pk-bar"><span class="pk-hint">Scroll inside to read</span><span class="pk-acts"></span><button class="pk-open" type="button">Open full page</button></div>
+  <div class="pk-bar"><span class="pk-hint">Preview</span><span class="pk-acts"></span><button class="pk-open" type="button">Open full page</button></div>
 </div>
 <!-- Cursor -->
 <div id="cur"></div>
@@ -3890,9 +3890,9 @@ setTimeout(function(){
   // wheel over the card's own chrome must not turn the slides underneath
   card.addEventListener('wheel', function(e){ e.stopPropagation(); }, { passive:true });
 
-  btn.addEventListener('click', function(){ var a = anchorEl; hide(true); if(a) a.click(); });
+  btn.addEventListener('click', function(e){ e.stopPropagation(); var a = anchorEl; hide(true); if(a) a.click(); });
   sec.addEventListener('click', function(e){ if(e.target.closest && e.target.closest('a')) hide(true,'click'); }, true);
-  card.addEventListener('click', function(e){ e.stopPropagation(); }, true);
+  card.addEventListener('click', function(e){ e.stopPropagation(); });
 
   // leaving the slide / section, or any key/scroll intent elsewhere, closes the peek
   var track = document.getElementById('catTrack');
