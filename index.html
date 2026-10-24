@@ -293,6 +293,9 @@ function initHScroll(cfg){
     return (panels[0] && panels[0].getBoundingClientRect().width) || track.clientWidth || 1;
   }
 
+  // furthest the track can really scroll (phones show 88vw panels, so this is less than panelStep()*(total-1))
+  function trackMax(){ return Math.max(0, Math.min(panelStep() * (total - 1), track.scrollWidth - track.clientWidth)); }
+
   function currentIndex(){
     // read the track's real scroll position — always correct, no guessing
     var w = panelStep();
@@ -301,7 +304,7 @@ function initHScroll(cfg){
 
   function updateHud(){
     var idx = Math.max(0, Math.min(total - 1, currentIndex()));
-    var maxScroll = panelStep() * (total - 1);
+    var maxScroll = trackMax();
     var progress = maxScroll > 0 ? track.scrollLeft / maxScroll : 0;
     curNumEl.textContent = String(idx + 1).padStart(2, '0');
     fillEl.style.width = (Math.max(0, Math.min(1, progress)) * 100) + '%';
@@ -394,7 +397,7 @@ function initHScroll(cfg){
     // scrollWidth-based check think the last panel was reached a full
     // panel early, silently stranding mobile users one panel before the
     // end. Using the known panel count directly is exact.
-    var maxScroll = panelStep() * (total - 1);
+    var maxScroll = trackMax();
     var atStart = track.scrollLeft <= 1;
     var atEnd   = track.scrollLeft >= maxScroll - 1;
     // one slide per gesture: take the dominant axis (a sideways trackpad swipe
@@ -445,7 +448,7 @@ function initHScroll(cfg){
     touchStartY = e.touches[0].clientY;
   }, { passive:true });
   track.addEventListener('touchend', function(e){
-    var maxScroll = panelStep() * (total - 1);
+    var maxScroll = trackMax();
     var atStart = track.scrollLeft <= 1;
     var atEnd   = track.scrollLeft >= maxScroll - 1;
     if(!atStart && !atEnd) return;
@@ -453,7 +456,10 @@ function initHScroll(cfg){
     if(Math.abs(dx) < 30) return; // too small to count as an intentional swipe
     var dir = dx > 0 ? 1 : -1; // dx>0: swiped left (forward); dx<0: swiped right (back)
     if((dir > 0 && atEnd) || (dir < 0 && atStart)){
-      window.scrollBy({ top: dir * 320, left: 0, behavior: 'smooth' });
+      var host = section || track.closest('.hs-host') || track;
+      var r = host.getBoundingClientRect();
+      var topY = window.scrollY + (dir > 0 ? r.bottom : r.top - window.innerHeight);
+      window.scrollTo({ top: Math.max(0, topY), left: 0, behavior: 'smooth' });
     }
   }, { passive:true });
 
@@ -890,7 +896,7 @@ body.wada-1 body.wada-2 body.wada-3 body.wada-4 .h-panel::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  transform: translateY(-14vh);
+  transform: translateY(0);
 }
 /* children start hidden, fade + rise in when .reveal is added */
 .h-text > * {
@@ -2093,8 +2099,8 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 
 
 @media (max-width: 760px) {
-  #hero { align-items: center; padding-top: 60px; }
-  .h-text { padding-bottom: 0 !important; }
+  #hero { align-items: center; justify-content: center; padding-top: 0; }
+  .h-text { padding-bottom: 0 !important; transform: translateY(0) !important; }
 }
 
 
@@ -2313,7 +2319,8 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 
 /* ══ v92 — smoothness: fewer live SVG filters, GPU-promoted fixed layers ══ */
 .h-eyebrow, .h-sub, .hs-cat, .hs-list li, .cat-teaser, .cat-list a, .cat-eyebrow, .sec-lbl, .rn-si, .rb-sub { filter:none !important; }
-.h-name .ty-ch{transition:opacity 1s ease}
+.h-name .ty-ch{display:inline-block;opacity:1 !important;clip-path:inset(-12% 100% -12% -2%);transform:translateY(3px) rotate(-1.5deg);transition:clip-path .26s cubic-bezier(.4,0,.6,1),transform .38s ease}
+.h-name .ty-ch.on{clip-path:inset(-12% -6% -12% -2%);transform:none}
 .h-name{filter:url(#inkRough)}
 #bg-video, #bg-figure, #cat-figure, #it-figure { will-change:opacity; backface-visibility:hidden; }
 #bg-video { transform:translate3d(-50%,-37%,0); }
@@ -2344,7 +2351,9 @@ html { scroll-behavior:auto !important; }                  /* native smooth-scro
   #hero,#flip-track{min-height:100dvh}
   .hs-viewport{height:100dvh}
 }
-.hs-track{overscroll-behavior-x:contain;touch-action:pan-x pan-y}
+.hs-track{overscroll-behavior:contain;touch-action:pan-x pan-y}
+/* v112 — phones: inside a slide section only sideways swipes work (vertical is locked); a swipe past the first/last slide hands on to the page */
+@media (hover:none) and (pointer:coarse){.hs-track,.hs-viewport,.hs-host .hs-panel{touch-action:pan-x !important}.hs-track{overscroll-behavior:contain}}
 @media (max-width:760px){
   html{-webkit-tap-highlight-color:transparent}
   body{-webkit-text-size-adjust:100%}
@@ -2356,7 +2365,7 @@ html { scroll-behavior:auto !important; }                  /* native smooth-scro
 
 /* ══ HAND CONTROL — optional webcam hand tracking (desktop only) ══ */
 #hc-toggle,#hc-invite,#hc-cam,#hc-dot{display:none}
-@media (hover:hover) and (pointer:fine){
+@media all{
   .hs-section-label{top:64px !important}
   #hc-toggle{display:flex;position:fixed;top:14px;left:18px;z-index:905;align-items:center;gap:10px;padding:7px 12px 7px 10px;
     font-family:'Special Elite',monospace;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(66,60,43,.78);
@@ -2399,13 +2408,11 @@ html { scroll-behavior:auto !important; }                  /* native smooth-scro
 html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
 
 /* v97 — flame: lift the clip's own paper-toned backdrop to white so multiply leaves only the vase + flame (no ghost oval of double texture) */
-/* v110 — phones & tablets: the webcam hand-control is desktop-only; its unstyled markup was leaking into the bottom of the page on touch screens */
-@media (hover:none),(pointer:coarse){#hc-toggle,#hc-invite,#hc-cam,#hc-dot,#hc-guide,#hc-help{display:none !important}}
 /* v111 — hero: nothing behind the headline for now (the flame lives in Work Compilation) */
 #bg-video{display:none !important}
 
 /* ── hand control: instructions, help button, live hint, click pulse ── */
-@media (hover:hover) and (pointer:fine){
+@media all{
   #hc-guide{position:fixed;left:18px;bottom:182px;z-index:906;width:300px;padding:16px 18px 14px;background:rgba(247,241,226,.97);border:1px solid rgba(66,60,43,.2);box-shadow:0 14px 34px rgba(60,44,28,.2);transform:rotate(-.5deg) translateY(8px);opacity:0;visibility:hidden;transition:opacity .45s,transform .45s,visibility .45s}
   #hc-guide.show{opacity:1;visibility:visible;transform:rotate(-.5deg)}
   #hc-guide::before{content:'';position:absolute;inset:5px;border:1px dashed rgba(66,60,43,.22);pointer-events:none}
@@ -2424,7 +2431,7 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
 
 .ft-ver{margin-left:12px;font-family:'Special Elite',monospace;font-size:9px;letter-spacing:2px;color:rgba(224,206,196,.22)}
 
-@media (hover:hover) and (pointer:fine){
+@media all{
   #hc-guide{width:236px !important;padding:14px 16px 12px !important}
   #hc-guide .hc-row{align-items:center !important;gap:12px !important;margin:0 0 6px !important}
   #hc-guide .hc-row .hc-ico{flex:none}
@@ -2433,6 +2440,14 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
   #hc-guide .hc-tip{margin-top:6px !important;padding-top:8px !important;font-size:10.5px !important}
 }
 
+
+/* v112 — phone: hand-control toggle sits like on the laptop; the instructions only open once it is switched on */
+@media (max-width:760px){
+  #hc-toggle{top:10px !important;left:12px !important;font-size:10px !important;letter-spacing:1.4px !important;padding:6px 10px 6px 8px !important}
+  #hc-cam{bottom:64px !important;width:150px !important;height:112px !important;left:12px !important}
+  #hc-guide{left:12px !important;bottom:186px !important;max-width:calc(100vw - 24px)}
+  #hc-help{bottom:70px !important}
+}
 /* ══ v99 — Resume: lead with the invitation; Play is a red-ink stamp like "Send message" ══ */
 .br-resume{display:flex !important;flex-direction:column}
 .br-resume .sec-lbl{order:0}
@@ -2474,12 +2489,12 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
 #category-nav.peeking #cat-figure{opacity:.08 !important;transition:opacity 1.3s ease}
 /* ── Work Compilation: slow mandala behind the lists — sage + gold ink on the paper, kept very quiet ── */
 #cat-mandala{position:absolute;left:50%;top:50%;width:min(88vh,860px);height:min(88vh,860px);transform:translate(-50%,-50%);z-index:0;pointer-events:none;object-fit:contain;mix-blend-mode:multiply;opacity:0;transition:opacity 1.6s ease;-webkit-mask-image:radial-gradient(circle at 50% 50%,#000 58%,transparent 71%);mask-image:radial-gradient(circle at 50% 50%,#000 58%,transparent 71%)}
-/* v111 — the rising flame now lives here, behind the Work Compilation lists */
-#cat-mandala{width:auto !important;height:112% !important;max-width:none !important;top:46% !important;filter:brightness(1.16) contrast(1.18);-webkit-mask-image:radial-gradient(ellipse 55% 50% at center,#000 42%,transparent 78%) !important;mask-image:radial-gradient(ellipse 55% 50% at center,#000 42%,transparent 78%) !important}
-@media (max-width:760px){#cat-mandala{height:92% !important;top:56% !important}}
-#cat-mandala.on{opacity:.46}
+/* v112 — flames only: the lamp is cropped away and the fire is enlarged to fill the whole Work Compilation screen */
+#cat-flame{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;container-type:size}
+#cat-flame #cat-mandala{position:absolute !important;left:50% !important;top:47% !important;width:max(300cqh,150cqw) !important;height:auto !important;max-width:none !important;transform:translate(-51%,-29%) !important;-webkit-mask-image:radial-gradient(ellipse 21% 13.5% at 51% 29%,#000 48%,transparent 100%) !important;mask-image:radial-gradient(ellipse 21% 13.5% at 51% 29%,#000 48%,transparent 100%) !important;filter:brightness(1.1) contrast(1.15);mix-blend-mode:multiply}
+#cat-mandala.on{opacity:.55}
 #category-nav.peeking #cat-mandala.on{opacity:.17;transition:opacity 1s ease}
-@media (max-width:760px){#cat-mandala{width:112vw;height:112vw}#cat-mandala.on{opacity:.38}}
+@media (max-width:760px){#cat-mandala.on{opacity:.6}}
 
 /* the project list stays sharp and readable while a preview is open — only the headings behind it soften */
 #category-nav.peeking .hs-panel .hs-content{opacity:1 !important;filter:none !important}
@@ -2738,7 +2753,7 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
       <div class="hs-hud-count"><b id="catCurNum">01</b>&nbsp;/&nbsp;06</div>
       <div class="hs-hud-bar"><div class="hs-hud-fill" id="catHudFill"></div></div>
     </div>
-    <video id="cat-mandala" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" disablepictureinpicture></video>
+    <div id="cat-flame" aria-hidden="true"><video id="cat-mandala" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" disablepictureinpicture></video></div>
     <div id="cat-figure">
       <svg id="catf-svg" viewBox="0 0 475.145446 537.000000" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
         <g transform="translate(-162.412820,648.000000) scale(0.100000,-0.100000)">
@@ -3215,9 +3230,9 @@ function doForm(e){
     if(!hName){ if(onDone) onDone(); return; }
     var chars = hName.querySelectorAll('.ty-ch');
     // letters surface one after another, each fading up out of the paper like drying ink
-    chars.forEach(function(ch, i){ ch.style.transitionDelay = (i * 38) + 'ms'; });
+    chars.forEach(function(ch, i){ var d = (i * 82) + 'ms'; ch.style.transitionDelay = d + ',' + d; });
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ chars.forEach(function(ch){ ch.classList.add('on'); }); }); });
-    setTimeout(function(){ if(onDone) onDone(); }, chars.length * 38 + 1000);
+    setTimeout(function(){ if(onDone) onDone(); }, chars.length * 82 + 600);
   }
 
   function showText(onTyped){
@@ -3951,7 +3966,7 @@ setTimeout(function(){
 
 <script>
 (function(){
-  if(!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  var COARSE = !window.matchMedia('(hover:hover) and (pointer:fine)').matches;   // phones/tablets: toggle only, no pop-up invitation
   var $ = function(id){ return document.getElementById(id); };
   var tog = $('hc-toggle'), inv = $('hc-invite'), cam = $('hc-cam'), dot = $('hc-dot'), guide = $('hc-guide'), help = $('hc-help'), hint = $('hc-hint');
   var vid = cam.querySelector('video'), cv = cam.querySelector('canvas'), st = cam.querySelector('.hc-st'), lb = tog.querySelector('.hc-lb');
@@ -3968,7 +3983,7 @@ setTimeout(function(){
   function unsay(){ clearTimeout(hintT); hint.classList.remove('show'); }
 
   /* ── invitation: appears once the headline has been written ── */
-  function showInvite(){ if(store('hc-seen') || running) return; inv.classList.add('show'); }
+  function showInvite(){ if(COARSE || store('hc-seen') || running) return; inv.classList.add('show'); }
   function hideInvite(){ inv.classList.remove('show'); store('hc-seen','1'); }
   (function waitForHero(){
     var n = 0, iv = setInterval(function(){
