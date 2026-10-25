@@ -2558,6 +2558,21 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
 #bg-figure{height:84vh !important;max-height:84vh !important;top:46% !important}
 #bgf-nm{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:1.2vh;font-family:'AMS Aaditya',sans-serif;font-weight:700;font-size:clamp(28px,4.6vh,44px);line-height:1;letter-spacing:2px;color:rgba(188,37,47,.8);-webkit-text-stroke:.7px rgba(188,37,47,.55);white-space:nowrap;opacity:0;mix-blend-mode:multiply;filter:url(#inkRough)}
 @media (max-width:760px){#bg-figure{height:70vh !important;max-height:70vh !important;top:45% !important}}
+
+/* ══ v115 — phones: headline lines never wrap, one tidy row of social icons, centred footer, no logo clash in the bottom bar ══ */
+@media (max-width:760px){
+  .h-name{font-size:min(8.6vw,38px) !important;white-space:nowrap !important;line-height:1.25}
+  .h-name span{white-space:nowrap}
+  .h-sub{white-space:normal !important;font-size:10px !important;letter-spacing:2px !important;line-height:1.7;max-width:300px;margin-left:auto;margin-right:auto}
+  nav .n-logo{display:none !important}
+  .br-find .socials{flex-wrap:nowrap !important;justify-content:space-between !important;gap:0 !important;padding:18px 18px !important}
+  .br-find .cs{width:36px !important;height:36px !important}
+  .br-find .cs svg{width:24px !important;height:24px !important}
+  footer{padding:28px 20px 96px !important;align-items:center !important;text-align:center}
+  footer .ft-bar{padding:0 !important;flex-direction:column !important;align-items:center !important;gap:16px;width:100%}
+  footer .ft-l{text-align:center}
+  footer .ft-r{justify-content:center;align-items:center}
+}
 </style>
 </head>
 <body>
@@ -3385,7 +3400,7 @@ function doForm(e){
     }
     // progress through first screen: 0 at top, 1 by one full viewport
     var sp = clamp(y / H, 0, 1);
-    if(video){ video.style.opacity = String(0.62 * (1 - sp)); }  // fade synced to scroll, capped at the subtler ceiling
+    if(video){ video.style.opacity = String(0.62 * (1 - clamp(y / (H * 0.4), 0, 1))); }  // gone well before the next section's artwork arrives  // fade synced to scroll, capped at the subtler ceiling
   }
   window.addEventListener('scroll', function(){
     if(!ticking){ requestAnimationFrame(onScroll); ticking=true; }
