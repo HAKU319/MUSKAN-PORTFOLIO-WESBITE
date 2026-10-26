@@ -2300,7 +2300,7 @@ nav.show .n-links li:nth-child(5) { transition-delay: .40s; }
 .pk-view { position:relative; flex:1; overflow:hidden; background:#efe9da; border:1px solid rgba(66,60,43,.18); }
 .pk-view::before { content:'sketching…'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
   font-family:'Special Elite',monospace; font-size:12px; letter-spacing:3px; text-transform:uppercase; color:rgba(66,60,43,.4); }
-.pk-frame { pointer-events:none; position:absolute; top:0; left:0; border:0; background:#121212; transform-origin:0 0; opacity:0; transition:opacity .4s ease; }
+.pk-frame { pointer-events:auto; position:absolute; top:0; left:0; border:0; background:#121212; transform-origin:0 0; opacity:0; transition:opacity .4s ease; }
 .pk-frame.show { opacity:1; }
 .pk-missing { position:absolute; inset:0; display:none; align-items:center; justify-content:center; text-align:center; padding:24px;
   font-family:'Special Elite',monospace; font-size:13px; line-height:1.8; color:rgba(66,60,43,.7); background:#efe9da; z-index:2; }
@@ -3929,9 +3929,9 @@ setTimeout(function(){
   // wheel over the card's own chrome must not turn the slides underneath
   card.addEventListener('wheel', function(e){ e.stopPropagation(); }, { passive:true });
 
-  btn.addEventListener('click', function(){ var a = anchorEl; hide(true); if(a) a.click(); });
+  btn.addEventListener('click', function(e){ e.stopPropagation(); var a = anchorEl; hide(true); if(a) a.click(); });
   sec.addEventListener('click', function(e){ if(e.target.closest && e.target.closest('a')) hide(true,'click'); }, true);
-  card.addEventListener('click', function(e){ e.stopPropagation(); }, true);
+  card.addEventListener('click', function(e){ e.stopPropagation(); });
 
   // leaving the slide / section, or any key/scroll intent elsewhere, closes the peek
   var track = document.getElementById('catTrack');
