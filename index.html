@@ -2666,7 +2666,7 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
 #reel-modal.open #reel-panel{transform:none}
 #reel-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 2px 10px;font-family:'Special Elite',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(66,60,43,.8)}
 #reel-close{font-family:inherit;font-size:16px;line-height:1;background:none;border:1px dashed rgba(66,60,43,.45);border-radius:50%;width:34px;height:34px;color:rgba(66,60,43,.85);cursor:pointer;flex:none}
-#reel-stage{position:relative;width:100%;height:min(74dvh,720px);background:#1c170e;overflow:hidden;border-radius:3px}
+#reel-stage{position:relative;width:100%;height:min(76dvh,780px);background:#1c170e;overflow:hidden;border-radius:3px}
 #reel-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
 #reel-out{margin-top:12px;align-self:center;font-family:'Special Elite',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#9c3a30;text-decoration:none;border-bottom:1.5px solid rgba(163,49,42,.55);padding-bottom:2px}
 body.reel-open{overflow:hidden}
@@ -2978,7 +2978,6 @@ body.reel-open{overflow:hidden}
           <p class="cat-teaser">On-set dressing for the Witchamiss web series &mdash; sourcing, styling and dressing sets to match each scene&rsquo;s tone and story.</p>
           <div class="cat-list">
             <a href="https://www.instagram.com/reel/Db9Jppei1xL/" data-reel="Db9Jppei1xL" data-reel-title="Witchamiss &mdash; teaser, behind the scenes">Witchamiss &middot; Teaser BTS &#9654;</a>
-            <a href="https://www.instagram.com/reel/Db9Jppei1xL/" target="_blank" rel="noopener">Watch on Instagram &#8599;</a>
           </div>
         </div>
       </div>
@@ -3132,7 +3131,7 @@ body.reel-open{overflow:hidden}
     if(!m || !f) return;
     var ttl = document.getElementById('reel-title'), out = document.getElementById('reel-out');
     function openReel(id, title){
-      f.src = 'https://www.instagram.com/reel/' + id + '/embed/';
+      f.src = 'https://www.instagram.com/reel/' + id + '/embed/captioned/';
       ttl.textContent = title || 'Video'; out.href = 'https://www.instagram.com/reel/' + id + '/';
       m.classList.add('open'); m.setAttribute('aria-hidden','false'); document.body.classList.add('reel-open');
     }
@@ -3941,6 +3940,7 @@ setTimeout(function(){
   var cur = null, anchorEl = null, showT = null, hideT = null, open = false, zoneLeft = 0, closing = false;
 
   function fileOf(a){
+    if(a.getAttribute && a.getAttribute('data-reel')) return 'reel:' + a.getAttribute('data-reel');
     return window.caseKey(a.getAttribute('href')) || null;
   }
   function entry(href){
@@ -3961,6 +3961,15 @@ setTimeout(function(){
     m.innerHTML = 'This case study is<br>coming soon.';
     view.appendChild(f); view.appendChild(m);
     var e = frames[href] = { f:f, m:m, ready:false };
+    if(href.indexOf('reel:') === 0){
+      // the Motion slide's reel: show the real Instagram player (video + caption) in the preview card
+      f.setAttribute('data-reel','1'); f.setAttribute('tabindex','0'); f.setAttribute('allow','autoplay; encrypted-media; picture-in-picture; fullscreen'); f.setAttribute('allowfullscreen','');
+      e.ready = true;
+      var shownR = false, showR = function(){ if(shownR) return; shownR = true; f.classList.add('show'); };
+      f.addEventListener('load', showR); setTimeout(showR, 1800);
+      f.src = 'https://www.instagram.com/reel/' + href.slice(5) + '/embed/captioned/';
+      return e;
+    }
     // on the live site a missing page (404) gets a friendly note instead of an error page
     var html = window.casePage(href);
     if(html){
@@ -3992,6 +4001,7 @@ setTimeout(function(){
     return e;
   }
   function fit(f){
+    if(f.getAttribute('data-reel')){ f.style.width = '100%'; f.style.height = '100%'; f.style.transform = 'none'; return; }
     var s = view.clientWidth / VW;
     f.style.width = VW + 'px';
     f.style.height = (view.clientHeight / s) + 'px';
