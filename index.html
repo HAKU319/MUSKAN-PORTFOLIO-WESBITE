@@ -2616,6 +2616,15 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
   html:not(.ink-on) .h-name{filter:none !important}
   .hs-panel[data-title="Accounting"] .hs-title em{font-size:.84em}
 }
+/* ══ v121 — touch screens: no custom cursor at all ══ */
+@media (hover:none),(pointer:coarse),(max-width:760px){#cur,#cur-dot,#cur-ring,#cur-lbl{display:none !important}}
+/* ══ v122 — phones: bottom menu always readable (paper bar), footer clears it ══ */
+@media (max-width:760px){
+  nav#nav{background:rgba(238,230,212,.94) !important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid rgba(66,60,43,.18) !important;box-shadow:0 -6px 18px -10px rgba(40,34,20,.35)}
+  nav#nav .n-links a{color:rgba(66,60,43,.62) !important}
+  nav#nav .n-links a.active{color:#2f2a1b !important}
+  footer{padding-bottom:104px !important}
+}
 </style>
 </head>
 <body>
@@ -3304,7 +3313,22 @@ function doForm(e){
     video.classList.add('reveal');
     setTimeout(function(){ video.style.transition = 'opacity .18s linear'; }, fade * 1000 + 120);   // afterwards the scroll-fade follows the finger immediately
     var pl = video.play();
+    var scrubbing = false;
+    function scrub(){
+      if(scrubbing || video.ended) return; scrubbing = true;
+      var t0 = null, last = -1, dur = video.duration || 5;
+      (function step(ts){
+        if(t0 === null) t0 = ts;
+        var t = Math.min((ts - t0) / 1000, dur - 0.04);
+        if(t - last > 0.035){ try{ video.currentTime = t; }catch(e){} last = t; }
+        if(t < dur - 0.05 && !video.ended){ requestAnimationFrame(step); }
+      })(performance.now());
+    }
+    // some phones (low-power mode, strict autoplay) refuse play() from a timer — then the flame would sit frozen and only
+    // wake after the first scroll/tap. Check it is really moving; if not, drive the frames ourselves so it grows right on cue.
+    setTimeout(function(){ if(!video.ended && video.currentTime < 0.08) scrub(); }, 450);
     if(pl && pl.catch) pl.catch(function(){
+      scrub();
       ['pointerdown','pointermove','keydown','wheel','touchstart'].forEach(function(ev){
         window.addEventListener(ev, function once(){ window.removeEventListener(ev, once); if(!video.ended) video.play().catch(function(){}); }, { passive:true });
       });
