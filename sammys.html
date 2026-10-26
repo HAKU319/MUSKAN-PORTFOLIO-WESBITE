@@ -92,6 +92,29 @@
     .progress-dots{ display:none; }
     .browser{ width:88vw; height:50vh; }
   }
+
+/* ═══ case-motion — shared smooth scroll choreography (same feel as the Studio 57 developer case study) ═══ */
+html{scroll-behavior:auto !important}
+.step{opacity:.18 !important;transform:translate3d(0,22px,0);filter:blur(2px);transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform .9s cubic-bezier(.22,.61,.36,1),filter .8s cubic-bezier(.22,.61,.36,1) !important;will-change:opacity,transform}
+.step.active{opacity:1 !important;transform:none;filter:none}
+.step>*{transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform .9s cubic-bezier(.22,.61,.36,1)}
+.viz{opacity:0 !important;transform:translate3d(0,26px,0) scale(.965);transition:opacity .7s cubic-bezier(.22,.61,.36,1),transform .95s cubic-bezier(.2,.8,.2,1) !important;pointer-events:none;will-change:opacity,transform}
+.viz.on{opacity:1 !important;transform:none;pointer-events:auto}
+@keyframes cm-in{from{opacity:0;transform:translate3d(0,16px,0) scale(.98)}}
+.viz.on>*,.viz.on>*>*{animation:cm-in .85s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 75ms + 120ms)}
+.browser{transition:transform .9s cubic-bezier(.22,.61,.36,1)}
+.progress-dots div{transition:background .5s,transform .5s cubic-bezier(.22,.61,.36,1),box-shadow .5s !important}
+.cs-hero>*{animation:cm-in 1s cubic-bezier(.22,.61,.36,1) both;animation-delay:calc(var(--i,0) * 110ms + 100ms)}
+.cm-rv{opacity:0;transform:translate3d(0,26px,0);transition:opacity .9s cubic-bezier(.22,.61,.36,1),transform 1s cubic-bezier(.22,.61,.36,1);transition-delay:calc(var(--i,0) * 90ms);will-change:opacity,transform}
+.cm-rv.cm-in{opacity:1;transform:none}
+@media (max-width:900px){
+.scrolly-sticky{height:46vh !important;z-index:6 !important;background:var(--bg,#121212);box-shadow:0 22px 24px -10px var(--bg,#121212);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.scrolly-steps{position:relative;z-index:2 !important}
+.step{padding-top:calc(46vh + 30px) !important;min-height:calc(100vh + 8vh) !important;justify-content:flex-start !important}
+.browser{zoom:.64;width:340px !important;height:520px !important;max-width:none}
+}
+@media (max-width:380px){.browser{zoom:.56}}
+@media (prefers-reduced-motion:reduce){.step,.viz,.cm-rv{transition:none !important;transform:none !important;filter:none !important}.viz.on>*,.viz.on>*>*,.cs-hero>*{animation:none !important}.cm-rv{opacity:1}}
 </style>
 </head>
 <body data-step="0">
@@ -163,28 +186,46 @@
 </section>
 
 <script>
+function revealInit(){
+  var sel = '.cs-outro>*,.cs-proto-head>*,.cs-proto-frame,.cm-auto';
+  var els = [].slice.call(document.querySelectorAll(sel));
+  if(!('IntersectionObserver' in window)){ return; }
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('cm-in'); io.unobserve(e.target); } }); }, { threshold:.12, rootMargin:'0px 0px -6% 0px' });
+  els.forEach(function(el, i){ el.classList.add('cm-rv'); el.style.setProperty('--i', (i % 4)); io.observe(el); });
+}
+
 (function(){
-  var steps = document.querySelectorAll('.step');
-  var vizzes = document.querySelectorAll('.viz');
+  var steps = [].slice.call(document.querySelectorAll('.step'));
+  var vizzes = [].slice.call(document.querySelectorAll('.viz'));
   var dotsWrap = document.getElementById('dots');
   var body = document.body;
-  for (var i = 0; i < steps.length; i++) {
-    var d = document.createElement('div');
-    d.dataset.i = i;
-    if (i === 0) d.classList.add('on');
-    dotsWrap.appendChild(d);
-  }
-  var dots = dotsWrap.querySelectorAll('div');
+  var dots = [];
+  if(dotsWrap){ steps.forEach(function(_, i){ var d = document.createElement('div'); d.dataset.i = i; dotsWrap.appendChild(d); dots.push(d); }); }
+  [].forEach.call(document.querySelectorAll('.cs-hero>*'), function(el, i){ el.style.setProperty('--i', i); });
+  vizzes.forEach(function(v){
+    [].forEach.call(v.children, function(c, i){ c.style.setProperty('--i', i); [].forEach.call(c.children, function(g, j){ g.style.setProperty('--i', i + j + 1); }); });
+  });
+  var cur = -1;
   function setStep(idx){
+    if(idx === cur) return; cur = idx;
     body.dataset.step = idx;
     vizzes.forEach(function(v){ v.classList.toggle('on', v.dataset.viz == idx); });
-    dots.forEach(function(dd,i){ dd.classList.toggle('on', i == idx); });
-    steps.forEach(function(s,i){ s.classList.toggle('active', i == idx); });
+    dots.forEach(function(d, i){ d.classList.toggle('on', i == idx); });
+    steps.forEach(function(s, i){ s.classList.toggle('active', i == idx); });
   }
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){ if (e.isIntersecting) setStep(parseInt(e.target.dataset.step)); });
-  }, { threshold: 0.55 });
-  steps.forEach(function(s){ io.observe(s); });
+  setStep(0);
+  function band(){ return window.innerWidth <= 900 ? '-58% 0px -32% 0px' : '-46% 0px -46% 0px'; }
+  var io;
+  function watch(){
+    if(io) io.disconnect();
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting) setStep(parseInt(e.target.dataset.step, 10)); });
+    }, { rootMargin: band() });
+    steps.forEach(function(s){ io.observe(s); });
+  }
+  watch();
+  var rt; window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(watch, 200); });
+  revealInit();
 })();
 </script>
 </body>

@@ -301,6 +301,14 @@ footer.cs-footer {
   .pn-home { order:3 }
 }
 
+
+/* ═══ case-motion — shared smooth reveal (same feel as the Studio 57 developer case study) ═══ */
+html{scroll-behavior:auto !important}
+@keyframes cm-in{from{opacity:0;transform:translate3d(0,18px,0)}}
+.hero>*{animation:cm-in 1s cubic-bezier(.22,.61,.36,1) both;animation-delay:calc(var(--i,0) * 110ms + 100ms)}
+.cm-rv{opacity:0;transform:translate3d(0,28px,0);transition:opacity .95s cubic-bezier(.22,.61,.36,1),transform 1.05s cubic-bezier(.22,.61,.36,1);transition-delay:calc(var(--i,0) * 90ms);will-change:opacity,transform}
+.cm-rv.cm-in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.cm-rv{opacity:1;transform:none;transition:none}.hero>*{animation:none}}
 </style>
 </head>
 <body>
@@ -415,5 +423,15 @@ footer.cs-footer {
   &copy; 2026 Muskan KC &middot; Designed &amp; built in New York
 </footer>
 
+<script>
+(function(){
+  [].forEach.call(document.querySelectorAll('.hero>*'), function(el, i){ el.style.setProperty('--i', i); });
+  if(!('IntersectionObserver' in window)) return;
+  var els = [].slice.call(document.querySelectorAll('.step,.cs-h,.cs-p,.cs-pull,.cs-list,.tcg-card,.ba-col,.changed-item,.blend-video,.cta-section>*,.project-nav,.flyer-slot,.wall-section .cs-num')).filter(function(el){ return !el.closest('.cm-rv') || el.classList.contains('cm-rv'); });
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('cm-in'); io.unobserve(e.target); } }); }, { threshold:.1, rootMargin:'0px 0px -6% 0px' });
+  var last = null, n = 0;
+  els.forEach(function(el){ if(el.parentNode !== last){ last = el.parentNode; n = 0; } el.classList.add('cm-rv'); el.style.setProperty('--i', Math.min(n++, 4)); io.observe(el); });
+})();
+</script>
 </body>
 </html>
