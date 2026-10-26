@@ -2644,6 +2644,20 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
   .swipe-hint i{font-style:normal;color:#9c3a30;display:inline-block;animation:sw-nudge 1.4s ease-in-out infinite}
   @keyframes sw-nudge{0%,100%{transform:translateX(-3px)}50%{transform:translateX(6px)}}
 }
+/* ══ v124 — touch screens: the paper texture lives on its own fixed layer, so it never rescales when the page height changes (it used to zoom in when the intro finished) ══ */
+@media (max-width:760px),(hover:none){
+  body{background-image:none !important}
+  body::before{content:"";position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:-1;pointer-events:none;
+    background-image:linear-gradient(rgba(224,212,180,.3),rgba(224,212,180,.3)),var(--paper-texture);background-size:cover;background-position:center top;background-repeat:no-repeat}
+}
+@media (max-width:760px){
+  #bg-video{top:55% !important;width:min(122vw,84vh) !important}
+}
+/* ══ v125 — phones: the bottom bar only appears together with its links (until then the paper texture runs to the edge) ══ */
+@media (max-width:760px){
+  nav#nav{transition:background-color .7s ease,border-color .7s ease,box-shadow .7s ease !important}
+  nav#nav:not(.show){background:transparent !important;border-top-color:transparent !important;box-shadow:none !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
+}
 </style>
 </head>
 <body>
