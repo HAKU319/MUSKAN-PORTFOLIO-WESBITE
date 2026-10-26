@@ -2597,6 +2597,13 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
 @media (max-width:760px){#bg-video{width:min(108vw,74vh) !important}}
 /* v117 — phones: the whole slide section (not just the track) only takes sideways swipes until the last slide */
 @media (hover:none) and (pointer:coarse){.hs-host{touch-action:pan-x}.hs-host.at-end{touch-action:pan-x pan-y}}
+/* ══ v118 — phones: hero text sits higher (no big empty band on top), flame follows it; Who-I-Am ring is centred on the slide's content ══ */
+@media (max-width:760px){
+  #hero{justify-content:flex-start !important;padding-top:14dvh !important}
+  .h-text{padding-bottom:0 !important}
+  #bg-video{top:42% !important}
+  #it-figure{left:44vw !important;width:84vw !important;height:84vw !important}
+}
 </style>
 </head>
 <body>
@@ -2662,7 +2669,7 @@ html.intro-lock, html.intro-lock body{overflow:hidden !important;height:100%}
   </svg>
     <div id="bgf-nm" aria-hidden="true">नमस्ते</div>
 </div>
-<video id="bg-video" autoplay muted loop playsinline webkit-playsinline="true" preload="auto" disablepictureinpicture disableremoteplayback controlsList="nodownload noplaybackrate nofullscreen" aria-hidden="true"></video>
+<video id="bg-video" muted playsinline webkit-playsinline="true" preload="auto" disablepictureinpicture disableremoteplayback controlsList="nodownload noplaybackrate nofullscreen" aria-hidden="true"></video>
 <section id="hero">
   <div class="h-text">
     <div class="h-eyebrow">UX/UI &nbsp;·&nbsp; Graphic &nbsp;·&nbsp; Web &nbsp;·&nbsp; VR</div>
@@ -3254,7 +3261,23 @@ function doForm(e){
 
   reveal(0);
   layer.style.opacity = '0';
-  if(video){ try{ video.muted = true; var pw = video.play(); if(pw && pw.catch) pw.catch(function(){}); }catch(e){} }  // warm-up: decoded & ready before its reveal
+  var flameStarted = false;
+  // warm-up: decode the first frames, then park on frame 0 — the flame is played from its very start (a small flame that grows) when it is revealed
+  if(video){ try{ video.muted = true; video.loop = false; var pw = video.play(); if(pw && pw.then) pw.then(function(){ if(!flameStarted){ video.pause(); try{ video.currentTime = 0; }catch(e){} } }).catch(function(){}); }catch(e){} }
+  function startFlame(fade){
+    if(!video || flameStarted) return; flameStarted = true;
+    try{ video.pause(); video.currentTime = 0; video.loop = false; }catch(e){}
+    video.style.transition = 'opacity ' + fade + 's ease';
+    video.style.clipPath = 'inset(0 0 0 0)';
+    video.style.opacity = '0.62';   // kept subtle — full strength competed with the headline
+    video.classList.add('reveal');
+    var pl = video.play();
+    if(pl && pl.catch) pl.catch(function(){
+      ['pointerdown','pointermove','keydown','wheel','touchstart'].forEach(function(ev){
+        window.addEventListener(ev, function once(){ window.removeEventListener(ev, once); if(!video.ended) video.play().catch(function(){}); }, { passive:true });
+      });
+    });
+  }
   var introDone = false;
   var introCancelled = false;
   var handedOff = false;    // true once the sketch has permanently given way to the video
@@ -3328,17 +3351,7 @@ function doForm(e){
   window.__heroUnlock = unlockIntro;
 
   function revealVideo(){
-    if(video){
-      video.style.transition = 'opacity 1.6s ease, clip-path 2s cubic-bezier(.22,1,.36,1)';
-      video.style.opacity = '0.62';   // kept subtle — full strength competed with the headline
-      video.classList.add('reveal'); // drives the clip-path wipe below
-      var pl = video.play();
-      if(pl && pl.catch) pl.catch(function(){
-        ['pointerdown','pointermove','keydown','wheel','touchstart'].forEach(function(ev){
-          window.addEventListener(ev, function once(){ window.removeEventListener(ev, once); video.play().catch(function(){}); }, { passive:true });
-        });
-      });
-    }
+    startFlame(3.2);   // fades in slowly while the flame grows from a spark
   }
 
   function handoff(){
@@ -3416,11 +3429,7 @@ function doForm(e){
       showText();
       layer.style.transition = 'opacity .3s ease';
       layer.style.opacity = '0';
-      if(video){
-        video.style.transition = 'opacity .5s ease';
-        video.style.opacity = '0.62';
-        var plE = video.play(); if(plE && plE.catch) plE.catch(function(){});
-      }
+      startFlame(1.4);
     }
     // progress through first screen: 0 at top, 1 by one full viewport
     var sp = clamp(y / H, 0, 1);
@@ -3633,7 +3642,7 @@ setTimeout(function(){
   function retryVideoPlay(){
     if(retried) return;
     var v = document.getElementById('bg-video');
-    if(v && v.paused){
+    if(v && v.paused && !v.ended){
       var p = v.play();
       if(p && p.then){ p.then(function(){ retried = true; }).catch(function(){}); }
     } else { retried = true; }
