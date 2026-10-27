@@ -4449,5 +4449,40 @@ setTimeout(function(){
 })();
 </script>
 
+<script>
+/* Favicon namaste: while the mouse is over the page the tab icon does a little bow, then settles back (like hellomonday). */
+(function(){
+  try{
+    var link = document.querySelector('link[rel="icon"]'); if(!link) return;
+    var src = decodeURIComponent((link.getAttribute('href')||'').split(',').slice(1).join(','));
+    var inner = src.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+    if(!inner) return;
+    function frame(a, sy){
+      var svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='-60 -20 393 446'>" +
+        "<g transform='translate(116 416) rotate(" + a.toFixed(2) + ") scale(1 " + sy.toFixed(3) + ") translate(-116 -416)'>" + inner + "</g></svg>";
+      return 'data:image/svg+xml,' + encodeURIComponent(svg);
+    }
+    var N = 16, frames = [];
+    for(var i=0;i<=N;i++){
+      var t = i/N, bow = Math.sin(Math.PI*t), wob = 1 - 0.3*t;
+      frames.push(frame(-12*bow*wob, 1 - 0.12*bow));       // lean + dip, hands pressed together, then rise
+    }
+    var rest = frames[0];
+    link.setAttribute('href', rest);
+    var playing = false, last = 0;
+    function play(){
+      if(playing) return; playing = true; var k = 0;
+      (function step(){
+        link.setAttribute('href', frames[k]);
+        if(++k <= N) setTimeout(step, 62); else { link.setAttribute('href', rest); playing = false; last = Date.now(); }
+      })();
+    }
+    function poke(){ if(!playing && Date.now() - last > 1800) play(); }
+    document.documentElement.addEventListener('mouseenter', poke);
+    document.addEventListener('mousemove', poke, {passive:true});
+    document.addEventListener('pointerdown', poke, {passive:true});
+  }catch(e){}
+})();
+</script>
 </body>
 </html>
