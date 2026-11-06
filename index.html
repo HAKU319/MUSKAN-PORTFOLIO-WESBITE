@@ -2963,6 +2963,7 @@ body.reel-open{overflow:hidden}
           <div class="cat-eyebrow">Category 05 &middot; Immersive</div>
           <h2 class="cat-title">VR / <em>AR</em></h2>
           <div class="cat-list">
+            <a href="climbing-everest.html">Climbing Everest VR</a>
             <a href="piano-vr.html">Piano VR App</a>
             <a href="vr-accessibility.html">VR Accessibility</a>
             <a href="#writing">Read the Process Notes &darr;</a>
@@ -3157,7 +3158,7 @@ body.reel-open{overflow:hidden}
 /* embedded case-study pages — previews and the full overlay work from this one file */
 window.CASE_PAGES = (function(){ try{ return JSON.parse(document.getElementById('case-pages-data').textContent); }catch(e){ return {}; } })();
 /* Netlify's "pretty URLs" may rewrite sammys.html to /sammys — accept either spelling and map it to the real page key */
-window.CASE_KEYS = ['sammys.html','nyeeminc.html','studio57.html','studio57-app.html','studio57-developer.html','freelance.html','freelance-projects.html','piano-vr.html','vr-accessibility.html','spotify.html'];
+window.CASE_KEYS = ['climbing-everest.html','sammys.html','nyeeminc.html','studio57.html','studio57-app.html','studio57-developer.html','freelance.html','freelance-projects.html','piano-vr.html','vr-accessibility.html','spotify.html'];
 window.caseKey = function(href){
   if(!href || href.charAt(0) === '#') return '';
   var u; try{ u = new URL(href, location.href); }catch(e){ return ''; }
@@ -3848,13 +3849,13 @@ setTimeout(function(){
   var CASE_STUDY_FILES = [
     'sammys.html','nyeeminc.html','studio57.html','studio57-app.html','studio57-developer.html',
     'freelance.html','freelance-projects.html',
-    'piano-vr.html','vr-accessibility.html','spotify.html'
+    'piano-vr.html','vr-accessibility.html','spotify.html','climbing-everest.html'
   ];
   var LABELS = {
     'sammys.html':'Sammy\u2019s Senior Sanctuary','nyeeminc.html':'Nyeem Inc.',
     'studio57.html':'Studio 57','studio57-app.html':'Studio 57 \u2014 Booking App','studio57-developer.html':'Studio 57 \u2014 Salon Booking App',
     'freelance.html':'Freelance Event Graphics','freelance-projects.html':'Freelance Projects',
-    'piano-vr.html':'Piano VR App','vr-accessibility.html':'VR Accessibility',
+    'piano-vr.html':'Piano VR App','vr-accessibility.html':'VR Accessibility','climbing-everest.html':'Climbing Everest VR',
     'spotify.html':'Spotify Research'
   };
 

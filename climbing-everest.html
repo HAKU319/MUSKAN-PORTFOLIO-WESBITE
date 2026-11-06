@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Climbing Everest — A VR Experience · Muskan KC</title>
+<meta name="description" content="Climbing Everest: a VR experience that starts in Namche Bazaar and ends at the summit. Research, design doc, Unity prototype and a playable web build for Meta Quest and desktop.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&display=swap" rel="stylesheet">
+
+<style>
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box }
+html { scroll-behavior:smooth }
+body {
+  background-color: #0e1b2b;
+  color: #f0ede6;
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 16px; line-height:1.7;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+a { color:inherit; text-decoration:none }
+em { font-style:italic; color:rgba(240,237,230,.65); font-weight:300 }
+
+.nav-back {
+  position:fixed; top:24px; left:32px; z-index:100;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:10px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.55);
+  border-bottom:1px solid rgba(240,237,230,.25);
+  padding-bottom:3px;
+  transition:color .2s, border-color .2s;
+}
+.nav-back:hover { color:rgba(240,237,230,.95); border-color:rgba(240,237,230,.7) }
+
+.nav-visit {
+  position:fixed; top:24px; right:32px; z-index:100;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:10px; font-weight:700;
+  letter-spacing:2.5px; text-transform:uppercase;
+  color:rgba(240,237,230,.85);
+  border:1.5px solid rgba(240,237,230,.3);
+  padding:10px 22px;
+  transition:all .2s;
+}
+.nav-visit:hover { border-color:rgba(240,237,230,.7); background:rgba(240,237,230,.06) }
+
+.hero {
+  min-height:90vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:120px 40px 80px; text-align:center;
+}
+.hero-eyebrow {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:6px; text-transform:uppercase;
+  color:rgba(240,237,230,.42); margin-bottom:26px;
+}
+.hero-title {
+  font-family:'Fraunces',serif;
+  font-size:clamp(48px,7.5vw,108px);
+  font-weight:800; font-style:italic;
+  color:rgba(240,237,230,.96); line-height:.97;
+  letter-spacing:-3px;
+  font-variation-settings:'opsz' 108,'WONK' 1;
+  margin:0; max-width:900px;
+}
+.hero-sub {
+  font-family:'Fraunces',serif;
+  font-size:clamp(18px,2.2vw,28px);
+  font-weight:300; font-style:italic;
+  color:rgba(240,237,230,.55);
+  margin-top:20px; max-width:680px;
+  font-variation-settings:'opsz' 28;
+}
+.hero-meta {
+  margin-top:48px;
+  display:flex; gap:48px; flex-wrap:wrap; justify-content:center;
+}
+.hero-meta > div { display:flex; flex-direction:column; gap:6px }
+.hero-meta-l {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:8px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.4);
+}
+.hero-meta-v {
+  font-family:'Fraunces',serif;
+  font-size:15px; font-weight:500;
+  color:rgba(240,237,230,.88);
+  font-variation-settings:'opsz' 15;
+}
+
+section.cs { padding:60px 40px; max-width:860px; margin:0 auto }
+.cs-eyebrow {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:5px; text-transform:uppercase;
+  color:rgba(240,237,230,.4); margin-bottom:14px;
+}
+.cs-h {
+  font-family:'Fraunces',serif;
+  font-size:clamp(28px,4vw,48px);
+  font-weight:800; font-style:italic;
+  color:rgba(240,237,230,.92);
+  line-height:1.05; letter-spacing:-1.5px;
+  margin:0 0 24px;
+  font-variation-settings:'opsz' 48,'WONK' 1;
+}
+.cs-p {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:16px; line-height:1.78;
+  color:rgba(240,237,230,.65);
+  margin:0 0 16px; max-width:680px;
+}
+.cs-pull {
+  font-family:'Fraunces',serif;
+  font-size:clamp(20px,2.4vw,28px);
+  font-weight:300; font-style:italic;
+  color:rgba(240,237,230,.78);
+  line-height:1.4; letter-spacing:-.5px;
+  margin:32px 0;
+  padding-left:24px;
+  border-left:2px solid rgba(240,237,230,.3);
+  font-variation-settings:'opsz' 28;
+}
+.cs-list {
+  list-style:none; padding-left:0;
+  margin:18px 0; max-width:680px;
+}
+.cs-list li {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:15px; line-height:1.78;
+  color:rgba(240,237,230,.6);
+  padding-left:28px; position:relative;
+  margin-bottom:10px;
+}
+.cs-list li::before {
+  content:'—'; position:absolute; left:0;
+  color:rgba(240,237,230,.35); font-weight:700;
+}
+
+.steps { display:flex; flex-direction:column; gap:32px; margin-top:32px }
+.step {
+  display:grid; grid-template-columns:60px 1fr; gap:24px;
+  padding-bottom:28px;
+  border-bottom:1px solid rgba(240,237,230,.08);
+}
+.step:last-child { border-bottom:none; padding-bottom:0 }
+.step-n {
+  font-family:'Fraunces',serif;
+  font-size:32px; font-weight:900;
+  color:rgba(240,237,230,.16);
+  line-height:1;
+  font-variation-settings:'opsz' 32;
+}
+.step-t {
+  font-family:'Fraunces',serif;
+  font-size:20px; font-weight:700; font-style:italic;
+  color:rgba(240,237,230,.9);
+  margin:0 0 10px;
+  font-variation-settings:'opsz' 20;
+}
+.step-d {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:14px; line-height:1.72;
+  color:rgba(240,237,230,.6);
+}
+
+.tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:24px }
+.tag {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase;
+  border:1px solid rgba(240,237,230,.18);
+  padding:6px 14px; color:rgba(240,237,230,.6);
+}
+
+.cta-section {
+  padding:100px 40px;
+  text-align:center;
+  border-top:1px solid rgba(240,237,230,.08);
+  margin-top:60px;
+}
+.cta-h {
+  font-family:'Fraunces',serif;
+  font-size:clamp(32px,4.5vw,56px);
+  font-weight:800; font-style:italic;
+  color:rgba(240,237,230,.94);
+  line-height:1.05; letter-spacing:-1.5px;
+  margin:0 0 30px;
+  font-variation-settings:'opsz' 56,'WONK' 1;
+}
+.cta-btn {
+  display:inline-flex; align-items:center; gap:12px;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:11px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.95);
+  border:1.5px solid rgba(240,237,230,.4);
+  padding:16px 34px;
+  transition:all .25s;
+}
+.cta-btn:hover { border-color:rgba(240,237,230,.85); background:rgba(240,237,230,.08) }
+
+footer.cs-footer {
+  padding:30px 40px; text-align:center;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.3);
+  border-top:1px solid rgba(240,237,230,.06);
+}
+
+@media (max-width:760px) {
+  .nav-back { top:18px; left:18px; font-size:9px; letter-spacing:1.5px }
+  .nav-visit { top:18px; right:18px; padding:8px 12px; font-size:8.5px; letter-spacing:1.2px }
+}
+@media (max-width:420px) {
+  .nav-visit { top:54px; right:auto; left:18px }
+  .hero { padding:100px 24px 60px }
+  section.cs { padding:50px 24px }
+  .hero-meta { gap:28px }
+  .step { grid-template-columns:50px 1fr; gap:16px }
+}
+
+.project-nav {
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:32px;
+  padding:48px 40px 80px;
+  max-width:1100px;
+  margin:0 auto;
+  border-top:1px solid rgba(240,237,230,.08);
+}
+.pn-link {
+  display:flex; align-items:center; gap:18px;
+  text-decoration:none;
+  transition:opacity .2s;
+}
+.pn-prev { justify-content:flex-start }
+.pn-next { justify-content:flex-end }
+.pn-link:hover { opacity:.7 }
+.pn-link:hover .pn-arrow { transform:translateX(0) }
+.pn-prev:hover .pn-arrow { transform:translateX(-6px) }
+.pn-next:hover .pn-arrow { transform:translateX(6px) }
+.pn-arrow {
+  font-family:'Fraunces',serif;
+  font-size:32px; font-weight:200;
+  color:rgba(240,237,230,.45);
+  transition:transform .25s cubic-bezier(.22,.61,.36,1);
+  font-variation-settings:'opsz' 32;
+}
+.pn-link > span:not(.pn-arrow) {
+  display:flex; flex-direction:column; gap:4px;
+}
+.pn-prev > span:not(.pn-arrow) { text-align:left }
+.pn-next > span:not(.pn-arrow) { text-align:right }
+.pn-l {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:8px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.38);
+}
+.pn-n {
+  font-family:'Fraunces',serif;
+  font-size:16px; font-weight:500;
+  font-style:italic;
+  color:rgba(240,237,230,.88);
+  font-variation-settings:'opsz' 16;
+}
+.pn-home {
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:9px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  color:rgba(240,237,230,.5);
+  text-decoration:none;
+  border:1px solid rgba(240,237,230,.2);
+  padding:10px 22px;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.pn-home:hover {
+  color:rgba(240,237,230,.95);
+  border-color:rgba(240,237,230,.55);
+  background:rgba(240,237,230,.04);
+}
+.pn-empty { width:1px; height:1px }
+@media (max-width:760px) {
+  .project-nav {
+    grid-template-columns:1fr;
+    gap:18px; padding:40px 24px 60px;
+    text-align:center;
+  }
+  .pn-link { justify-content:center }
+  .pn-home { order:3 }
+}
+
+/* ═══ Climbing Everest — page-specific ═══ */
+:root{--ev-ice:#bfe3f5;--ev-flag:#e9a23b;--ev-line:rgba(240,237,230,.12)}
+body{background-image:radial-gradient(120% 60% at 50% -10%,rgba(120,170,210,.16),transparent 60%)}
+.hero.ev-hero{position:relative;isolation:isolate;overflow:hidden;min-height:92vh}
+.ev-hero::before{content:'';position:absolute;inset:0;z-index:-2;background:url('everest/pano-basecamp.jpg') center 55%/cover no-repeat;opacity:.38}
+.ev-hero::after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(14,27,43,.55) 0%,rgba(14,27,43,.72) 55%,#0e1b2b 100%)}
+.ev-actions{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:40px}
+.ev-btn{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:15px 30px;border:1.5px solid rgba(240,237,230,.4);color:rgba(240,237,230,.95);transition:all .25s}
+.ev-btn:hover{border-color:rgba(240,237,230,.85);background:rgba(240,237,230,.08)}
+.ev-btn.solid{background:var(--ev-flag);border-color:var(--ev-flag);color:#1a1206}
+.ev-btn.solid:hover{background:#f3b54f;border-color:#f3b54f}
+.ev-note{font-size:12px;letter-spacing:.3px;color:rgba(240,237,230,.5);margin-top:16px;max-width:520px}
+section.cs.wide{max-width:1100px}
+.ev-fig{margin:34px 0 8px}
+.ev-fig img{display:block;width:100%;height:auto;border:1px solid var(--ev-line);background:#0a1420}
+.ev-fig figcaption{font-size:12px;line-height:1.6;letter-spacing:.4px;color:rgba(240,237,230,.5);margin-top:10px;max-width:680px}
+.ev-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:34px 0 8px}
+.ev-grid .ev-fig{margin:0}
+.ev-pano{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:34px 0 8px}
+.ev-pano figure img{aspect-ratio:2/1;object-fit:cover}
+.ev-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:34px 0 8px;border:1px solid var(--ev-line)}
+.ev-stats>div{padding:22px 18px;border-right:1px solid var(--ev-line)}
+.ev-stats>div:last-child{border-right:none}
+.ev-stats .n{font-size:clamp(20px,2.6vw,30px);color:var(--ev-ice);line-height:1.1}
+.ev-stats .l{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(240,237,230,.45);margin-top:8px}
+.ev-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:30px 0 8px}
+.ev-card{border:1px solid var(--ev-line);padding:22px 22px 20px;background:rgba(255,255,255,.025)}
+.ev-card .k{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--ev-flag);margin-bottom:10px}
+.ev-card h4{margin:0 0 8px;color:rgba(240,237,230,.92)}
+.ev-card p{font-size:14px;line-height:1.7;color:rgba(240,237,230,.6);margin:0}
+.ev-time{list-style:none;margin:30px 0 8px;padding:0;border-left:1px solid var(--ev-line)}
+.ev-time li{position:relative;padding:0 0 26px 28px}
+.ev-time li::before{content:'';position:absolute;left:-5px;top:7px;width:9px;height:9px;border-radius:50%;background:var(--ev-flag)}
+.ev-time .y{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(240,237,230,.45)}
+.ev-time .t{font-size:15px;color:rgba(240,237,230,.9);margin:4px 0 4px}
+.ev-time .d{font-size:14px;line-height:1.7;color:rgba(240,237,230,.58);max-width:640px}
+.ev-play{padding:90px 40px;text-align:center;border-top:1px solid rgba(240,237,230,.08);margin-top:50px;background:linear-gradient(180deg,transparent,rgba(120,170,210,.07))}
+.ev-play .cta-h{margin-bottom:14px}
+.ev-play .cs-p{margin:0 auto 6px;text-align:center}
+@media (max-width:760px){
+  .ev-grid,.ev-pano,.ev-cards{grid-template-columns:1fr}
+  .ev-stats{grid-template-columns:1fr 1fr}
+  .ev-stats>div:nth-child(2){border-right:none}
+  .ev-stats>div:nth-child(-n+2){border-bottom:1px solid var(--ev-line)}
+}
+@media (max-width:420px){
+  .ev-hero{min-height:auto}
+  .ev-play{padding:64px 24px}
+  .ev-actions{flex-direction:column;align-items:stretch;width:100%}
+  .ev-btn{justify-content:center}
+}
+
+
+/* ═══ case-motion — shared smooth reveal (same feel as the Studio 57 developer case study) ═══ */
+html{scroll-behavior:auto !important}
+@keyframes cm-in{from{opacity:0;transform:translate3d(0,18px,0)}}
+.hero>*{animation:cm-in 1s cubic-bezier(.22,.61,.36,1) both;animation-delay:calc(var(--i,0) * 110ms + 100ms)}
+.cm-rv{opacity:0;transform:translate3d(0,28px,0);transition:opacity .95s cubic-bezier(.22,.61,.36,1),transform 1.05s cubic-bezier(.22,.61,.36,1);transition-delay:calc(var(--i,0) * 90ms);will-change:opacity,transform}
+.cm-rv.cm-in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.cm-rv{opacity:1;transform:none;transition:none}.hero>*{animation:none}}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Special+Elite&display=swap" rel="stylesheet"><style id="case-fonts">
+/* ═══ case-fonts — same type as the home screen: Bungee headlines, Special Elite text ═══ */
+body,body *{font-family:'Special Elite',monospace !important}
+h1,h2,h3,h4,.cs-h,.hero-title,.cta-h,.cs-pull,.bs-n,.num,.pname,.cs-num,.fc-title,.step-t,.pn-n{font-family:'Bungee',cursive !important;font-style:normal !important;font-weight:400 !important;letter-spacing:0 !important;overflow-wrap:break-word}
+h1 *,h2 *,h3 *,h4 *,.hero-title *,.cs-h *,.cta-h *,.cs-pull *{font-family:'Bungee',cursive !important;font-style:normal !important;font-weight:400 !important;letter-spacing:0 !important}
+h1,.hero-title{font-size:clamp(26px,4.4vw,54px) !important;line-height:1.22 !important}
+h2,.cs-h,.step h2{font-size:clamp(19px,2.3vw,30px) !important;line-height:1.3 !important}
+h3,.cta-h,.cs-outro h3{font-size:clamp(18px,2.6vw,32px) !important;line-height:1.3 !important}
+h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !important}
+.cs-pull{font-size:clamp(17px,2vw,26px) !important;line-height:1.45 !important}
+.bs-n{font-size:clamp(44px,7vw,100px) !important}
+.num{font-size:clamp(20px,2.4vw,30px) !important}
+@media (max-width:600px){
+  h1,.hero-title{font-size:clamp(22px,7vw,32px) !important}
+  h2,.cs-h,.step h2{font-size:clamp(17px,5vw,23px) !important}
+  h3,.cta-h,.cs-outro h3{font-size:clamp(17px,5.4vw,24px) !important}
+  .cs-pull{font-size:clamp(15px,4.4vw,19px) !important}
+  .bs-n{font-size:clamp(38px,12vw,60px) !important}
+  .num{font-size:clamp(18px,5.6vw,24px) !important}
+  p,li,td,th,figcaption{font-size:max(12.5px,1em)}
+  .nav-back,.nav-visit{position:absolute !important;background:rgba(0,0,0,.6) !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+}
+</style></head>
+<body>
+
+<a href="/" class="nav-back">&larr; Back to portfolio</a>
+<a href="https://everest-vr-climb.netlify.app/" target="_blank" rel="noopener" class="nav-visit">Play the web build &#8599;</a>
+
+<section class="hero ev-hero">
+  <div class="hero-eyebrow">VR / XR &middot; Experience Design &middot; Unity &amp; WebXR &middot; 2023&ndash;2026</div>
+  <h1 class="hero-title">Climbing Everest<br><em>A VR Experience</em></h1>
+  <div class="hero-sub">Start in Namche Bazaar, join the puja at Base Camp, then climb to the summit &mdash; an Everest experience that is about the journey, not only the climb.</div>
+  <div class="hero-meta">
+    <div><div class="hero-meta-l">Type</div><div class="hero-meta-v">VR Experience &middot; Concept to Prototype</div></div>
+    <div><div class="hero-meta-l">Role</div><div class="hero-meta-v">Concept, UX &amp; Experience Design</div></div>
+    <div><div class="hero-meta-l">Platform</div><div class="hero-meta-v">Meta Quest &middot; Web</div></div>
+    <div><div class="hero-meta-l">Tools</div><div class="hero-meta-v">Unity &middot; WebXR &middot; AI-assisted build</div></div>
+  </div>
+  <div class="ev-actions">
+    <a class="ev-btn solid" href="https://everest-vr-climb.netlify.app/" target="_blank" rel="noopener">Play it now &#8599;</a>
+    <a class="ev-btn" href="#process">Read the process &darr;</a>
+  </div>
+  <p class="ev-note">Plays on a desktop browser, or in the Meta Quest browser with &ldquo;Enter VR&rdquo;.</p>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">Overview</div>
+  <h2 class="cs-h">Everest is out of reach for almost everyone.</h2>
+  <p class="cs-p">Climbing Mount Everest takes extreme fitness, serious risk and a budget most people will never have. I wanted to design a VR experience that lets anyone feel what the journey is like &mdash; the thin air, the cold, the ice, the culture on the way up &mdash; without the danger.</p>
+  <p class="cs-p">It began as a graduate VR course project in 2023 that I never finished. In 2026 I came back to it and rebuilt it with a clearer idea: the experience matters more than the game. So the trek to Base Camp comes first, and the climb comes second.</p>
+  <div class="cs-pull">Don&rsquo;t just simulate the summit. Let people walk there.</div>
+  <div class="ev-stats">
+    <div><div class="n">8,848 m</div><div class="l">Summit height</div></div>
+    <div><div class="n">3</div><div class="l">Chapters, Namche to summit</div></div>
+    <div><div class="n">Quest 2</div><div class="l">Target headset</div></div>
+    <div><div class="n">90 fps</div><div class="l">Performance target</div></div>
+  </div>
+</section>
+
+<section class="cs" id="process">
+  <div class="cs-eyebrow">Research</div>
+  <h2 class="cs-h">What VR can do for mountaineering.</h2>
+  <p class="cs-p">I started with a literature review and a look at the existing Everest apps. The case for VR kept coming back to the same points: it is safe, it is far cheaper than a real expedition, and it can teach geography, history and culture along the way as well as entertain.</p>
+  <ul class="cs-list">
+    <li><strong>Access.</strong> People who can&rsquo;t climb because of health, money or geography can still experience the mountain.</li>
+    <li><strong>Training.</strong> Climbing scenarios can be practised repeatedly with no physical risk.</li>
+    <li><strong>Education.</strong> The route, the weather and the culture of the Khumbu region can be taught in context.</li>
+  </ul>
+  <p class="cs-p">I reviewed two existing products, <em>Everest VR</em> (S&oacute;lfar Studios) and <em>The Climb</em> (Crytek). Both centre on the climb itself. I wanted the journey to the mountain &mdash; the villages, the rituals, the pace &mdash; to carry equal weight.</p>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">Design Document</div>
+  <h2 class="cs-h">The 2023 plan.</h2>
+  <p class="cs-p">The first version was written up as a VR project design document: how users move, what they can grab, what they feel and hear, and what the headset has to hit to stay comfortable.</p>
+  <div class="ev-cards">
+    <div class="ev-card"><div class="k">Movement</div><h4>Teleport &amp; climb</h4><p>Teleportation for comfort, plus hand-over-hand climbing on steep sections.</p></div>
+    <div class="ev-card"><div class="k">Grabbable gear</div><h4>Real climbing kit</h4><p>Ice axe, rope and carabiner, oxygen tank, backpack, food and water &mdash; no sockets, everything is held.</p></div>
+    <div class="ev-card"><div class="k">Feedback</div><h4>Haptics &amp; 3D audio</h4><p>Vibration and sound when the axe bites into ice or the ice cracks, when weather turns, or when you lose grip. Wind and crunching snow in 3D.</p></div>
+    <div class="ev-card"><div class="k">Interface</div><h4>Menus you can reach</h4><p>A start menu, a gear menu at Base Camp, and optional compass, mini map and interactive map. Colour and contrast set for readability.</p></div>
+    <div class="ev-card"><div class="k">Performance</div><h4>Budgeted for a headset</h4><p>90 fps (about 11 ms per frame), 500,000 triangles, 2&ndash;3k draw calls and fully baked lighting.</p></div>
+    <div class="ev-card"><div class="k">Learning</div><h4>Narrated history</h4><p>Audio narration on the history and geography of Everest, so the experience teaches as it goes.</p></div>
+  </div>
+</section>
+
+<section class="cs wide">
+  <div class="cs-eyebrow">First Prototype</div>
+  <h2 class="cs-h">Where it started: blocks and a skybox.</h2>
+  <p class="cs-p">The original Unity prototype was deliberately rough: a snowy 360&deg; skybox, placeholder blocks standing in for hands and a few interactions wired up. It proved the idea, but it stalled before it became a game.</p>
+  <div class="ev-grid">
+    <figure class="ev-fig"><img src="everest/unity-proto-1.jpg" alt="Unity editor showing the first Climbing Everest VR prototype with block hands and a snowy skybox" loading="lazy"><figcaption>The first Unity scene (2023): block hands, an XR rig and an Everest skybox.</figcaption></figure>
+    <figure class="ev-fig"><img src="everest/unity-proto-2.jpg" alt="Second view of the Unity prototype above the clouds" loading="lazy"><figcaption>The same scene above the clouds.</figcaption></figure>
+  </div>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">The Rebuild</div>
+  <h2 class="cs-h">Experience first, game second.</h2>
+  <p class="cs-p">When I returned to the project I changed its shape. Instead of dropping the player straight onto the mountain, the experience now follows the real journey in three chapters. I read first-hand accounts from climbers and trekkers (expedition dispatches and trek journals) and used how they describe the place &mdash; the light, the colour, the sounds &mdash; to guide the visuals.</p>
+  <ul class="ev-time">
+    <li><div class="y">Chapter 1 &middot; 3,440 m</div><div class="t">Namche Bazaar</div><div class="d">The Sherpa capital of the Khumbu. Walk its stone terraces, spin prayer wheels, pass yaks and porters, and share tea before the trail climbs on. This is where the culture lives.</div></li>
+    <li><div class="y">Chapter 2 &middot; 5,364 m</div><div class="t">Base Camp</div><div class="d">A tent city on the glacier. A lama leads the puja &mdash; juniper smoke, rice in the air, prayer flags raised &mdash; then you choose your ice axe, oxygen flow and weather at the gear crate.</div></li>
+    <li><div class="y">Chapter 3 &middot; to 8,848 m</div><div class="t">The Climb</div><div class="d">Icefall, camps and the summit push. Grip holds, swing the ice axe, clip into the fixed rope, breathe oxygen and manage stamina as the weather changes.</div></li>
+  </ul>
+  <figure class="ev-fig"><img src="everest/web-namche.jpg" alt="Namche Bazaar in the web build: stone houses on terraces around a white stupa, with snow peaks behind" loading="lazy"><figcaption>Chapter 1: Namche Bazaar in the playable web build.</figcaption></figure>
+  <div class="ev-grid">
+    <figure class="ev-fig"><img src="everest/web-basecamp.jpg" alt="Base Camp in-game with tents, prayer flags and a lama at the puja altar" loading="lazy"><figcaption>Chapter 2: Base Camp, with a first-person guide to the altar.</figcaption></figure>
+    <figure class="ev-fig"><img src="everest/web-climb.jpg" alt="Night climb on a ladder in the Khumbu Icefall with a head-torch beam and a heads-up altitude display" loading="lazy"><figcaption>Chapter 3: the Icefall at night, lit by a head-torch.</figcaption></figure>
+  </div>
+</section>
+
+<section class="cs wide">
+  <div class="cs-eyebrow">Environments</div>
+  <h2 class="cs-h">Four places, wrapped around you.</h2>
+  <p class="cs-p">Each chapter sits inside a 360&deg; panorama, so the world feels huge from the first second while the geometry stays light enough for a headset.</p>
+  <div class="ev-pano">
+    <figure class="ev-fig"><img src="everest/pano-range.jpg" alt="360 degree panorama of a snowy mountain range" loading="lazy"><figcaption>The snowy range, the backdrop for the climb.</figcaption></figure>
+    <figure class="ev-fig"><img src="everest/pano-village.jpg" alt="360 degree panorama of a mountain monastery village" loading="lazy"><figcaption>A monastery village on the trek.</figcaption></figure>
+    <figure class="ev-fig"><img src="everest/pano-basecamp.jpg" alt="360 degree panorama of Base Camp with tents and prayer flags" loading="lazy"><figcaption>Base Camp: tents and prayer flags.</figcaption></figure>
+    <figure class="ev-fig"><img src="everest/pano-summit.jpg" alt="360 degree panorama above the clouds near the summit" loading="lazy"><figcaption>Above the clouds, near the summit.</figcaption></figure>
+  </div>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">Interaction Design</div>
+  <h2 class="cs-h">Hands first, buttons last.</h2>
+  <p class="cs-p">The controls try to feel like what climbers actually do. On a headset the body does the work; on a desktop everything has a keyboard and mouse equivalent, so anyone with a link can try it.</p>
+  <ul class="cs-list">
+    <li><strong>Climb:</strong> grip a hold and pull down; swing the ice axe into blue ice and squeeze to plant it.</li>
+    <li><strong>Stay safe:</strong> put your carabiner on the red fixed rope so a slip is caught instead of sending you back to the start.</li>
+    <li><strong>Breathe &amp; eat:</strong> raise a hand to your mask for oxygen; reach over your shoulder for food and water from your pack.</li>
+    <li><strong>Read the world:</strong> a wrist display shows altitude, compass, stamina, oxygen and rope status.</li>
+    <li><strong>Comfort:</strong> snap or smooth turning, captioned narration and volume settings, saved between visits.</li>
+  </ul>
+  <div class="cs-pull">The mountain should be hard to climb, never hard to understand.</div>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">Where It Stands</div>
+  <h2 class="cs-h">Playable today, headset-ready next.</h2>
+  <ul class="ev-time">
+    <li><div class="y">2023</div><div class="t">Course project</div><div class="d">Literature review, design doc and a first Unity prototype for a graduate VR course.</div></li>
+    <li><div class="y">2026</div><div class="t">Playable web build</div><div class="d">All three chapters are live in the browser, on desktop and in the Meta Quest browser.</div></li>
+    <li><div class="y">Now</div><div class="t">Unity project for Quest 2</div><div class="d">A Unity 2021 project (OpenXR) with the Main Menu, Base Camp and Climb scenes, set up to build to a Meta Quest 2.</div></li>
+    <li><div class="y">Next</div><div class="t">Headset testing &amp; richer assets</div><div class="d">Tuning the hand gestures in a real headset, more detailed 3D props such as prayer flags, and bringing Namche Bazaar into Unity.</div></li>
+  </ul>
+</section>
+
+<section class="cs">
+  <div class="cs-eyebrow">Takeaway</div>
+  <h2 class="cs-h">What this project taught me.</h2>
+  <p class="cs-p">Designing for VR means designing for a body and a place, not a screen. The strongest moments in this project aren&rsquo;t the mechanics &mdash; they&rsquo;re the quiet ones: the first look down a Namche street, or the puja before the climb. Finishing it also reminded me that an idea you shelved can come back better if you change what it is about.</p>
+</section>
+
+<section class="ev-play">
+  <h2 class="cta-h">Try the climb yourself.</h2>
+  <p class="cs-p">Open it on a computer, or in the Meta Quest browser and press &ldquo;Enter VR&rdquo;.</p>
+  <div class="ev-actions"><a class="ev-btn solid" href="https://everest-vr-climb.netlify.app/" target="_blank" rel="noopener">Play Climbing Everest &#8599;</a></div>
+</section>
+
+<!-- Project navigation -->
+<section class="project-nav">
+  <a href="piano-vr.html" class="pn-link pn-prev"><span class="pn-arrow">&larr;</span><span><span class="pn-l">Previous Project</span><span class="pn-n">Piano VR App</span></span></a>
+  <a href="/" class="pn-home">All Work</a>
+  <a href="vr-accessibility.html" class="pn-link pn-next"><span><span class="pn-l">Next Project</span><span class="pn-n">VR Accessibility</span></span><span class="pn-arrow">&rarr;</span></a>
+</section>
+
+<footer class="cs-footer">
+  &copy; 2026 Muskan KC &middot; Designed &amp; built in New York
+</footer>
+<script>
+(function(){
+  [].forEach.call(document.querySelectorAll('.hero>*'), function(el, i){ el.style.setProperty('--i', i); });
+  if(!('IntersectionObserver' in window)) return;
+  var els = [].slice.call(document.querySelectorAll('.step,.cs-h,.cs-p,.cs-pull,.cs-list,.tcg-card,.ba-col,.changed-item,.blend-video,.cta-section>*,.project-nav,.flyer-slot,.wall-section .cs-num')).filter(function(el){ return !el.closest('.cm-rv') || el.classList.contains('cm-rv'); });
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('cm-in'); io.unobserve(e.target); } }); }, { threshold:.1, rootMargin:'0px 0px -6% 0px' });
+  var last = null, n = 0;
+  els.forEach(function(el){ if(el.parentNode !== last){ last = el.parentNode; n = 0; } el.classList.add('cm-rv'); el.style.setProperty('--i', Math.min(n++, 4)); io.observe(el); });
+})();
+</script>
+</body>
+</html>
