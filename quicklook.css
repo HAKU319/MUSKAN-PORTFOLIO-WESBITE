@@ -1,0 +1,78 @@
+/* ═══ Quick look / Full story — shared by the case studies ═══
+   Two ways to read a project: a 30-second visual summary, or the whole story.
+   Markup lives in each page; behaviour is in quicklook.js. */
+:root{ --ql-acc:#d9702a; --ql-line:rgba(240,237,230,.14); --ql-ink:rgba(240,237,230,.92); --ql-dim:rgba(240,237,230,.6); }
+
+/* ── the switch ── */
+.ql-switch{ display:inline-flex; gap:4px; margin-top:40px; padding:4px; border:1px solid var(--ql-line); border-radius:999px; background:rgba(0,0,0,.18); }
+.ql-switch button{ appearance:none; border:0; cursor:pointer; background:transparent; color:var(--ql-dim); padding:10px 22px; border-radius:999px; display:flex; flex-direction:column; align-items:center; gap:1px; line-height:1.2; transition:background .25s, color .25s; }
+.ql-switch button b{ font-size:12px; letter-spacing:2px; text-transform:uppercase; font-weight:700; }
+.ql-switch button span{ font-size:10px; letter-spacing:.5px; opacity:.75; }
+.ql-switch button:hover{ color:var(--ql-ink); }
+.ql-switch button[aria-pressed="true"]{ background:var(--ql-acc); color:#1a0c06; }
+.ql-switch button:focus-visible{ outline:2px solid var(--ql-ink); outline-offset:2px; }
+
+/* ── which mode shows what ── */
+body.mode-quick section.cs:not(.ql){ display:none; }
+body.mode-full .ql{ display:none; }
+
+/* ── the quick-look panel ── */
+section.cs.ql{ padding-top:56px; max-width:980px; }
+.ql-facts{ display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin:8px 0 38px; border-top:1px solid var(--ql-line); }
+.ql-facts > div{ padding:22px 24px 4px 0; }
+.ql-facts > div + div{ padding-left:24px; border-left:1px solid var(--ql-line); }
+.ql-facts .k{ font-size:10px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--ql-acc); margin-bottom:10px; }
+.ql-facts p{ font-size:14.5px; line-height:1.7; color:var(--ql-dim); margin:0; }
+
+.ql-hint{ font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:rgba(240,237,230,.45); margin:0 0 12px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+/* ── before / after slider ── */
+.ql-ba{ --p:50%; position:relative; width:100%; aspect-ratio:1500/648; overflow:hidden; border:1px solid var(--ql-line); border-radius:6px; background:#0c0705; cursor:ew-resize; touch-action:pan-y; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; }
+.ql-ba img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; -webkit-user-drag:none; }
+.ql-ba .ql-before{ clip-path:inset(0 calc(100% - var(--p)) 0 0); }
+.ql-handle{ position:absolute; top:0; bottom:0; left:var(--p); width:2px; margin-left:-1px; background:rgba(255,255,255,.92); box-shadow:0 0 0 1px rgba(0,0,0,.35); z-index:3; outline:none; }
+.ql-handle::after{ content:'\2194'; position:absolute; top:50%; left:50%; width:38px; height:38px; margin:-19px 0 0 -19px; border-radius:50%; background:#fff; color:#1a0c06; display:grid; place-items:center; font-size:17px; box-shadow:0 4px 16px rgba(0,0,0,.45); }
+.ql-handle:focus-visible::after{ outline:3px solid var(--ql-acc); outline-offset:2px; }
+.ql-tag{ position:absolute; bottom:12px; z-index:2; font-size:10px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; padding:5px 12px; border-radius:999px; background:rgba(0,0,0,.62); color:#fff; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); pointer-events:none; }
+.ql-tag.b{ left:12px; } .ql-tag.a{ right:12px; background:var(--ql-acc); color:#1a0c06; }
+
+/* ── the annotation dots ── */
+.ql-dot{ position:absolute; z-index:4; width:30px; height:30px; margin:-15px 0 0 -15px; padding:0; border:0; border-radius:50%; background:var(--ql-acc); color:#1a0c06; font-size:13px; font-weight:800; cursor:pointer; display:grid; place-items:center; box-shadow:0 2px 10px rgba(0,0,0,.5); transition:opacity .25s, transform .25s; }
+.ql-dot::before{ content:''; position:absolute; inset:-6px; border-radius:50%; border:2px solid var(--ql-acc); opacity:0; animation:qlPulse 2.4s ease-out infinite; }
+.ql-dot::after{ content:''; position:absolute; inset:-8px; }                 /* bigger tap target */
+.ql-dot.on{ transform:scale(1.18); background:#fff; }
+.ql-dot.on::before{ border-color:#fff; }
+.ql-dot.hid{ opacity:0; pointer-events:none; }
+.ql-dot:focus-visible{ outline:3px solid #fff; outline-offset:3px; }
+@keyframes qlPulse{ 0%{ transform:scale(.7); opacity:.8 } 100%{ transform:scale(1.5); opacity:0 } }
+
+.ql-note{ margin-top:14px; padding:18px 22px; min-height:92px; border:1px solid var(--ql-line); border-left:3px solid var(--ql-acc); border-radius:4px; background:rgba(240,237,230,.04); }
+.ql-note b{ display:block; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--ql-acc); margin-bottom:8px; }
+.ql-note p{ font-size:15px; line-height:1.65; color:var(--ql-ink); margin:0; }
+.ql-note.swap p,.ql-note.swap b{ animation:qlSwap .35s ease both; }
+@keyframes qlSwap{ from{ opacity:0; transform:translateY(6px) } }
+
+.ql-chips{ display:flex; flex-wrap:wrap; gap:8px; margin:30px 0 4px; }
+.ql-chips span{ font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; border:1px solid var(--ql-line); padding:7px 14px; color:var(--ql-dim); }
+.ql-cta{ display:flex; flex-wrap:wrap; gap:14px; margin-top:34px; }
+.ql-cta a,.ql-cta button{ appearance:none; cursor:pointer; background:transparent; font:inherit; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--ql-ink); border:1.5px solid rgba(240,237,230,.4); padding:15px 28px; transition:all .25s; }
+.ql-cta a:hover,.ql-cta button:hover{ border-color:#fff; background:rgba(240,237,230,.08); }
+.ql-cta .solid{ background:var(--ql-acc); border-color:var(--ql-acc); color:#1a0c06; }
+.ql-cta .solid:hover{ background:#eb8341; border-color:#eb8341; }
+
+/* ── phones ── */
+@media (max-width:760px){
+  .ql-switch{ width:100%; max-width:360px; margin-top:32px; }
+  .ql-switch button{ flex:1; padding:10px 8px; }
+  section.cs.ql{ padding-top:36px; }
+  .ql-facts{ grid-template-columns:1fr; margin-bottom:28px; }
+  .ql-facts > div, .ql-facts > div + div{ padding:18px 0 6px; border-left:0; }
+  .ql-facts > div + div{ border-top:1px solid var(--ql-line); }
+  .ql-hint{ font-size:10px; letter-spacing:1.5px; }
+  .ql-tag{ bottom:8px; font-size:9px; padding:4px 9px; letter-spacing:1.5px; }
+  .ql-tag.b{ left:8px; } .ql-tag.a{ right:8px; }
+  .ql-handle::after{ width:34px; height:34px; margin:-17px 0 0 -17px; }
+  .ql-note{ padding:16px 18px; min-height:120px; }
+  .ql-cta{ flex-direction:column; } .ql-cta a,.ql-cta button{ text-align:center; }
+}
+@media (prefers-reduced-motion:reduce){ .ql-dot::before{ animation:none } .ql-note.swap p,.ql-note.swap b{ animation:none } }
