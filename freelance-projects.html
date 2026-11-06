@@ -175,7 +175,7 @@ nav{ position:fixed; top:100px; left:48px; z-index:500; display:flex; flex-direc
 .fc-title{ font-family:'Fraunces',serif; font-style:italic; font-weight:700; font-size:16px; color:#fff; }
 .fc-cat{ font-family:'Cabinet Grotesk',sans-serif; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:rgba(240,237,230,.65); margin-top:4px; }
 .newspaper-badge{
-  position:absolute; top:14px; right:14px; z-index:5;
+  position:absolute; top:-11px; right:-9px; z-index:8; pointer-events:none; transform:translateZ(24px) rotate(3deg);
   font-family:'Cabinet Grotesk',sans-serif; font-size:8px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
   color:#14243a; background:var(--teal); padding:5px 10px; border-radius:20px;
   box-shadow:0 4px 12px rgba(0,0,0,.35);
@@ -190,7 +190,8 @@ nav{ position:fixed; top:100px; left:48px; z-index:500; display:flex; flex-direc
 /* touch devices: no cursor to tilt toward, so skip 3D and rely on the entrance drop */
 @media (hover:none){
   .flyer-slot{ perspective:none; }
-  .flyer-caption{ opacity:1; transform:none; background:linear-gradient(to top, rgba(10,18,30,.9), transparent); }
+  /* on touch the caption sits under the artwork instead of covering it */
+  .flyer-caption{ position:static; opacity:1; transform:none; background:#0f1c2d; padding:11px 14px 13px; }
 }
 
 /* ═══ Lightbox ═══ */
@@ -357,10 +358,10 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
     <div class="flyer-slot">
       <div class="flyer-3d">
         <span class="tape"></span>
+        <span class="newspaper-badge">4 Pages &middot; Read</span>
         <div class="flyer flyer-newspaper" onclick="openNewspaper()">
           <img src="newspaper-page-1.jpg" alt="The Renakshya Times — Wedding Newspaper" loading="lazy">
           <div class="flyer-shine"></div>
-          <div class="newspaper-badge">4 Pages &middot; Read</div>
           <div class="flyer-caption">
             <div class="fc-title">The Renakshya Times</div>
             <div class="fc-cat">Wedding Newspaper &middot; 4 Pages</div>
