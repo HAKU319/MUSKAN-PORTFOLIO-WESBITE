@@ -494,7 +494,8 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   p,li,td,th,figcaption{font-size:max(12.5px,1em)}
   .nav-back,.nav-visit{position:absolute !important;background:rgba(0,0,0,.6) !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 }
-</style></head>
+</style><link rel="stylesheet" href="quicklook.css">
+</head>
 <body>
 
 <a href="/" class="nav-back">&larr; Back to portfolio</a>
@@ -548,6 +549,35 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
     <div><div class="hero-meta-l">Live at</div><div class="hero-meta-v">nyeeminc.com</div></div>
     <div><div class="hero-meta-l">Year</div><div class="hero-meta-v">2026</div></div>
   </div>
+</section>
+
+
+<div style="text-align:center"><div class="ql-switch" role="group" aria-label="How do you want to read this project?">
+  <button type="button" data-mode="quick" aria-pressed="true"><b>Quick look</b><span>30 seconds</span></button>
+  <button type="button" data-mode="full" aria-pressed="false"><b>Full story</b><span>every detail</span></button>
+</div></div>
+
+<!-- ─── quick look ─── -->
+<section class="cs ql">
+  <div class="ql-facts">
+    <div><div class="k">The problem</div><p>A Cannes-selected filmmaker&rsquo;s site looked like a generic film-school template. Functional, but emotionally flat.</p></div>
+    <div><div class="k">What I did</div><p>Redesigned and built the whole site so it feels like a film: big type, a cinematic ticker, motion that rewards scrolling.</p></div>
+    <div><div class="k">The result</div><p>A live site that sounds like the company, not just describes it. Live at nyeeminc.com.</p></div>
+  </div>
+  <div class="ql-hint"><span>Drag to compare old vs new</span><span>Tap the dots for my decisions</span></div>
+  <div class="ql-ba">
+    <img class="ql-after" src="nyeem/after.jpg" alt="The new NyeemInc. homepage hero" loading="lazy" draggable="false">
+    <img class="ql-before" src="nyeem/before.jpg" alt="The original NyeemInc. homepage" loading="lazy" draggable="false">
+    <span class="ql-tag b">Before</span><span class="ql-tag a">After</span>
+    <div class="ql-handle"></div>
+    <button type="button" class="ql-dot" style="left:58%;top:42%" data-t="One loud sentence" data-d="The old home page was a wall of posters. Now one line says who they are: big type, one orange accent, nothing competing.">1</button>
+    <button type="button" class="ql-dot" style="left:66%;top:19%" data-t="A ticker that sells" data-d="An orange ticker carries the awards and credits (Cannes Short Film Corner, 10+ festivals) before anyone has to scroll.">2</button>
+    <button type="button" class="ql-dot" style="left:90%;top:9%" data-t="A calm menu" data-d="Seven small, quiet links. The film is the star, the navigation stays out of its way.">3</button>
+    <button type="button" class="ql-dot" style="left:86%;top:70%" data-t="A hidden signature" data-d="The brand name sits huge and faint behind the headline, like a title card waiting in the dark.">4</button>
+  </div>
+  <div class="ql-note"><b></b><p></p></div>
+  <div class="ql-chips"><span>UX/UI</span><span>Web design</span><span>Front-end build</span><span>Motion</span></div>
+  <div class="ql-cta"><button type="button" class="solid" data-go-full>Read the full story</button><a href="https://nyeeminc.com/" target="_blank" rel="noopener">Visit live site</a></div>
 </section>
 
 <!-- ─── the brief ─── -->
@@ -827,11 +857,12 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
 (function(){
   [].forEach.call(document.querySelectorAll('.hero>*'), function(el, i){ el.style.setProperty('--i', i); });
   if(!('IntersectionObserver' in window)) return;
-  var els = [].slice.call(document.querySelectorAll('.step,.cs-h,.cs-p,.cs-pull,.cs-list,.tcg-card,.ba-col,.changed-item,.blend-video,.cta-section>*,.project-nav,.flyer-slot,.wall-section .cs-num')).filter(function(el){ return !el.closest('.cm-rv') || el.classList.contains('cm-rv'); });
+  var els = [].slice.call(document.querySelectorAll('.step,.cs-h,.cs-p,.cs-pull,.cs-list,.tcg-card,.ba-col,.changed-item,.blend-video,.cta-section>*,.project-nav,.flyer-slot,.wall-section .cs-num,.ql-facts>div,.ql-ba,.ql-note,.ql-chips,.ql-cta')).filter(function(el){ return !el.closest('.cm-rv') || el.classList.contains('cm-rv'); });
   var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('cm-in'); io.unobserve(e.target); } }); }, { threshold:.1, rootMargin:'0px 0px -6% 0px' });
   var last = null, n = 0;
   els.forEach(function(el){ if(el.parentNode !== last){ last = el.parentNode; n = 0; } el.classList.add('cm-rv'); el.style.setProperty('--i', Math.min(n++, 4)); io.observe(el); });
 })();
 </script>
+<script src="quicklook.js"></script>
 </body>
 </html>
