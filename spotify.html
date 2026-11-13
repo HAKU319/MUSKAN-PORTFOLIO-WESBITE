@@ -170,7 +170,9 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   p,li,td,th,figcaption{font-size:max(12.5px,1em)}
   .nav-back,.nav-visit{position:absolute !important;background:rgba(0,0,0,.6) !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 }
-</style></head>
+</style><link rel="stylesheet" href="quicklook.css">
+<style>:root{--ql-acc:#1DB954}</style>
+</head>
 <body data-step="0">
 
 <section class="cs-hero">
@@ -184,7 +186,18 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   </div>
   <div class="cs-scroll-hint">&darr; Scroll to begin</div>
 </section>
+<div class="ql-switch-wrap" style="text-align:center;padding:0 20px"><div class="ql-switch" role="group" aria-label="How do you want to read this project?">
+  <button type="button" data-mode="quick" aria-pressed="true"><b>Quick look</b><span>30 seconds</span></button>
+  <button type="button" data-mode="full" aria-pressed="false"><b>Full story</b><span>every detail</span></button>
+</div></div>
+<section class="cs ql">
+  <div class="ql-facts"><div><div class="k">The problem</div><p>Podcast listening was booming, but Spotify gave listeners no way to save a specific moment worth returning to.</p></div><div><div class="k">What I did</div><p>A full UX thesis: Reddit research, a survey, three personas, then a one-tap bookmark prototype tested with real users.</p></div><div><div class="k">The result</div><p>Users loved naming and organizing their bookmarks. The prototype is live, so you can try it yourself.</p></div></div><div class="ql-stats"><div><b>40%</b><span>Of survey respondents want a bookmark feature</span></div><div><b>45%</b><span>Frustrated by playlist management</span></div><div><b>40%</b><span>Listen to podcasts daily</span></div><div><b>3</b><span>Personas that shaped the design</span></div></div><div class="ql-hint"><span>The finished thing</span><span>Tap the dots for my decisions</span></div>
+  <div class="ql-ba shot" style="--ar:780/1170;--mw:340px"><img src="ql/spotify-app.jpg" alt="The Spotify bookmark prototype home screen" loading="lazy" draggable="false"><button type="button" class="ql-dot" style="left:72%;top:21%" data-t="Bookmarks as a first-class tab" data-d="Saved moments get their own filter next to Music and Podcasts, instead of being buried in playlists.">1</button><button type="button" class="ql-dot" style="left:82%;top:42%" data-t="Your bookmarks, one tap away" data-d="A tile on the home screen opens every bookmark. Fewer taps than the old playlist workaround.">2</button><button type="button" class="ql-dot" style="left:33%;top:64%" data-t="A badge that nudges you back" data-d="Episodes with bookmarks you have not opened show a count, so a saved moment does not get forgotten.">3</button></div>
+  <div class="ql-note"><b></b><p></p></div><div class="ql-chips"><span>UX research</span><span>Prototyping</span><span>Usability testing</span><span>Thesis</span></div><div class="ql-cta"><button type="button" class="solid" data-go-full>Read the full story</button><a href="https://spotifbookmarkredesign.netlify.app/" target="_blank" rel="noopener">Try the live prototype</a></div>
+</section>
 
+
+<div class="ql-full">
 <div class="scrolly">
   <div class="progress-dots" id="dots"></div>
   <div class="scrolly-sticky">
@@ -293,6 +306,8 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   <a href="https://spotifbookmarkredesign.netlify.app/" target="_blank" class="cs-proto-fallback">Not loading? Open the prototype directly &#8599;</a>
 </section>
 
+
+</div><!-- /ql-full -->
 <section class="cs-outro">
   <h3>Conclusion &amp; takeaway</h3>
   <p>A well-defined problem, backed by real user insight, makes the design process smoother and far more impactful. Simplicity, when grounded in genuine need, is what creates real value.</p>
@@ -344,5 +359,6 @@ function revealInit(){
   revealInit();
 })();
 </script>
+<script src="quicklook.js"></script>
 </body>
 </html>

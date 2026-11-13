@@ -384,7 +384,9 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   p,li,td,th,figcaption{font-size:max(12.5px,1em)}
   .nav-back,.nav-visit{position:absolute !important;background:rgba(0,0,0,.6) !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 }
-</style></head>
+</style><link rel="stylesheet" href="quicklook.css">
+<style>:root{--ql-acc:#e9a23b}</style>
+</head>
 <body>
 
 <a href="/" class="nav-back">&larr; Back to portfolio</a>
@@ -406,6 +408,16 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   </div>
   <p class="ev-note">Plays on a desktop browser, or in the Meta Quest browser with &ldquo;Enter VR&rdquo;.</p>
 </section>
+<div class="ql-switch-wrap" style="text-align:center;padding:0 20px"><div class="ql-switch" role="group" aria-label="How do you want to read this project?">
+  <button type="button" data-mode="quick" aria-pressed="true"><b>Quick look</b><span>30 seconds</span></button>
+  <button type="button" data-mode="full" aria-pressed="false"><b>Full story</b><span>every detail</span></button>
+</div></div>
+<section class="cs ql">
+  <div class="ql-facts"><div><div class="k">The problem</div><p>Everest is out of reach for almost everyone: it takes extreme fitness, serious risk and a budget most people never have.</p></div><div><div class="k">What I did</div><p>Designed a VR journey that starts in Namche Bazaar, joins the puja at Base Camp, then climbs to the summit. The experience comes first, the game second.</p></div><div><div class="k">The result</div><p>A playable build that runs in a desktop browser or the Meta Quest browser. Rebuilt in 2026 from a 2023 course project.</p></div></div><div class="ql-hint"><span>The finished thing</span><span>Tap the dots for my decisions</span></div>
+  <div class="ql-ba shot" style="--ar:1280/720;--mw:100%"><img src="everest/web-basecamp.jpg" alt="The Base Camp scene in the web build" loading="lazy" draggable="false"><button type="button" class="ql-dot" style="left:27%;top:11%" data-t="A guide, not a tutorial wall" data-d="A small "Next" card tells you where to walk. It is the only instruction on screen.">1</button><button type="button" class="ql-dot" style="left:64%;top:42%" data-t="Prayer flags, up close" data-d="The details of Base Camp culture are part of the world, not decoration.">2</button><button type="button" class="ql-dot" style="left:44%;top:60%" data-t="The puja" data-d="Walk to the lama and join the ceremony. The trek comes before the climb.">3</button><button type="button" class="ql-dot" style="left:12%;top:91%" data-t="Altitude as the only HUD" data-d="A single number shows how high you are. Nothing else gets in the way of looking around.">4</button></div>
+  <div class="ql-note"><b></b><p></p></div><div class="ql-stats"><div><b>8,848 m</b><span>Summit height</span></div><div><b>3</b><span>Chapters, Namche to summit</span></div><div><b>Quest 2</b><span>Target headset</span></div><div><b>90 fps</b><span>Performance target</span></div></div><div class="ql-chips"><span>VR/XR</span><span>Experience design</span><span>Unity</span><span>WebXR</span></div><div class="ql-cta"><button type="button" class="solid" data-go-full>Read the full story</button><a href="https://everest-vr-climb.netlify.app/" target="_blank" rel="noopener">Play it now</a></div>
+</section>
+
 
 <section class="cs">
   <div class="cs-eyebrow">Overview</div>
@@ -542,5 +554,6 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   els.forEach(function(el){ if(el.parentNode !== last){ last = el.parentNode; n = 0; } el.classList.add('cm-rv'); el.style.setProperty('--i', Math.min(n++, 4)); io.observe(el); });
 })();
 </script>
+<script src="quicklook.js"></script>
 </body>
 </html>

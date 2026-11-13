@@ -329,7 +329,9 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   p,li,td,th,figcaption{font-size:max(12.5px,1em)}
   .nav-back,.nav-visit{position:absolute !important;background:rgba(0,0,0,.6) !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 }
-</style></head>
+</style><link rel="stylesheet" href="quicklook.css">
+<style>:root{--ql-acc:#f2b84b}</style>
+</head>
 <body>
 
 <a href="/" class="nav-back">&larr; Back to portfolio</a>
@@ -346,6 +348,14 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
     <div><div class="hero-meta-l">Year</div><div class="hero-meta-v">2023&ndash;2024</div></div>
   </div>
 </section>
+<div class="ql-switch-wrap" style="text-align:center;padding:0 20px"><div class="ql-switch" role="group" aria-label="How do you want to read this project?">
+  <button type="button" data-mode="quick" aria-pressed="true"><b>Quick look</b><span>30 seconds</span></button>
+  <button type="button" data-mode="full" aria-pressed="false"><b>Full story</b><span>every detail</span></button>
+</div></div>
+<section class="cs ql">
+  <div class="ql-facts"><div><div class="k">The problem</div><p>Small businesses, event organisers and couples all need strong visuals fast, often without a long discovery process.</p></div><div><div class="k">What I did</div><p>Designed posters, wedding stationery, restaurant promos, cafe branding and social graphics, each delivered print-ready and optimised for screens.</p></div><div><div class="k">The result</div><p>A broad body of real client work that made me faster and more flexible. Every piece starts with the same questions: who is it for, and what must not be missed.</p></div></div><div class="ql-gal"><figure><img src="lakeside-live-music.jpg" alt="Live music poster" loading="lazy"><figcaption>Live music poster</figcaption></figure><figure><img src="oonagh-joe-painting.jpg" alt="Wedding save the date" loading="lazy"><figcaption>Wedding save the date</figcaption></figure><figure><img src="lakeside-gift-card.jpg" alt="Gift card promo" loading="lazy"><figcaption>Gift card promo</figcaption></figure><figure><img src="lakeside-christmas-eve.jpg" alt="Christmas Eve event poster" loading="lazy"><figcaption>Christmas Eve event poster</figcaption></figure></div><div class="ql-chips"><span>Posters</span><span>Wedding stationery</span><span>Restaurant promos</span><span>Cafe branding</span><span>Social media</span></div><div class="ql-cta"><button type="button" class="solid" data-go-full>Read the full story</button><a href="freelance-projects.html">See the full wall of work</a></div>
+</section>
+
 
 <section class="cs">
   <div class="cs-eyebrow">Overview</div>
@@ -438,5 +448,6 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   els.forEach(function(el){ if(el.parentNode !== last){ last = el.parentNode; n = 0; } el.classList.add('cm-rv'); el.style.setProperty('--i', Math.min(n++, 4)); io.observe(el); });
 })();
 </script>
+<script src="quicklook.js"></script>
 </body>
 </html>

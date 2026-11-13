@@ -13,11 +13,11 @@
 .ql-switch button:focus-visible{ outline:2px solid var(--ql-ink); outline-offset:2px; }
 
 /* ── which mode shows what ── */
-body.mode-quick section.cs:not(.ql){ display:none; }
+body.mode-quick section.cs:not(.ql), body.mode-quick .ql-full{ display:none !important; }
 body.mode-full .ql{ display:none; }
 
 /* ── the quick-look panel ── */
-section.cs.ql{ padding-top:56px; max-width:980px; }
+section.cs.ql, section.ql{ padding:56px 40px 70px; max-width:980px; margin-left:auto; margin-right:auto; box-sizing:border-box; }
 .ql-facts{ display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin:8px 0 38px; border-top:1px solid var(--ql-line); }
 .ql-facts > div{ padding:22px 24px 4px 0; }
 .ql-facts > div + div{ padding-left:24px; border-left:1px solid var(--ql-line); }
@@ -27,7 +27,7 @@ section.cs.ql{ padding-top:56px; max-width:980px; }
 .ql-hint{ font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:rgba(240,237,230,.45); margin:0 0 12px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
 
 /* ── before / after slider ── */
-.ql-ba{ --p:50%; position:relative; width:100%; aspect-ratio:1500/648; overflow:hidden; border:1px solid var(--ql-line); border-radius:6px; background:#0c0705; cursor:ew-resize; touch-action:pan-y; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; }
+.ql-ba{ --p:50%; position:relative; width:100%; aspect-ratio:var(--ar,1500/648); overflow:hidden; border:1px solid var(--ql-line); border-radius:6px; background:#0c0705; cursor:ew-resize; touch-action:pan-y; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; }
 .ql-ba img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; -webkit-user-drag:none; }
 .ql-ba .ql-before{ clip-path:inset(0 calc(100% - var(--p)) 0 0); }
 .ql-handle{ position:absolute; top:0; bottom:0; left:var(--p); width:2px; margin-left:-1px; background:rgba(255,255,255,.92); box-shadow:0 0 0 1px rgba(0,0,0,.35); z-index:3; outline:none; }
@@ -64,7 +64,7 @@ section.cs.ql{ padding-top:56px; max-width:980px; }
 @media (max-width:760px){
   .ql-switch{ width:100%; max-width:360px; margin-top:32px; }
   .ql-switch button{ flex:1; padding:10px 8px; }
-  section.cs.ql{ padding-top:36px; }
+  section.cs.ql, section.ql{ padding:36px 24px 56px; }
   .ql-facts{ grid-template-columns:1fr; margin-bottom:28px; }
   .ql-facts > div, .ql-facts > div + div{ padding:18px 0 6px; border-left:0; }
   .ql-facts > div + div{ border-top:1px solid var(--ql-line); }
@@ -76,3 +76,21 @@ section.cs.ql{ padding-top:56px; max-width:980px; }
   .ql-cta{ flex-direction:column; } .ql-cta a,.ql-cta button{ text-align:center; }
 }
 @media (prefers-reduced-motion:reduce){ .ql-dot::before{ animation:none } .ql-note.swap p,.ql-note.swap b{ animation:none } }
+
+/* ── single annotated screenshot (no slider) ── */
+.ql-ba.shot{ cursor:default; touch-action:auto; max-width:var(--mw,100%); margin-left:auto; margin-right:auto; }
+.ql-ba.shot img{ position:absolute; }
+.ql-ba.shot .ql-tag.a{ right:auto; left:12px; }
+
+/* ── big numbers ── */
+.ql-stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin:6px 0 34px; }
+.ql-stats > div{ border:1px solid var(--ql-line); border-radius:6px; padding:20px 18px 18px; background:rgba(240,237,230,.035); }
+.ql-stats b{ display:block; font-size:clamp(30px,5vw,44px); line-height:1; color:var(--ql-acc); font-weight:800; margin-bottom:10px; letter-spacing:-.5px; }
+.ql-stats span{ font-size:12px; letter-spacing:.4px; line-height:1.5; color:var(--ql-dim); }
+
+/* ── small gallery of real work ── */
+.ql-gal{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:4px 0 30px; }
+.ql-gal figure{ margin:0; }
+.ql-gal img{ width:100%; aspect-ratio:3/4; object-fit:cover; display:block; border-radius:4px; border:1px solid var(--ql-line); }
+.ql-gal figcaption{ font-size:10px; letter-spacing:1.6px; text-transform:uppercase; color:var(--ql-dim); margin-top:8px; line-height:1.4; }
+@media (max-width:760px){ .ql-gal{ grid-template-columns:repeat(2,1fr); } .ql-ba.shot{ max-width:100%; } }

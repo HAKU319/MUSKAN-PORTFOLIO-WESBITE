@@ -332,7 +332,9 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   p,li,td,th,figcaption{font-size:max(12.5px,1em)}
   .nav-back,.nav-visit{position:absolute !important;background:rgba(0,0,0,.6) !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 }
-</style></head>
+</style><link rel="stylesheet" href="quicklook.css">
+<style>:root{--ql-acc:#e9c46a}</style>
+</head>
 <body>
 
 <a href="/" class="nav-back">&larr; Back to portfolio</a>
@@ -349,6 +351,14 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
     <div><div class="hero-meta-l">Year</div><div class="hero-meta-v">2025</div></div>
   </div>
 </section>
+<div class="ql-switch-wrap" style="text-align:center;padding:0 20px"><div class="ql-switch" role="group" aria-label="How do you want to read this project?">
+  <button type="button" data-mode="quick" aria-pressed="true"><b>Quick look</b><span>30 seconds</span></button>
+  <button type="button" data-mode="full" aria-pressed="false"><b>Full story</b><span>every detail</span></button>
+</div></div>
+<section class="cs ql">
+  <div class="ql-facts"><div><div class="k">The problem</div><p>The Piano VR lessons worked, but the menu in front of them had grown cluttered, with buttons sized for a flat screen and items at inconsistent depths.</p></div><div><div class="k">What I did</div><p>Audited every screen, watched real users, then rebuilt the menu as a spatial system: fewer top-level items, controls within natural reach, depth to show importance.</p></div><div><div class="k">The result</div><p>A menu that gets out of the way, so the music stays the experience. Designed collaboratively with the team.</p></div></div><div class="ql-stats"><div><b>01</b><span>Audit and watch real users</span></div><div><b>02</b><span>Rebuild the architecture</span></div><div><b>03</b><span>Spatial hierarchy: reach and depth</span></div><div><b>04</b><span>Iterate with the team</span></div></div><div class="ql-chips"><span>Spatial UI</span><span>VR/XR</span><span>Figma</span><span>Shapes XR</span><span>Unity</span></div><div class="ql-cta"><button type="button" class="solid" data-go-full>Read the full story</button><a href="https://medium.com/" target="_blank" rel="noopener">Read the Medium article</a></div>
+</section>
+
 
 <section class="cs">
   <div class="cs-eyebrow">Background</div>
@@ -455,5 +465,6 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   els.forEach(function(el){ if(el.parentNode !== last){ last = el.parentNode; n = 0; } el.classList.add('cm-rv'); el.style.setProperty('--i', Math.min(n++, 4)); io.observe(el); });
 })();
 </script>
+<script src="quicklook.js"></script>
 </body>
 </html>
