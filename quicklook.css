@@ -14,7 +14,7 @@
 
 /* ── which mode shows what ── */
 body.mode-quick section.cs:not(.ql), body.mode-quick .ql-full{ display:none !important; }
-body.mode-full .ql{ display:none; }
+body.mode-full .ql, body.mode-full .ql-quick{ display:none !important; }
 
 /* ── the quick-look panel ── */
 section.cs.ql, section.ql{ padding:56px 40px 70px; max-width:980px; margin-left:auto; margin-right:auto; box-sizing:border-box; }
