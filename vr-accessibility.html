@@ -329,7 +329,9 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   p,li,td,th,figcaption{font-size:max(12.5px,1em)}
   .nav-back,.nav-visit{position:absolute !important;background:rgba(0,0,0,.6) !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 }
-</style></head>
+</style><link rel="stylesheet" href="quicklook.css">
+<style>:root{--ql-acc:#4DFFD2}</style>
+</head>
 <body>
 
 <a href="/" class="nav-back">&larr; Back to portfolio</a>
@@ -346,6 +348,14 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
     <div><div class="hero-meta-l">Year</div><div class="hero-meta-v">2024</div></div>
   </div>
 </section>
+<div class="ql-switch-wrap" style="text-align:center;padding:0 20px"><div class="ql-switch" role="group" aria-label="How do you want to read this project?">
+  <button type="button" data-mode="quick" aria-pressed="true"><b>Quick look</b><span>30 seconds</span></button>
+  <button type="button" data-mode="full" aria-pressed="false"><b>Full story</b><span>every detail</span></button>
+</div></div>
+<section class="cs ql">
+  <div class="ql-facts"><div><div class="k">The problem</div><p>Virtual environments are hard to use for people who cannot see 3D objects clearly, and there is no easy way for a scene to explain itself.</p></div><div><div class="k">What I did</div><p>Tested four AI engines, picked Google Cloud Vision, and built a Shapes XR prototype where objects describe themselves in text and by voice.</p></div><div><div class="k">The result</div><p>A working prototype with two features: an AI description icon and voice playback. The AI layer stays invisible, so the scene simply explains itself.</p></div></div><div class="ql-stats"><div><b>4</b><span>AI engines tested before building</span></div><div><b>1</b><span>Winner: Google Cloud Vision</span></div><div><b>2</b><span>Features: description icon and voice playback</span></div><div><b>2024</b><span>Research and prototype</span></div></div><div class="ql-chips"><span>Accessibility</span><span>AI</span><span>VR/XR</span><span>Shapes XR</span><span>Research</span></div><div class="ql-cta"><button type="button" class="solid" data-go-full>Read the full story</button></div>
+</section>
+
 
 <section class="cs">
   <div class="cs-eyebrow">Objective</div>
@@ -451,5 +461,6 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   els.forEach(function(el){ if(el.parentNode !== last){ last = el.parentNode; n = 0; } el.classList.add('cm-rv'); el.style.setProperty('--i', Math.min(n++, 4)); io.observe(el); });
 })();
 </script>
+<script src="quicklook.js"></script>
 </body>
 </html>

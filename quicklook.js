@@ -20,18 +20,18 @@
   [].forEach.call(document.querySelectorAll('[data-go-full]'), function(el){
     el.addEventListener('click', function(e){
       e.preventDefault(); setMode('full');
-      var t = document.querySelector('section.cs:not(.ql)'); if(t) t.scrollIntoView({ behavior:'smooth', block:'start' });
+      var t = document.querySelector('.ql-full') || document.querySelector('section.cs:not(.ql)'); if(t) t.scrollIntoView({ behavior:'smooth', block:'start' });
     });
   });
 
   /* ── before / after ── */
   var ba = document.querySelector('.ql-ba'); if(!ba) return;
-  var handle = ba.querySelector('.ql-handle'), dots = [].slice.call(ba.querySelectorAll('.ql-dot')), note = document.querySelector('.ql-note');
+  var handle = ba.querySelector('.ql-handle') || document.createElement('div'), dots = [].slice.call(ba.querySelectorAll('.ql-dot')), note = document.querySelector('.ql-note');
   var pct = 50, dragging = false;
   function setP(p){
     pct = Math.max(0, Math.min(100, p)); ba.style.setProperty('--p', pct + '%');
     handle.setAttribute('aria-valuenow', Math.round(pct));
-    dots.forEach(function(d){ d.classList.toggle('hid', parseFloat(d.style.left) < pct + 2); });   // a dot hides while the "before" covers it
+    if(ba.querySelector('.ql-handle')) dots.forEach(function(d){ d.classList.toggle('hid', parseFloat(d.style.left) < pct + 2); });   // a dot hides while the "before" covers it
   }
   function fromEvent(e){ var r = ba.getBoundingClientRect(); setP((e.clientX - r.left) / r.width * 100); }
   ba.addEventListener('pointerdown', function(e){
@@ -78,7 +78,7 @@
   handle.setAttribute('role','slider'); handle.setAttribute('tabindex','0'); handle.setAttribute('aria-valuemin','0'); handle.setAttribute('aria-valuemax','100');
   handle.setAttribute('aria-label','Compare the old site (left) with the new site (right)');
   setP(50); showNote(0);
-  if('IntersectionObserver' in window){
+  if(ba.querySelector('.ql-handle') && 'IntersectionObserver' in window){
     var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting && body.classList.contains('mode-quick')){ io.disconnect(); sweep(); } }); }, { threshold:.55 });
     io.observe(ba);
   }

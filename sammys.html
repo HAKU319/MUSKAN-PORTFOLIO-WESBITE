@@ -138,7 +138,9 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   p,li,td,th,figcaption{font-size:max(12.5px,1em)}
   .nav-back,.nav-visit{position:absolute !important;background:rgba(0,0,0,.6) !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 }
-</style></head>
+</style><link rel="stylesheet" href="quicklook.css">
+<style>:root{--ql-acc:#4DFFD2}</style>
+</head>
 <body data-step="0">
 
 <section class="cs-hero">
@@ -147,7 +149,16 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   <p>Sammy's Senior Sanctuary needed a site that felt as warm as the dogs it helps — but the old build buried donations, ignored accessibility, and confused a mostly older, mostly mobile audience. Scroll to follow the process.</p>
   <div class="cs-scroll-hint">&darr; Scroll to begin</div>
 </section>
+<div class="ql-switch-wrap" style="text-align:center;padding:0 20px"><div class="ql-switch" role="group" aria-label="How do you want to read this project?">
+  <button type="button" data-mode="quick" aria-pressed="true"><b>Quick look</b><span>30 seconds</span></button>
+  <button type="button" data-mode="full" aria-pressed="false"><b>Full story</b><span>every detail</span></button>
+</div></div>
+<section class="cs ql">
+  <div class="ql-facts"><div><div class="k">The problem</div><p>The old site buried the donate link three clicks deep behind a cluttered nav, with low contrast and no alt text, for a mostly older, mostly mobile audience.</p></div><div><div class="k">What I did</div><p>Audited the site, ran five usability tests, then redesigned it: simpler nav, bigger tap targets, plain language and one clear path from story to donation.</p></div><div><div class="k">The result</div><p>Completed donations rose 42%, measured over three months of live traffic after launch.</p></div></div><div class="ql-stats"><div><b>+42%</b><span>Donation completions after launch</span></div><div><b>3 clicks</b><span>How deep the donate link used to be</span></div><div><b>5</b><span>Usability sessions that shaped the fixes</span></div><div><b>3 mo</b><span>Of live traffic measured</span></div></div><div class="ql-chips"><span>UX/UI</span><span>Accessibility</span><span>Usability testing</span><span>Non-profit</span></div><div class="ql-cta"><button type="button" class="solid" data-go-full>Read the full story</button></div>
+</section>
 
+
+<div class="ql-full">
 <div class="scrolly">
   <div class="progress-dots" id="dots"></div>
   <div class="scrolly-sticky">
@@ -201,6 +212,8 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   </div>
 </div>
 
+
+</div><!-- /ql-full -->
 <section class="cs-outro">
   <h3>The result</h3>
   <p>Every click now feels like it's rooting for you — the way the dogs do.</p>
@@ -250,5 +263,6 @@ function revealInit(){
   revealInit();
 })();
 </script>
+<script src="quicklook.js"></script>
 </body>
 </html>

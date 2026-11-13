@@ -323,7 +323,9 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   p,li,td,th,figcaption{font-size:max(12.5px,1em)}
   .nav-back,.nav-visit{position:absolute !important;background:rgba(0,0,0,.6) !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 }
-</style></head>
+</style><link rel="stylesheet" href="quicklook.css">
+<style>:root{--ql-acc:#f2b84b}</style>
+</head>
 <body>
 
 <div id="cur"></div>
@@ -351,7 +353,16 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   <p>A collection of freelance graphic design work &mdash; event flyers, wedding collateral and brand posters for real clients. Each one pasted up on the wall, like the real thing.</p>
   <div class="cs-scroll-hint">&darr; Tap any flyer to see it full-size</div>
 </div>
+<div class="ql-switch-wrap" style="text-align:center;padding:0 20px"><div class="ql-switch" role="group" aria-label="How do you want to read this project?">
+  <button type="button" data-mode="quick" aria-pressed="true"><b>Quick look</b><span>30 seconds</span></button>
+  <button type="button" data-mode="full" aria-pressed="false"><b>Full story</b><span>every detail</span></button>
+</div></div>
+<section class="cs ql">
+  <div class="ql-facts"><div><div class="k">The problem</div><p>Real clients, real deadlines: event flyers, wedding collateral and brand posters, each needing a clear hierarchy that lands at a glance.</p></div><div><div class="k">What I did</div><p>Designed each piece for its own audience, from a four-page wedding newspaper to restaurant gift cards, then delivered print-ready.</p></div><div><div class="k">The result</div><p>A wall of finished work for clients like Lakeside NYC and a wedding couple. Open any piece full size.</p></div></div><div class="ql-gal"><figure><img src="newspaper-page-1.jpg" alt="Wedding newspaper, 4 pages" loading="lazy"><figcaption>Wedding newspaper, 4 pages</figcaption></figure><figure><img src="oonagh-joe-rsvp.jpg" alt="Wedding RSVP card" loading="lazy"><figcaption>Wedding RSVP card</figcaption></figure><figure><img src="oonagh-joe-watercolor.jpg" alt="Watercolor save the date" loading="lazy"><figcaption>Watercolor save the date</figcaption></figure><figure><img src="lakeside-hours.jpg" alt="Restaurant hours poster" loading="lazy"><figcaption>Restaurant hours poster</figcaption></figure></div><div class="ql-chips"><span>Print</span><span>Wedding</span><span>Restaurant</span><span>Event posters</span></div><div class="ql-cta"><button type="button" class="solid" data-go-full>Read the full story</button></div>
+</section>
 
+
+<div class="ql-full">
 <div class="wall-section">
   <div class="flyers" id="flyers">
 
@@ -472,6 +483,8 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
 </div>
 
 <!-- Newspaper viewer (multi-page slider) -->
+
+</div><!-- /ql-full -->
 <div class="newspaper-viewer" id="newspaperViewer">
   <span class="nv-close" onclick="closeNewspaper()" aria-label="Close">&times;</span>
   <div class="nv-stage">
@@ -664,5 +677,6 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLB
   els.forEach(function(el){ if(el.parentNode !== last){ last = el.parentNode; n = 0; } el.classList.add('cm-rv'); el.style.setProperty('--i', Math.min(n++, 4)); io.observe(el); });
 })();
 </script>
+<script src="quicklook.js"></script>
 </body>
 </html>

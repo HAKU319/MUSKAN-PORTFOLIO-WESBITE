@@ -315,7 +315,9 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   p,li,td,th,figcaption{font-size:max(12.5px,1em)}
   .nav-back,.nav-visit{position:absolute !important;background:rgba(0,0,0,.6) !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 }
-</style></head>
+</style><link rel="stylesheet" href="quicklook.css">
+<style>:root{--ql-acc:#e58aa8}</style>
+</head>
 <body>
 
 <a href="/" class="nav-back">&larr; Back to portfolio</a>
@@ -333,6 +335,16 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
     <div><div class="hero-meta-l">Year</div><div class="hero-meta-v">2026</div></div>
   </div>
 </section>
+<div class="ql-switch-wrap" style="text-align:center;padding:0 20px"><div class="ql-switch" role="group" aria-label="How do you want to read this project?">
+  <button type="button" data-mode="quick" aria-pressed="true"><b>Quick look</b><span>30 seconds</span></button>
+  <button type="button" data-mode="full" aria-pressed="false"><b>Full story</b><span>every detail</span></button>
+</div></div>
+<section class="cs ql">
+  <div class="ql-facts"><div><div class="k">The problem</div><p>A new luxury nail bar had no site at all, and the owners did not want a template booking page that looked like every other salon.</p></div><div><div class="k">What I did</div><p>Built the brand presence and the whole site by hand: warm cream, deep blush and soft rust, an editorial serif, and a booking flow that keeps guests on the page.</p></div><div><div class="k">The result</div><p>A full custom site that the salon owns end to end, with no template fees and no platform lock-in. It is live now.</p></div></div><div class="ql-hint"><span>The finished thing</span><span>Tap the dots for my decisions</span></div>
+  <div class="ql-ba shot" style="--ar:1440/622;--mw:100%"><img src="ql/studio57-home.jpg" alt="The Studio 57 homepage" loading="lazy" draggable="false"><button type="button" class="ql-dot" style="left:50%;top:60%" data-t="A quiet logo" data-d="The mark sits calm in the middle. Quiet luxury, not a shouting banner.">1</button><button type="button" class="ql-dot" style="left:80%;top:30%" data-t="Real nail work as the backdrop" data-d="A moving close-up of actual manicure work sets the mood before a single word of copy.">2</button><button type="button" class="ql-dot" style="left:64%;top:85%" data-t="Booking is always in reach" data-d="One clear button leads to booking. Most bookings happen on phones, so it is built mobile first.">3</button></div>
+  <div class="ql-note"><b></b><p></p></div><div class="ql-chips"><span>Brand identity</span><span>UX design</span><span>Web design</span><span>Hand-coded HTML/CSS/JS</span></div><div class="ql-cta"><button type="button" class="solid" data-go-full>Read the full story</button><a href="https://studio57nailbarspa.netlify.app/" target="_blank" rel="noopener">Visit the live site</a></div>
+</section>
+
 
 <section class="cs">
   <div class="cs-eyebrow">The Brief</div>
@@ -434,5 +446,6 @@ h4,.step-t,.pname{font-size:clamp(14px,1.5vw,18px) !important;line-height:1.35 !
   els.forEach(function(el){ if(el.parentNode !== last){ last = el.parentNode; n = 0; } el.classList.add('cm-rv'); el.style.setProperty('--i', Math.min(n++, 4)); io.observe(el); });
 })();
 </script>
+<script src="quicklook.js"></script>
 </body>
 </html>
