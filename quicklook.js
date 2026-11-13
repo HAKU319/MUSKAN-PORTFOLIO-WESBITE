@@ -24,6 +24,10 @@
     });
   });
 
+  [].forEach.call(document.querySelectorAll('[data-go-quick]'), function(el){
+    el.addEventListener('click', function(e){ e.preventDefault(); setMode('quick'); window.scrollTo({ top:0, behavior:'smooth' }); });
+  });
+
   /* ── before / after ── */
   var ba = document.querySelector('.ql-ba'); if(!ba) return;
   var handle = ba.querySelector('.ql-handle') || document.createElement('div'), dots = [].slice.call(ba.querySelectorAll('.ql-dot')), note = document.querySelector('.ql-note');
